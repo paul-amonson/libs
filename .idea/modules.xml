@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/json/json.iml" filepath="$PROJECT_DIR$/.idea/modules/json/json.iml" group="json" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/json/json_main.iml" filepath="$PROJECT_DIR$/.idea/modules/json/json_main.iml" group="json" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/json/json_test.iml" filepath="$PROJECT_DIR$/.idea/modules/json/json_test.iml" group="json" />
+      <module fileurl="file://$PROJECT_DIR$/libs.iml" filepath="$PROJECT_DIR$/libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libs_main.iml" filepath="$PROJECT_DIR$/.idea/modules/libs_main.iml" group="libs" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libs_test.iml" filepath="$PROJECT_DIR$/.idea/modules/libs_test.iml" group="libs" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/prop_store/prop_store.iml" filepath="$PROJECT_DIR$/.idea/modules/prop_store/prop_store.iml" group="prop_store" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/prop_store/prop_store_main.iml" filepath="$PROJECT_DIR$/.idea/modules/prop_store/prop_store_main.iml" group="prop_store" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/prop_store/prop_store_test.iml" filepath="$PROJECT_DIR$/.idea/modules/prop_store/prop_store_test.iml" group="prop_store" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/yaml/yaml.iml" filepath="$PROJECT_DIR$/.idea/modules/yaml/yaml.iml" group="yaml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/yaml/yaml_main.iml" filepath="$PROJECT_DIR$/.idea/modules/yaml/yaml_main.iml" group="yaml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/yaml/yaml_test.iml" filepath="$PROJECT_DIR$/.idea/modules/yaml/yaml_test.iml" group="yaml" />
+    </modules>
+  </component>
+</project>
