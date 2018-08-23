@@ -87,6 +87,13 @@ subprojects {
     }
 }
 
+project(':crypto') {
+    group = 'com.amonson'
+    dependencies {
+        compile project(':prop_store')
+    }
+}
+
 project(':prop_store') {
     group = 'com.amonson'
 }
