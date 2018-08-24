@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include 'prop_store'
-include 'crypto'
-include 'threads'
+package com.amonson.threads;
 
-rootProject.name = 'libs'
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public interface ThreadPoolRunnable {
+    Object run(AtomicBoolean signalToStop, Object[] arguments);
+}
