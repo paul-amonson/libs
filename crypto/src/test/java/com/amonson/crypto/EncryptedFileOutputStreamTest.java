@@ -42,17 +42,17 @@ public class EncryptedFileOutputStreamTest {
 
     @Test
     public void ctor() throws Exception {
-        EncryptedFileOutputStream stream = new EncryptedFileOutputStream("file2.tmp", key_);
-        EncryptedFileOutputStream stream2 = new EncryptedFileOutputStream(new File("file2.tmp"), key_);
-    }
-
-    @Test
-    public void write() throws Exception {
-        EncryptedFileOutputStream stream = new EncryptedFileOutputStream("file2.tmp", key_);
-        stream.write(0);
-        byte[] bytes = new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        stream.write(bytes, 0, 10);
-        stream.flush();
-        stream.close();
+        try (EncryptedFileOutputStream stream = new EncryptedFileOutputStream("file2.tmp", key_)) {
+            stream.write(0);
+            byte[] bytes = new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            stream.write(bytes, 0, 10);
+            stream.flush();
+        }
+        try (EncryptedFileOutputStream stream = new EncryptedFileOutputStream(new File("file2.tmp"), key_)) {
+            stream.write(0);
+            byte[] bytes = new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            stream.write(bytes, 0, 10);
+            stream.flush();
+        }
     }
 }

@@ -96,22 +96,8 @@ project(':crypto') {
 
 project(':prop_store') {
     group = 'com.amonson'
-}
-
-project(':json') {
-    group = 'com.amonson'
-
     dependencies {
-        compile project(':prop_store')
         compile group: 'com.github.cliftonlabs', name: 'json-simple', version: '3.0.2+'
-    }
-}
-
-project(':yaml') {
-    group = 'com.amonson'
-
-    dependencies {
-        compile project(':prop_store')
         compile group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
     }
 }

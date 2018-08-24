@@ -14,10 +14,8 @@
 
 package com.amonson.prop_store;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,65 +25,50 @@ public final class PropStoreFactory {
     private PropStoreFactory() {}
 
     /**
-     * Register a class to be an implementation of a PropStore.
-     *
-     * @param name The name of the new implementation for property store serialization.This will not overwrite an
-     *            existing entry with the same name.
-     * @param classObject The Class of the implementation which must be derived from PropStore.
-     * @param creationArgs The arguments used in creating the instances for the given name. This is implementation
-     *                     specific.
-     * @return true if the class and arguments were added; false otherwise.
-     */
-    public static boolean register(String name, Class<? extends PropStore> classObject, Map<String, ?> creationArgs) {
-        argumentsMap_.putIfAbsent(name, creationArgs);
-        return classMap_.putIfAbsent(name, classObject) == null;
-    }
-
-    /**
      * Retrieve an instance of the named implementation.
      *
      * @param name The name of the implementation to create.
      * @return THe new instance of the PropStore derived class.
      * @throws PropStoreFactoryException is thrown when the instance cannot be created or the name is not registered.
      */
-    public static PropStore instance(String name) {
-        if(classMap_.containsKey(name)) {
-            if(instanceMap_.containsKey(name))
-                return instanceMap_.get(name);
-            else {
-                try {
-                    Class<? extends PropStore> theClass = classMap_.get(name);
-                    Constructor<? extends PropStore> ctor = theClass.getConstructor(Map.class);
-                    PropStore result = ctor.newInstance(argumentsMap_.get(name));
-                    instanceMap_.put(name, result);
-                    return result;
-                } catch(NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    throw new PropStoreFactoryException(e);
-                }
-            }
-        } else
-            throw new PropStoreFactoryException(String.format("Failed to find the PropStore named '%s'!", name));
+    public static PropStore getStore(String name) {
+        return getStore(name, null);
     }
 
     /**
-     * Gets the list of registered implementations.
+     * Retrieve an instance of the named implementation with implementaion specific arguments..
      *
-     * @return The list of names registered with the factory.
+     * @param name The name of the implementation to create.
+     * @param args The arguments in a map for the implementation, null is allowed.
+     * @return THe new instance of the PropStore derived class.
+     * @throws PropStoreFactoryException is thrown when the instance cannot be created or the name is not registered.
      */
-    public static Collection<String> registeredImplementations() {
-        return classMap_.keySet();
+    public static PropStore getStore(String name, Map<String, ?> args) {
+        name = name.toLowerCase().trim();
+        if(!supportedImplementations_.contains(name))
+            throw new PropStoreFactoryException(String.format("Implementation '%s' is not supported!", name));
+        switch(name) {
+            case "json":
+                return new JsonStore(args);
+            case "yaml":
+                return new YamlStore(args);
+            default:
+                return null; // This cannot happen but the compiler must be satisfied.
+        }
     }
 
     /**
-     * Remove all registered classes, arguments, and remembered instances.
+     * Gets the list of implementations supported.
+     *
+     * @return The collection of names supported by the factory.
      */
-    public static void resetFactory() {
-        classMap_.clear();
-        instanceMap_.clear();
-        argumentsMap_.clear();
+    public static Collection<String> getNames() {
+        return supportedImplementations_;
     }
 
-    private static Map<String, Class<? extends PropStore>> classMap_ = new HashMap<>();
-    private static Map<String, PropStore> instanceMap_ = new HashMap<>();
-    private static Map<String, Map<String, ?>> argumentsMap_ = new HashMap<>();
+    @SuppressWarnings("serial")
+    private static final Collection<String> supportedImplementations_ = new ArrayList<String>() {{
+        add("json");
+        add("yaml");
+    }};
 }

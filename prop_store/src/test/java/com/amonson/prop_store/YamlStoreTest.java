@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.amonson.yaml;
+package com.amonson.prop_store;
 
-import com.amonson.prop_store.PropList;
-import com.amonson.prop_store.PropMap;
-import com.amonson.prop_store.PropStoreException;
-import com.amonson.yaml.YamlStore;
 import org.junit.Test;
 
 import java.util.HashMap;

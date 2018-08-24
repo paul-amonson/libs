@@ -21,78 +21,18 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PropStoreFactoryTest {
-    public static class MockPropStore extends PropStore {
-        public MockPropStore(Map<String,?> config) {
-            super(config);
-        }
-
-        @Override
-        public String toString(PropMap map) {
-            return null;
-        }
-
-        @Override
-        public String toString(PropList array) {
-            return null;
-        }
-
-        @Override
-        public PropMap fromStringToMap(String storeText) {
-            return null;
-        }
-
-        @Override
-        public PropList fromStringToList(String storeText) {
-            return null;
-        }
-    }
-    public class MockPropStore2 extends PropStore {
-        public MockPropStore2(Map<String,?> config) {
-            super(config);
-        }
-
-        @Override
-        public String toString(PropMap map) {
-            return null;
-        }
-
-        @Override
-        public String toString(PropList array) {
-            return null;
-        }
-
-        @Override
-        public PropMap fromStringToMap(String storeText) {
-            return null;
-        }
-
-        @Override
-        public PropList fromStringToList(String storeText) {
-            return null;
-        }
-    }
 
     @Test
     public void allTests() {
-        try {
-            PropStoreFactory.instance("test1");
-            fail();
-        } catch(PropStoreFactoryException e) { /* PASS */ }
-        assertTrue(PropStoreFactory.register("test1", MockPropStore.class, null));
-        assertFalse(PropStoreFactory.register("test1", MockPropStore.class, null));
-        assertNotNull(PropStoreFactory.instance("test1"));
-        assertNotNull(PropStoreFactory.instance("test1"));
-        assertTrue(PropStoreFactory.register("test2", MockPropStore2.class, null));
-        try {
-            PropStoreFactory.instance("test2");
-            fail();
-        } catch(PropStoreFactoryException e) { /* PASS */ }
+        assertNotNull(PropStoreFactory.getStore(" YamL "));
+        assertNotNull(PropStoreFactory.getStore("JSON"));
+        assertEquals(2, PropStoreFactory.getNames().size());
+        assertTrue(PropStoreFactory.getNames().contains("json"));
+        assertTrue(PropStoreFactory.getNames().contains("yaml"));
     }
 
-    @Test
-    public void registeredImplementations() {
-        PropStoreFactory.resetFactory();
-        Collection<String> impls = PropStoreFactory.registeredImplementations();
-        assertEquals(0, impls.size());
+    @Test(expected = PropStoreFactoryException.class)
+    public void negative() {
+        PropStoreFactory.getStore("test1");
     }
 }

@@ -12,41 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.amonson.yaml;
+package com.amonson.prop_store;
 
-import com.amonson.prop_store.*;
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
+import com.github.cliftonlabs.json_simple.*;
 
 /**
- * PropStore implementation for YAML.
+ * PropStore implementation for JSON.
  */
-public class YamlStore extends PropStore {
+class JsonStore extends PropStore {
     /**
-     * Default constructor that takes a amp of configuration values for the property store (not used in the is base
-     * abstract class).
+     * Default constructor that takes a amp of configuration values for the property store.
      *
      * @param config The map of configuration parameters that may or may not be used by the derived classes. This may
      *               be null.
      */
-    public YamlStore(Map<String, ?> config) {
+    public JsonStore(Map<String, ?> config) {
         super(config);
-        int indent = 2;
         if(config != null) {
             Object obj = config.get("indent");
-            if (obj instanceof String) indent = Integer.parseInt((String) obj);
-            else if (obj instanceof Number) indent = ((Number) obj).intValue();
+            if (obj instanceof String) indent_ = Integer.parseInt((String) obj);
+            else if (obj instanceof Number) indent_ = ((Number) obj).intValue();
         }
-        DumperOptions options = new DumperOptions();
-        options.setIndent(indent);
-        options.setPrettyFlow(true);
-        options.setExplicitStart(true);
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        store_ = new Yaml(options);
     }
 
     /**
@@ -57,7 +44,10 @@ public class YamlStore extends PropStore {
      */
     @Override
     public String toString(PropMap map) {
-        return store_.dump(map);
+        JsonObject json = new JsonObject(map);
+        String str = json.toJson();
+        if(indent_ > 0 && indent_ <= 8) str = Jsoner.prettyPrint(str, indent_);
+        return str;
     }
 
     /**
@@ -68,7 +58,10 @@ public class YamlStore extends PropStore {
      */
     @Override
     public String toString(PropList list) {
-        return store_.dump(list);
+        JsonArray json = new JsonArray(list);
+        String str = json.toJson();
+        if(indent_ > 0 && indent_ <= 8) str = Jsoner.prettyPrint(str, indent_);
+        return str;
     }
 
     /**
@@ -80,7 +73,15 @@ public class YamlStore extends PropStore {
      */
     @Override
     public PropMap fromStringToMap(String storeText) throws PropStoreException {
-        return parseMap(store_.load(storeText));
+        Object obj;
+        try {
+            obj = Jsoner.deserialize(storeText);
+        } catch(JsonException e) {
+            throw new PropStoreException("Failed to parse the text as JSON!", e);
+        }
+        if(obj instanceof JsonObject)
+            return parseMap((JsonObject)obj);
+        throw new PropStoreException("The JSON text was not a map!");
     }
 
     /**
@@ -92,36 +93,42 @@ public class YamlStore extends PropStore {
      */
     @Override
     public PropList fromStringToList(String storeText) throws PropStoreException {
-        return parseArray(store_.load(storeText));
+        Object obj;
+        try {
+            obj = Jsoner.deserialize(storeText);
+        } catch(JsonException e) {
+            throw new PropStoreException("Failed to parse the text as JSON!", e);
+        }
+        if(obj instanceof JsonArray)
+            return parseArray((JsonArray)obj);
+        throw new PropStoreException("The JSON text was not a list!");
     }
 
-    @SuppressWarnings("unchecked")
-    private PropMap parseMap(Map<? extends String, ?> map) {
+    private PropMap parseMap(JsonObject map) {
         PropMap result = new PropMap();
         for(String key: map.keySet()) {
-            if(map.get(key) instanceof Map)
-                result.put(key, parseMap((Map<String,Object>)map.get(key)));
-            else if(map.get(key) instanceof List)
-                result.put(key, parseArray((List<Object>)map.get(key)));
+            if(map.get(key) instanceof JsonObject)
+                result.put(key, parseMap((JsonObject)map.get(key)));
+            else if(map.get(key) instanceof JsonArray)
+                result.put(key, parseArray((JsonArray)map.get(key)));
             else
                 result.put(key, map.get(key));
         }
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    private PropList parseArray(List<?> array) {
+    private PropList parseArray(JsonArray array) {
         PropList result = new PropList();
         for (Object anArray : array) {
-            if (anArray instanceof Map)
-                result.add(parseMap((Map<String, Object>)anArray));
-            else if (anArray instanceof List)
-                result.add(parseArray((List<Object>)anArray));
+            if (anArray instanceof JsonObject)
+                result.add(parseMap((JsonObject)anArray));
+            else if (anArray instanceof JsonArray)
+                result.add(parseArray((JsonArray)anArray));
             else
                 result.add(anArray);
         }
         return result;
     }
 
-    private Yaml store_;
+    private int indent_ = 0;
 }

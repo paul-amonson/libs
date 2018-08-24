@@ -13,8 +13,6 @@
 // limitations under the License.
 
 include 'prop_store'
-include 'json'
-include 'yaml'
 include 'crypto'
 
 rootProject.name = 'libs'
