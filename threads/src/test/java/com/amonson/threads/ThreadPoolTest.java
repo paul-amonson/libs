@@ -14,11 +14,10 @@
 
 package com.amonson.threads;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.Before;
+import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ThreadPoolTest implements WorkItemCallback, ThreadPoolRunnable {
