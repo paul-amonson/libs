@@ -111,6 +111,12 @@ project(':prop_store') {
     }
 }
 
+project(':logger') {
+    group = 'com.amonson'
+    dependencies {
+    }
+}
+
 task cleanUp(type: Delete) {
     delete "${rootProject.buildDir}/libs/${rootProject.name}-${rootProject.version}.jar"
 }
