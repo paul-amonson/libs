@@ -33,17 +33,35 @@ public final class LoggerFactory {
      */
     public static Logger getNamedLogger(String name, String implementation, Object... kwargs) {
         String key = String.format("%s:%s", name, implementation);
-        if(instances_.containsKey(key)) return instances_.get(key);
+        if(instances_.containsKey(key)) {
+            lastSuccessfulLogger_ = key;
+            return instances_.get(key);
+        }
         if(implementations_.containsKey(implementation)) {
             Logger result = newInstance(implementations_.get(implementation), kwargs);
             if(result != null) {
                 result.initialize(kwargs);
                 instances_.put(key, result);
             }
+            lastSuccessfulLogger_ = key;
             return result;
         }
         return null;
     }
+
+    /**
+     * Retrieves a singleton instance of a Logger class based on the last name and implementation.
+     *
+     * @return The Logger or null if a Logger cannot be created or the name is unknown.
+     */
+    public static Logger getLogger() {
+        if(lastSuccessfulLogger_ == null)
+            throw new RuntimeException("LoggerFactory.getNamedLogger must be called " +
+                    "prior to using LoggerFactory.getLogger!");
+        String[] parts = lastSuccessfulLogger_.split(":");
+        return getNamedLogger(parts[0], parts[1]);
+    }
+
 
     /**
      * Add an implementation of Logger to the factory. This will NOT replace implementations already inserted with the
@@ -74,4 +92,5 @@ public final class LoggerFactory {
     private static Map<String, Class<? extends Logger>> implementations_ = new HashMap<String, Class<? extends Logger>>() {{
         put("console", com.amonson.logger.ConsoleLoggerImpl.class);
     }};
+    private static String  lastSuccessfulLogger_ = null;
 }

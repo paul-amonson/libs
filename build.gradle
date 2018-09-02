@@ -38,6 +38,10 @@ subprojects {
         testCompile 'junit:junit:4.12'
     }
 
+    clean {
+        delete "${projectDir}/out"
+    }
+
     compileJava {
         options.compilerArgs << '-Werror'
         options.compilerArgs << '-Xlint:all,-processing,-path'
