@@ -16,5 +16,6 @@ include 'prop_store'
 include 'crypto'
 include 'threads'
 include 'logger'
+include 'xdg'
 
 rootProject.name = 'libs'
