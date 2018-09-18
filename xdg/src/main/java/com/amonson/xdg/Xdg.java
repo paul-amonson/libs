@@ -234,6 +234,27 @@ public class Xdg {
         return findFileInPath(fileNameOnly, configDirs_);
     }
 
+    /**
+     * Get the storage location for new or updated configuration files.
+     *
+     * @return The folder name.
+     */
+    public File getConfigHome() { return new File(configHome_); }
+
+    /**
+     * Get the storage location for new or updated data files.
+     *
+     * @return The folder name.
+     */
+    public File getDataHome() { return new File(dataHome_); }
+
+    /**
+     * Get the storage location for temporary data files.
+     *
+     * @return The folder name.
+     */
+    public File getCacheHome() { return new File(cacheHome_); }
+
     private File findFileInPath(String fileNameOnly, List<String> path) {
         for(String parent: path) {
             File tryFile = Paths.get(parent, fileNameOnly).toFile();

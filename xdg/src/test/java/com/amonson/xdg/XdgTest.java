@@ -66,7 +66,10 @@ public class XdgTest {
     public void ctor() {
         new Xdg();
         new Xdg("");
-        new Xdg("test");
+        Xdg xdg = new Xdg("test");
+        assertEquals(tmpFolder + "/.config", xdg.getConfigHome().toString());
+        assertEquals(tmpFolder + "/.local/share", xdg.getDataHome().toString());
+        assertEquals(tmpFolder + "/.cache", xdg.getCacheHome().toString());
     }
 
     @Test
@@ -78,7 +81,10 @@ public class XdgTest {
         System.setProperty("xdg.data.home", "");
         System.setProperty("xdg.config.home", "");
         System.setProperty("xdg.cache.home", "");
-        new Xdg("test");
+        Xdg xdg = new Xdg("test");
+        assertEquals(tmpFolder + "/.config", xdg.getConfigHome().toString());
+        assertEquals(tmpFolder + "/.local/share", xdg.getDataHome().toString());
+        assertEquals(tmpFolder + "/.cache", xdg.getCacheHome().toString());
     }
 
     @Test
@@ -89,7 +95,10 @@ public class XdgTest {
         Xdg.environment_.put("XDG_DATA_HOME", "");
         Xdg.environment_.put("XDG_CONFIG_HOME", "");
         Xdg.environment_.put("XDG_CACHE_HOME", "");
-        new Xdg("test");
+        Xdg xdg = new Xdg("test");
+        assertEquals(tmpFolder + "/.config", xdg.getConfigHome().toString());
+        assertEquals(tmpFolder + "/.local/share", xdg.getDataHome().toString());
+        assertEquals(tmpFolder + "/.cache", xdg.getCacheHome().toString());
     }
 
     @Test
