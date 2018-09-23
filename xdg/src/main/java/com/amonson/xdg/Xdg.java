@@ -49,7 +49,7 @@ public class Xdg {
      * @param applicationName The name to use as an application subfolder to the base XDG specification defined folder.
      */
     public Xdg(String applicationName) {
-        if(applicationName != null && applicationName.trim().equals(""))
+        if(applicationName != null && !applicationName.trim().equals(""))
             applicationName_ = applicationName;
         initialize();
     }
@@ -239,14 +239,24 @@ public class Xdg {
      *
      * @return The folder name.
      */
-    public File getConfigHome() { return new File(configHome_); }
+    public File getConfigHome() {
+        if(applicationName_ != null)
+            return Paths.get(configHome_, applicationName_).toFile();
+        else
+            return new File(configHome_);
+    }
 
     /**
      * Get the storage location for new or updated data files.
      *
      * @return The folder name.
      */
-    public File getDataHome() { return new File(dataHome_); }
+    public File getDataHome() {
+        if(applicationName_ != null)
+            return Paths.get(dataHome_, applicationName_).toFile();
+        else
+            return new File(dataHome_);
+    }
 
     /**
      * Get the storage location for temporary data files.
@@ -277,7 +287,10 @@ public class Xdg {
                 applicationName_, applicationName_):"/usr/local/share:/usr/share";
         candidate = getPropertyOrDefault("xdg.data.dirs", candidate);
         candidate = getEnvironmentOrDefault("XDG_DATA_DIRS", candidate);
-        candidate = String.format("%s:%s", dataHome_, candidate);
+        if(applicationName_ != null)
+            candidate = String.format("%s:%s", Paths.get(dataHome_, applicationName_), candidate);
+        else
+            candidate = String.format("%s:%s", dataHome_, candidate);
         dataDirs_ = Arrays.asList(candidate.split(":"));
     }
 
@@ -286,7 +299,10 @@ public class Xdg {
                 applicationName_, applicationName_):"/etc/xdg:/etc";
         candidate = getPropertyOrDefault("xdg.config.dirs", candidate);
         candidate = getEnvironmentOrDefault("XDG_CONFIG_DIRS", candidate);
-        candidate = String.format("%s:%s", configHome_, candidate);
+        if(applicationName_ != null)
+            candidate = String.format("%s:%s", Paths.get(configHome_, applicationName_), candidate);
+        else
+            candidate = String.format("%s:%s", configHome_, candidate);
         configDirs_ = Arrays.asList(candidate.split(":"));
     }
 
