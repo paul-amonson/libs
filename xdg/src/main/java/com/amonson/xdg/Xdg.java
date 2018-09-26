@@ -50,7 +50,7 @@ public class Xdg {
      */
     public Xdg(String applicationName) {
         if(applicationName != null && !applicationName.trim().equals(""))
-            applicationName_ = applicationName;
+            applicationName_ = applicationName.trim();
         initialize();
     }
 
@@ -240,10 +240,7 @@ public class Xdg {
      * @return The folder name.
      */
     public File getConfigHome() {
-        if(applicationName_ != null)
-            return Paths.get(configHome_, applicationName_).toFile();
-        else
-            return new File(configHome_);
+        return new File(configHome_);
     }
 
     /**
@@ -252,10 +249,7 @@ public class Xdg {
      * @return The folder name.
      */
     public File getDataHome() {
-        if(applicationName_ != null)
-            return Paths.get(dataHome_, applicationName_).toFile();
-        else
-            return new File(dataHome_);
+        return new File(dataHome_);
     }
 
     /**
@@ -287,10 +281,7 @@ public class Xdg {
                 applicationName_, applicationName_):"/usr/local/share:/usr/share";
         candidate = getPropertyOrDefault("xdg.data.dirs", candidate);
         candidate = getEnvironmentOrDefault("XDG_DATA_DIRS", candidate);
-        if(applicationName_ != null)
-            candidate = String.format("%s:%s", Paths.get(dataHome_, applicationName_), candidate);
-        else
-            candidate = String.format("%s:%s", dataHome_, candidate);
+        candidate = String.format("%s:%s", dataHome_, candidate);
         dataDirs_ = Arrays.asList(candidate.split(":"));
     }
 
@@ -299,37 +290,34 @@ public class Xdg {
                 applicationName_, applicationName_):"/etc/xdg:/etc";
         candidate = getPropertyOrDefault("xdg.config.dirs", candidate);
         candidate = getEnvironmentOrDefault("XDG_CONFIG_DIRS", candidate);
-        if(applicationName_ != null)
-            candidate = String.format("%s:%s", Paths.get(configHome_, applicationName_), candidate);
-        else
-            candidate = String.format("%s:%s", configHome_, candidate);
+        candidate = String.format("%s:%s", configHome_, candidate);
         configDirs_ = Arrays.asList(candidate.split(":"));
     }
 
     private void setDataHome() {
         String candidate = Paths.get(home_, ".local", "share").toString();
         candidate = addApplicationName(candidate);
-        mkdirs(candidate);
         candidate = getPropertyOrDefault("xdg.data.home", candidate);
         candidate = getEnvironmentOrDefault("XDG_DATA_HOME", candidate);
+        mkdirs(candidate);
         dataHome_ = candidate;
     }
 
     private void setConfigHome() {
         String candidate = Paths.get(home_, ".config").toString();
         candidate = addApplicationName(candidate);
-        mkdirs(candidate);
         candidate = getPropertyOrDefault("xdg.config.home", candidate);
         candidate = getEnvironmentOrDefault("XDG_CONFIG_HOME", candidate);
+        mkdirs(candidate);
         configHome_ = candidate;
     }
 
     private void setCacheHome() {
         String candidate = Paths.get(home_, ".cache").toString();
         candidate = addApplicationName(candidate);
-        mkdirs(candidate);
         candidate = getPropertyOrDefault("xdg.cache.home", candidate);
         candidate = getEnvironmentOrDefault("XDG_CACHE_HOME", candidate);
+        mkdirs(candidate);
         cacheHome_ = candidate;
     }
 
@@ -343,14 +331,14 @@ public class Xdg {
         String property = System.getProperty(propertyName);
         if(property == null) return defaultValue;
         if(property.trim().equals("")) return defaultValue;
-        return property;
+        return property.trim();
     }
 
     private String getEnvironmentOrDefault(String envName, String defaultValue) {
         String env = environment_.get(envName);
         if(env == null) return defaultValue;
         if(env.trim().equals("")) return defaultValue;
-        return env;
+        return env.trim();
     }
 
     private void mkdirs(String folder) {
