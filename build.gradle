@@ -27,11 +27,16 @@ println("*** Building version: " + gitVersionString() + "\n")
 
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'maven-publish'
 
     version = gitVersionString()
     sourceCompatibility = 1.8
     repositories {
         mavenLocal()
+        maven {
+            url "http://linuxserver:8081/nexus/content/groups/public"
+        }
     }
 }
 
@@ -53,10 +58,6 @@ subprojects {
         options.compilerArgs << '-XDignore.symbol.file=true'
         options.fork = true
         options.forkOptions.executable = 'javac'
-    }
-
-    repositories {
-        jcenter()
     }
 
     task copyJars(type: Copy) {
@@ -131,3 +132,4 @@ task cleanUp(type: Delete) {
 }
 jar.finalizedBy(cleanUp)
 jar.dependsOn(subprojects.jar)
+build.finalizedBy(publishToMavenLocal)
