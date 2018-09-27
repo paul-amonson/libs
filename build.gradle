@@ -23,11 +23,16 @@ def gitVersionString = { ->
     return stdout.toString().trim()
 }
 
+println("*** Building version: " + gitVersionString() + "\n")
+
 allprojects {
     apply plugin: 'java'
 
     version = gitVersionString()
     sourceCompatibility = 1.8
+    repositories {
+        mavenLocal()
+    }
 }
 
 subprojects {
