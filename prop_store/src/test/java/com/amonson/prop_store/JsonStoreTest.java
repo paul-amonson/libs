@@ -19,6 +19,7 @@ import com.amonson.prop_store.PropList;
 import com.amonson.prop_store.PropMap;
 import com.amonson.prop_store.PropStoreException;
 import java.util.HashMap;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -33,8 +34,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", 3);
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "3");
         }});
         PropMap data = store.fromStringToMap(originalJson);
         String json = store.toString(data);
@@ -50,8 +51,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", "2");
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "2");
         }});
         PropMap data = store.fromStringToMap(originalJson);
         String json = store.toString(data);
@@ -67,9 +68,7 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", null);
-        }});
+        JsonStore store = new JsonStore(new Properties());
         PropMap data = store.fromStringToMap(originalJson);
         String json = store.toString(data);
     }
@@ -84,8 +83,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", -1);
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "-1");
         }});
         PropMap data = store.fromStringToMap(originalJson);
         String json = store.toString(data);
@@ -101,8 +100,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", 9);
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "9");
         }});
         PropMap data = store.fromStringToMap(originalJson);
         String json = store.toString(data);
@@ -147,8 +146,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}]\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", 9);
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "9");
         }});
         PropList data = store.fromStringToList(originalJson);
         String json = store.toString(data);
@@ -164,8 +163,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}]\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", -1);
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "-1");
         }});
         PropList data = store.fromStringToList(originalJson);
         String json = store.toString(data);
@@ -181,8 +180,8 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}]\n";
-        JsonStore store = new JsonStore(new HashMap<String,Object>() {{
-            put("indent", 2);
+        JsonStore store = new JsonStore(new Properties() {{
+            setProperty("com.amonson.prop_store.indent", "2");
         }});
         PropList data = store.fromStringToList(originalJson);
         String json = store.toString(data);

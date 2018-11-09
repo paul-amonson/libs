@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
@@ -42,22 +43,22 @@ public class YamlStoreTest {
 
     @Test
     public void ctor1() throws PropStoreException {
-        Map<String, Object> config = new HashMap<>();
-        config.put("indent", 4);
+        Properties config = new Properties();
+        config.setProperty("indent", "4");
         YamlStore store = new YamlStore(config);
     }
 
     @Test
     public void ctor2() throws PropStoreException {
-        Map<String, Object> config = new HashMap<>();
-        config.put("indent", "4");
+        Properties config = new Properties();
+        config.setProperty("indent", "4");
         YamlStore store = new YamlStore(config);
     }
 
     @Test
     public void ctor3() throws PropStoreException {
-        Map<String, Object> config = new HashMap<>();
-        config.put("other", 4);
+        Properties config = new Properties();
+        config.setProperty("other", "4");
         YamlStore store = new YamlStore(config);
     }
 

@@ -15,7 +15,7 @@
 package com.amonson.prop_store;
 
 import java.io.*;
-import java.util.Map;
+import java.util.Properties;
 
 /**
  * Class representing a Store of properies (maps/lists nested or flat). Any stream, reader/writer, or files can be
@@ -26,10 +26,10 @@ public abstract class PropStore {
      * Default constructor that takes a amp of configuration values for the property store (not used in the is base
      * abstract class).
      *
-     * @param config The map of configuration parameters that may or may not be used by the derived classes. This may
-     *               be null.
+     * @param config The properties of configuration parameters that may or may not be used by the derived classes.
+     *              This may be null.
      */
-    public PropStore(Map<String,?> config) {
+    public PropStore(Properties config) {
     }
 
     /**

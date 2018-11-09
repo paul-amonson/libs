@@ -15,10 +15,10 @@
 package com.amonson.prop_store;
 
 /**
- * THrown by the PropStoreFactory on
+ * Thrown by the PropStoreFactory.getStore or PropStoreFactory.registerNewStore.
  */
 @SuppressWarnings("serial")
-public class PropStoreFactoryException extends RuntimeException {
-    PropStoreFactoryException(Throwable e) { super(e); }
+public class PropStoreFactoryException extends Exception {
+    PropStoreFactoryException(String msg, Throwable e) { super(msg, e); }
     PropStoreFactoryException(String msg) { super(msg); }
 }

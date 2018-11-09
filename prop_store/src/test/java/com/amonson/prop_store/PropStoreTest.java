@@ -20,10 +20,11 @@ import org.junit.Test;
 
 import java.io.*;
 import java.util.Map;
+import java.util.Properties;
 
 public class PropStoreTest {
     static final class MockPropStore extends PropStore {
-        public MockPropStore(Map<String, ?> config) {
+        public MockPropStore(Properties config) {
             super(config);
         }
 

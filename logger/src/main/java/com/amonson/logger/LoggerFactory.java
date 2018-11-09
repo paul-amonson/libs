@@ -92,5 +92,5 @@ public final class LoggerFactory {
     private static Map<String, Class<? extends Logger>> implementations_ = new HashMap<String, Class<? extends Logger>>() {{
         put("console", com.amonson.logger.ConsoleLoggerImpl.class);
     }};
-    private static String  lastSuccessfulLogger_ = null;
+    static String  lastSuccessfulLogger_ = null;
 }

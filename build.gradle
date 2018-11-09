@@ -33,10 +33,7 @@ allprojects {
     version = gitVersionString()
     sourceCompatibility = 1.8
     repositories {
-        mavenLocal()
-        maven {
-            url "http://linuxserver:8081/nexus/content/groups/public"
-        }
+        mavenCentral()
     }
 }
 
@@ -49,7 +46,7 @@ subprojects {
     }
 
     clean {
-        delete "${projectDir}/out"
+        delete += "${projectDir}/out"
     }
 
     compileJava {

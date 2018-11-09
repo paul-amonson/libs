@@ -14,7 +14,8 @@
 
 package com.amonson.prop_store;
 
-import java.util.Map;
+import java.util.Properties;
+
 import com.github.cliftonlabs.json_simple.*;
 
 /**
@@ -24,16 +25,13 @@ class JsonStore extends PropStore {
     /**
      * Default constructor that takes a amp of configuration values for the property store.
      *
-     * @param config The map of configuration parameters that may or may not be used by the derived classes. This may
-     *               be null.
+     * @param config The Properties of configuration parameters that may or may not be used by the derived classes.
+     *              This may be null.
      */
-    public JsonStore(Map<String, ?> config) {
+    public JsonStore(Properties config) {
         super(config);
-        if(config != null) {
-            Object obj = config.get("indent");
-            if (obj instanceof String) indent_ = Integer.parseInt((String) obj);
-            else if (obj instanceof Number) indent_ = ((Number) obj).intValue();
-        }
+        if(config != null)
+            indent_ = Integer.parseInt(config.getProperty("com.amonson.prop_store.indent", "0"));
     }
 
     /**

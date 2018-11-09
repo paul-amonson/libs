@@ -14,10 +14,6 @@ public class LoggerFactoryTest {
 
     @Test
     public void tests() {
-        try {
-            LoggerFactory.getLogger();
-            fail();
-        } catch(RuntimeException e) { /* PASS */ }
         assertTrue(LoggerFactory.addImplementation("test", TestLogger.class));
         assertFalse(LoggerFactory.addImplementation("test", TestLogger.class));
         Logger l1 = LoggerFactory.getNamedLogger("myTest", "test");
@@ -27,5 +23,11 @@ public class LoggerFactoryTest {
         assertNull(LoggerFactory.getNamedLogger("myTest", "unknown"));
         Logger l3 = LoggerFactory.getLogger();
         assertEquals(l1, l3);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testsNegative() {
+        LoggerFactory.lastSuccessfulLogger_ = null;
+        LoggerFactory.getLogger();
     }
 }
