@@ -14,8 +14,10 @@
 
 package com.amonson.logger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Static factory for creating Logger implementations.
@@ -28,21 +30,19 @@ public final class LoggerFactory {
      *
      * @param name The named Logger to create/return.
      * @param implementation The name of the Logger implementation to create/return.
-     * @param kwargs Optional arguments for the initialize method of the logger. By default this is ignored.
+     * @param config Optional config for the initialize method of the logger.
      * @return The Logger or null if a Logger cannot be created or the name is unknown.
      */
-    public static Logger getNamedLogger(String name, String implementation, Object... kwargs) {
+    public static Logger getNamedLogger(String name, String implementation, Properties config) {
         String key = String.format("%s:%s", name, implementation);
         if(instances_.containsKey(key)) {
             lastSuccessfulLogger_ = key;
             return instances_.get(key);
         }
         if(implementations_.containsKey(implementation)) {
-            Logger result = newInstance(implementations_.get(implementation), kwargs);
-            if(result != null) {
-                result.initialize(kwargs);
-                instances_.put(key, result);
-            }
+            Logger result = newInstance(implementations_.get(implementation));
+            result.initialize(config);
+            instances_.put(key, result);
             lastSuccessfulLogger_ = key;
             return result;
         }
@@ -50,18 +50,24 @@ public final class LoggerFactory {
     }
 
     /**
-     * Retrieves a singleton instance of a Logger class based on the last name and implementation.
+     * Retrieves a singleton instance of a Logger class per name.
+     *
+     * @param name The named Logger to create/return.
+     * @param implementation The name of the Logger implementation to create/return.
+     * @return The Logger or null if a Logger cannot be created or the name is unknown.
+     */
+    public static Logger getNamedLogger(String name, String implementation) {
+        return LoggerFactory.getNamedLogger(name, implementation, null);
+    }
+
+    /**
+     * Retrieves a singleton instance of a default Logger class.
      *
      * @return The Logger or null if a Logger cannot be created or the name is unknown.
      */
-    public static Logger getLogger() {
-        if(lastSuccessfulLogger_ == null)
-            throw new RuntimeException("LoggerFactory.getNamedLogger must be called " +
-                    "prior to using LoggerFactory.getLogger!");
-        String[] parts = lastSuccessfulLogger_.split(":");
-        return getNamedLogger(parts[0], parts[1]);
+    public static Logger getDefaultLogger() {
+        return getNamedLogger(null, null, null);
     }
-
 
     /**
      * Add an implementation of Logger to the factory. This will NOT replace implementations already inserted with the
@@ -72,24 +78,23 @@ public final class LoggerFactory {
      * @return True if the Logger class is added and false if not added.
      */
     public static boolean addImplementation(String implementation, Class<? extends Logger> loggerClass) {
-        if(!implementations_.containsKey(implementation)) {
-            implementations_.put(implementation, loggerClass);
-            return true;
-        }
-        return false;
+        return implementations_.putIfAbsent(implementation, loggerClass) == null;
     }
 
-    private static Logger newInstance(Class<? extends Logger> loggerClass, Object... args) {
+    private static Logger newInstance(Class<? extends Logger> loggerClass) {
         try {
-            return loggerClass.newInstance();
-        } catch(IllegalAccessException | InstantiationException e) {
-            return null;
+            return loggerClass.getDeclaredConstructor().newInstance();
+        } catch(IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException("Failed to create a logger!", e);
         }
     }
 
-    private static Map<String, Logger> instances_ = new HashMap<>();
     @SuppressWarnings("serial")
-    private static Map<String, Class<? extends Logger>> implementations_ = new HashMap<String, Class<? extends Logger>>() {{
+    private static Map<String, Logger> instances_ = new HashMap<>() {{
+        put("null:null", new ConsoleLoggerImpl());
+    }};
+    @SuppressWarnings("serial")
+    private static Map<String, Class<? extends Logger>> implementations_ = new HashMap<>() {{
         put("console", com.amonson.logger.ConsoleLoggerImpl.class);
     }};
     static String  lastSuccessfulLogger_ = null;

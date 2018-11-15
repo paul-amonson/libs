@@ -14,11 +14,14 @@
 
 package com.amonson.logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * General logger interface for implementations.
@@ -178,9 +181,27 @@ public abstract class Logger {
     /**
      * Called to initialize the logger with arguments passed to the factory.
      *
-     * @param kwargs The arguments for the specified implementation.
+     * @param config The config for the specified implementation.
      */
-    public void initialize(Object... kwargs) {}
+    public void initialize(Properties config) {
+        String levelKey = "com.amonson.logger.Logger.level";
+        String level = "INFO";
+        try {
+            Properties defaults = new Properties();
+            defaults.load(getClass().getResourceAsStream(File.separator + "default.properties"));
+            if(config != null) {
+                for (String key : defaults.stringPropertyNames())
+                    config.setProperty(key, defaults.getProperty(key));
+            } else
+                config = defaults;
+        } catch(IOException e) { /* Ignore */ }
+        if(config != null)
+            level = config.getProperty(levelKey, System.getProperty(levelKey, level)).toUpperCase();
+        else
+            level = System.getProperty(levelKey, level).toUpperCase();
+        level = level.toUpperCase();
+        currentLevel_ = Enum.valueOf(Level.class, level);
+    }
 
     /**
      * Required to override in derived class implementation.

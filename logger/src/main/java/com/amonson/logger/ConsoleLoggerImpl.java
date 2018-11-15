@@ -15,6 +15,8 @@
 package com.amonson.logger;
 
 class ConsoleLoggerImpl extends Logger {
+    ConsoleLoggerImpl() {}
+
     /**
      * Required to override in derived class implementation.
      *

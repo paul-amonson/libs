@@ -19,10 +19,9 @@ println("*** Building version: " + gitVersionString() + "\n")
 allprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
-    apply plugin: 'maven-publish'
 
     version = gitVersionString()
-    sourceCompatibility = 1.8
+    sourceCompatibility = 10
     repositories {
         mavenCentral()
     }
@@ -57,7 +56,7 @@ subprojects {
 
     test {
         reports {
-            html.destination = file("${rootProject.buildDir}/reports/test/${project.name}")
+            html.destination file("${rootProject.buildDir}/reports/test/${project.name}")
         }
         finalizedBy(jacocoTestReport)
     }
@@ -67,7 +66,7 @@ subprojects {
         reports {
             xml.enabled = true
             csv.enabled = false
-            html.destination = file("${rootProject.buildDir}/reports/coverage/${project.name}")
+            html.destination file("${rootProject.buildDir}/reports/coverage/${project.name}")
         }
         finalizedBy(jacocoTestCoverageVerification)
     }
@@ -116,8 +115,6 @@ project(':logger') {
 }
 
 task cleanUp(type: Delete) {
-    delete "${rootProject.buildDir}/libs/${rootProject.name}-${rootProject.version}.jar"
+    delete += "${rootProject.buildDir}/libs/${rootProject.name}-${rootProject.version}.jar"
 }
 jar.finalizedBy(cleanUp)
-jar.dependsOn(subprojects.jar)
-build.finalizedBy(publishToMavenLocal)

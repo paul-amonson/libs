@@ -21,13 +21,7 @@ public class LoggerFactoryTest {
         Logger l2 = LoggerFactory.getNamedLogger("myTest", "test");
         assertEquals(l1, l2);
         assertNull(LoggerFactory.getNamedLogger("myTest", "unknown"));
-        Logger l3 = LoggerFactory.getLogger();
-        assertEquals(l1, l3);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testsNegative() {
-        LoggerFactory.lastSuccessfulLogger_ = null;
-        LoggerFactory.getLogger();
+        Logger l3 = LoggerFactory.getDefaultLogger();
+        assertNotNull(l3);
     }
 }
