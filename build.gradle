@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-def honorCoverageRules = false
+def honorCoverageRules = true
 
 def gitVersionString = { ->
     def stdout = new ByteArrayOutputStream()
@@ -37,6 +37,25 @@ subprojects {
 
     clean {
         delete += "${projectDir}/out"
+    }
+
+    build {
+        finalizedBy(javadoc)
+    }
+
+    javadoc {
+        options.addBooleanOption('html5', true)
+        doLast {
+            copy {
+                from(javadoc.outputs)
+                into "${rootProject.buildDir}/docs/${project.name}"
+            }
+            copy {
+                from(file("${rootProject.projectDir}/index.html"))
+                from(file("${rootProject.projectDir}/stylesheet.css"))
+                into "${rootProject.buildDir}/docs"
+            }
+        }
     }
 
     compileJava {

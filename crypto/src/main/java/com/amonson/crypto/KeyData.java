@@ -38,7 +38,7 @@ public class KeyData {
     }
 
     /**
-     * Duplacating constructor for Key data.
+     * Duplicating constructor for Key data.
      * @param data The KeyData instance to copy from.
      */
     public KeyData(KeyData data) {
