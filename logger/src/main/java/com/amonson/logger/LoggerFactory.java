@@ -90,11 +90,11 @@ public final class LoggerFactory {
     }
 
     @SuppressWarnings("serial")
-    private static Map<String, Logger> instances_ = new HashMap<>() {{
+    private static Map<String, Logger> instances_ = new HashMap<String, Logger>() {{
         put("null:null", new ConsoleLoggerImpl());
     }};
     @SuppressWarnings("serial")
-    private static Map<String, Class<? extends Logger>> implementations_ = new HashMap<>() {{
+    private static Map<String, Class<? extends Logger>> implementations_ = new HashMap<String, Class<? extends Logger>>() {{
         put("console", com.amonson.logger.ConsoleLoggerImpl.class);
     }};
     static String  lastSuccessfulLogger_ = null;
