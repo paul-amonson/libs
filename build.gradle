@@ -44,7 +44,7 @@ subprojects {
     }
 
     javadoc {
-        options.addBooleanOption('html5', true)
+//        options.addBooleanOption('html5', true)
         doLast {
             copy {
                 from(javadoc.outputs)
