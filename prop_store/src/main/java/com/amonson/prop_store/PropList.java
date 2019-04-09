@@ -20,7 +20,7 @@ public class PropList extends ArrayList<Object> {
     }
 
     public PropList(Collection<?> list) {
-        addAll(list);
+        super(list);
     }
 
     public String getString(int index) {

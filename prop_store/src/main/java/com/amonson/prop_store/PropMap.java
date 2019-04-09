@@ -21,7 +21,7 @@ public class PropMap extends HashMap<String, Object> {
     }
 
     public PropMap(Map<String, ?> map) {
-        putAll(map);
+        super(map);
     }
 
     public String getString(String key) {

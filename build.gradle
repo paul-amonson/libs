@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-def honorCoverageRules = true
+apply plugin: 'idea'
+
+def honorScanningRules = true
 
 def gitVersionString = { ->
     def stdout = new ByteArrayOutputStream()
@@ -18,18 +20,17 @@ println("*** Building version: " + gitVersionString() + "\n")
 
 allprojects {
     apply plugin: 'java'
-    apply plugin: 'idea'
+    apply plugin: 'jacoco'
+    apply plugin: 'pmd'
 
     version = gitVersionString()
-    sourceCompatibility = 11
     repositories {
         mavenCentral()
     }
 }
 
 subprojects {
-    apply plugin: 'idea'
-    apply plugin: 'jacoco'
+    sourceCompatibility = 11
 
     dependencies {
         testCompile 'junit:junit:4.12'
@@ -76,8 +77,22 @@ subprojects {
     test {
         reports {
             html.destination file("${rootProject.buildDir}/reports/test/${project.name}")
+            junitXml.destination file("${rootProject.buildDir}/tests/${project.name}")
         }
         finalizedBy(jacocoTestReport)
+    }
+
+    pmdTest.enabled = false
+    pmdMain {
+        group = "Reporting"
+        rulePriority = 2
+        ignoreFailures = !honorScanningRules
+        reports {
+            xml.enabled = true
+            xml.destination = file("${rootProject.buildDir}/analysis/${project.name}.xml")
+            html.enabled = true
+            html.destination = file("${rootProject.buildDir}/reports/analysis/${project.name}.html")
+        }
     }
 
     jacocoTestReport {
@@ -94,7 +109,7 @@ subprojects {
         violationRules {
             rule {
                 element = 'PACKAGE'
-                enabled = honorCoverageRules
+                enabled = honorScanningRules
                 limit {
                     counter = 'METHOD'
                     minimum = 0.90
@@ -102,7 +117,7 @@ subprojects {
             }
             rule {
                 element = 'PACKAGE'
-                enabled = honorCoverageRules
+                enabled = honorScanningRules
                 limit {
                     counter = 'BRANCH'
                     minimum = 0.70
@@ -132,8 +147,3 @@ project(':logger') {
     dependencies {
     }
 }
-
-task cleanUp(type: Delete) {
-    delete += "${rootProject.buildDir}/libs/${rootProject.name}-${rootProject.version}.jar"
-}
-jar.finalizedBy(cleanUp)
