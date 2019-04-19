@@ -30,6 +30,7 @@ allprojects {
 }
 
 subprojects {
+    targetCompatibility = 11
     sourceCompatibility = 11
 
     dependencies {
@@ -38,10 +39,6 @@ subprojects {
 
     clean {
         delete += "${projectDir}/out"
-    }
-
-    build {
-        finalizedBy(javadoc)
     }
 
     javadoc {
@@ -85,6 +82,7 @@ subprojects {
     pmdTest.enabled = false
     pmdMain {
         group = "Reporting"
+        consoleOutput = true
         rulePriority = 2
         ignoreFailures = !honorScanningRules
         reports {
