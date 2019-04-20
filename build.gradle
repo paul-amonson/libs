@@ -34,7 +34,7 @@ subprojects {
     sourceCompatibility = 11
 
     dependencies {
-        testCompile 'junit:junit:4.12'
+        testCompile 'junit:junit:4.12+'
     }
 
     clean {
@@ -76,7 +76,7 @@ subprojects {
             html.destination file("${rootProject.buildDir}/reports/test/${project.name}")
             junitXml.destination file("${rootProject.buildDir}/tests/${project.name}")
         }
-        finalizedBy(jacocoTestReport)
+        finalizedBy(jacocoTestReport, pmdMain)
     }
 
     pmdTest.enabled = false
@@ -99,6 +99,7 @@ subprojects {
             xml.enabled = true
             csv.enabled = false
             html.destination file("${rootProject.buildDir}/reports/coverage/${project.name}")
+            xml.destination file("${buildDir}/jacoco/coverage.xml")
         }
         finalizedBy(jacocoTestCoverageVerification)
     }
