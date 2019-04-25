@@ -87,9 +87,9 @@ subprojects {
         ignoreFailures = !honorScanningRules
         reports {
             xml.enabled = true
-            xml.destination = file("${rootProject.buildDir}/analysis/${project.name}.xml")
+            xml.destination = file("${rootProject.buildDir}/pmd/${project.name}.xml")
             html.enabled = true
-            html.destination = file("${rootProject.buildDir}/reports/analysis/${project.name}.html")
+            html.destination = file("${rootProject.buildDir}/reports/pmd/${project.name}.html")
         }
     }
 
@@ -98,8 +98,8 @@ subprojects {
         reports {
             xml.enabled = true
             csv.enabled = false
-            html.destination file("${rootProject.buildDir}/reports/coverage/${project.name}")
-            xml.destination file("${buildDir}/jacoco/coverage.xml")
+            html.destination file("${rootProject.buildDir}/reports/jacoco/${project.name}")
+            xml.destination file("${rootProject.buildDir}/jacoco/${project.name}.xml")
         }
         finalizedBy(jacocoTestCoverageVerification)
     }
