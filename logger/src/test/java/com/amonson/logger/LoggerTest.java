@@ -1,8 +1,5 @@
 package com.amonson.logger;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -31,7 +28,7 @@ public class LoggerTest extends Logger {
     @Test
     public void test() throws Throwable {
         this.setDateFormatString(this.getDateFormatString());
-        this.setExceptionSeperator(this.getExceptionSeperator());
+        this.setExceptionSeparator(this.getExceptionSeparator());
         this.setLogFormatString(this.getLogFormatString());
         this.setLevel(this.getLevel());
         this.debug("Debug");

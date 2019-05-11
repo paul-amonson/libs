@@ -153,14 +153,14 @@ public abstract class Logger {
      *
      * @param delimiter Usually a single character delimiter used when dumping an exception stack.
      */
-    public void setExceptionSeperator(String delimiter) { exceptionSeparator_ = delimiter; }
+    public void setExceptionSeparator(String delimiter) { exceptionSeparator_ = delimiter; }
 
     /**
      * Gets the delimiter used when dumping an exception stack trace (defaults to a newline).
      *
      * @return Usually a single character delimiter used when dumping an exception stack.
      */
-    public String getExceptionSeperator() { return exceptionSeparator_; }
+    public String getExceptionSeparator() { return exceptionSeparator_; }
 
     /**
      * Sets the new threshold for log filtering. The base class does not filter, should be used by derived
