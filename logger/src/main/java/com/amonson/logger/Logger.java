@@ -14,8 +14,6 @@
 
 package com.amonson.logger;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -24,19 +22,27 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * General logger interface for implementations.
+ * General light weight logger for output implementations.
  */
-public abstract class Logger {
-    private static final int STACK_INDEX = 2;
+public class Logger {
     /**
-     * Enum for logger levels.
+     * Default logger to the console.
      */
-    public enum Level {
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        CRITICAL
+    public Logger() {
+        this(null);
+    }
+
+    /**
+     * Default logger to the console that takes config properties. The following properties are used:
+     * <ul>
+     * <li>com.amonson.logger.filterLevel - filter level for the output target.</li>
+     * </ul>
+     * @param config The proerties for the logger.
+     */
+    public Logger(Properties config) {
+        targets_.add(this::outputFinalString);
+        setEarlyLogMethod(null);
+        initialize(config);
     }
 
     /**
@@ -179,41 +185,59 @@ public abstract class Logger {
     public Level getLevel() { return currentLevel_; }
 
     /**
-     * Called to initialize the logger with arguments passed to the factory.
+     * Add a output target to the Logger.
      *
-     * @param config The config for the specified implementation.
+     * @param target The output target.
      */
-    public void initialize(Properties config) {
-        String levelKey = "com.amonson.logger.Logger.level";
-        String level = "INFO";
-        try {
-            Properties defaults = new Properties();
-            defaults.load(getClass().getResourceAsStream(File.separator + "default.properties"));
-            if(config != null) {
-                for (String key : defaults.stringPropertyNames())
-                    config.setProperty(key, defaults.getProperty(key));
-            } else
-                config = defaults;
-        } catch(IOException e) { /* Ignore */ }
-        if(config != null)
-            level = config.getProperty(levelKey, System.getProperty(levelKey, level)).toUpperCase();
-        else
-            level = System.getProperty(levelKey, level).toUpperCase();
-        level = level.toUpperCase();
-        currentLevel_ = Enum.valueOf(Level.class, level);
+    public void addOutputTarget(OutputTargetInterface target) {
+        if(target != null)
+            targets_.add(target);
     }
 
     /**
-     * Required to override in derived class implementation.
-     *
-     * @param lvl The log level of the log line to be used for filtering.
-     * @param logLine The full log line to log.
+     * Remove all output targets. Use when you don't want the default console output.
      */
-    protected abstract void outputFinalString(Level lvl, String logLine);
+    public void clearOutputTargets() {
+        targets_.clear();
+    }
 
-    private void log(Level lvl, StackTraceElement callinglocation, String msg, Object... args) {
+    /**
+     * Set the default logging method.
+     */
+    public void setDefaultLogMethod() {
+        logMethod_ = this::defaultLogMethod;
+    }
+
+    /**
+     * Set the new early log response method.
+     *
+     * @param method The replacement method to call when the public logging methods are called.
+     */
+    public void setEarlyLogMethod(EarlyInterceptLog method) {
+        if(method != null)
+            logMethod_ = method;
+        else
+            setDefaultLogMethod();
+    }
+
+    private void initialize(Properties config) {
+        String levelKey = "com.amonson.logger.Level";
+        String level = "INFO";
+        if (config != null)
+            level = config.getProperty(levelKey, System.getProperty(levelKey, level)).toUpperCase();
+        else
+            level = System.getProperty(levelKey, level).toUpperCase();
+        currentLevel_ = Level.valueOf(level);
+    }
+
+    private void log(Level lvl, StackTraceElement callingLocation, String msg, Object... args) {
+        logMethod_.log(lvl, callingLocation, msg, args);
+    }
+
+    private void defaultLogMethod(Level lvl, StackTraceElement callingLocation, String msg, Object... args) {
         String fullMsg = String.format(msg, args);
-        outputFinalString(lvl, buildLogLine(callinglocation, lvl, fullMsg));
+        for(OutputTargetInterface output: targets_)
+            output.outputFinalString(lvl, buildLogLine(callingLocation, lvl, fullMsg), currentLevel_);
     }
 
     private String buildLogLine(StackTraceElement trace, Level lvl, String msg) {
@@ -252,8 +276,21 @@ public abstract class Logger {
             dumpExceptionTrace(exceptionLines, throwable.getCause(), true);
     }
 
+    private void outputFinalString(Level lvl, String logLine, Level filter) {
+        if (lvl.ordinal() >= filter.ordinal()) {
+            if (lvl.ordinal() >= Level.ERROR.ordinal())
+                System.err.println(logLine);
+            else
+                System.out.println(logLine);
+        }
+    }
+
     private String dateFormat_ = "yyyy-MM-dd'T'kk:mm:ss.SSS'Z'";
     private String logLineFormat_ = "%D: %L: (%S): %M";
     private String exceptionSeparator_ = "\n";
     private Level currentLevel_ = Level.INFO;
+    private List<OutputTargetInterface> targets_ = new ArrayList<>();
+    private EarlyInterceptLog logMethod_;
+
+    private static final int STACK_INDEX = 2;
 }
