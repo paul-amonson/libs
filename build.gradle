@@ -55,6 +55,10 @@ subprojects {
             }
         }
     }
+    
+    build {
+        finalizedBy(javadoc)
+    }
 
     compileJava {
         options.compilerArgs << '-Werror'
