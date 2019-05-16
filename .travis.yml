@@ -20,3 +20,4 @@ deploy:
     branch: master
   local_dir: ./build/docs/
   repo: paul-amonson/paul-amonson.github.io
+  target_branch: master
