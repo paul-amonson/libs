@@ -56,7 +56,7 @@ subprojects {
         }
     }
     
-    build {
+    check {
         finalizedBy(javadoc)
     }
 
