@@ -19,5 +19,5 @@ deploy:
   on:
     branch: master
   local_dir: ./build/docs/
-  repo: paul-amonson/paul-amonson.github.io
+  repo: paul-amonson/paul-amonson.github.io/libs
   target_branch: master
