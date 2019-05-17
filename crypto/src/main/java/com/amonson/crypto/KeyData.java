@@ -25,7 +25,6 @@ import com.amonson.prop_store.*;
 /**
  * Class to create/store initialization vectors and keys for AES encryption/decryption.
  */
-@SuppressWarnings("serial")
 public class KeyData {
     /**
      * Constructor that takes a IV and Key Strings for AES encryption encoded with Base64.
@@ -93,7 +92,7 @@ public class KeyData {
      */
     @Override
     public boolean equals(Object o) {
-        if(KeyData.class.isInstance(o)) {
+        if(o instanceof KeyData) {
             KeyData kd = (KeyData)o;
             return kd.iv_.equals(iv_) && kd.key_.equals(key_);
         }
