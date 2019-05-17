@@ -52,10 +52,7 @@ subprojects {
                 from(file("${rootProject.projectDir}/html_src/stylesheet.css"))
                 into "${rootProject.buildDir}/docs/documentation"
             }
-            copy {
-                from(file("${rootProject.buildDir}/reports"))
-                into "${rootProject.buildDir}/docs/reports"
-            }
+            new File((String)"${rootProject.buildDir}/docs/documentation").mkdirs()
             new File((String)"${rootProject.buildDir}/docs/documentation/index.html").text = """
 <!DOCTYPE html>
 <html lang="en">
@@ -75,6 +72,7 @@ subprojects {
 </body>
 </html>
 """
+            new File((String)"${rootProject.buildDir}/docs/reports").mkdirs()
             new File((String)"${rootProject.buildDir}/docs/reports/index.html").text = """
 <!DOCTYPE html>
 <html lang="en">
@@ -134,7 +132,7 @@ Build: <i>${rootProject.version}</i></h1>
 
     test {
         reports {
-            html.destination file("${rootProject.buildDir}/reports/test/${project.name}")
+            html.destination file("${rootProject.buildDir}/docs/reports/test/${project.name}")
             junitXml.destination file("${rootProject.buildDir}/tests/${project.name}")
         }
         finalizedBy(jacocoTestReport, pmdMain)
@@ -150,7 +148,7 @@ Build: <i>${rootProject.version}</i></h1>
             xml.enabled = true
             xml.destination = file("${rootProject.buildDir}/pmd/${project.name}.xml")
             html.enabled = true
-            html.destination = file("${rootProject.buildDir}/reports/pmd/${project.name}.html")
+            html.destination = file("${rootProject.buildDir}/docs/reports/pmd/${project.name}.html")
         }
     }
 
@@ -159,7 +157,7 @@ Build: <i>${rootProject.version}</i></h1>
         reports {
             xml.enabled = true
             csv.enabled = false
-            html.destination file("${rootProject.buildDir}/reports/jacoco/${project.name}")
+            html.destination file("${rootProject.buildDir}/docs/reports/jacoco/${project.name}")
             xml.destination file("${rootProject.buildDir}/jacoco/${project.name}.xml")
         }
         finalizedBy(jacocoTestCoverageVerification)

@@ -31,11 +31,11 @@ public class EncryptedFileOutputStream extends OutputStream {
      * Open a file for write that is AES encrypted.
      * @param filename File to open for writing.
      * @param key Key object for crypto.
-     * @throws FileNotFoundException
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidAlgorithmParameterException
-     * @throws InvalidKeyException
+     * @throws FileNotFoundException When an input file is not found.
+     * @throws InvalidAlgorithmParameterException When the AES/CBC is not supported.
+     * @throws NoSuchAlgorithmException When the AES algorithm is not supported.
+     * @throws InvalidKeyException When a bad key is used, usually the wrong bit length.
+     * @throws NoSuchPaddingException When the AES/CBC/PKCS5PADDING is not supported.
      */
     public EncryptedFileOutputStream(String filename, KeyData key) throws FileNotFoundException, NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
@@ -48,11 +48,11 @@ public class EncryptedFileOutputStream extends OutputStream {
      * Open a file for write that is AES encrypted.
      * @param file File to open for writing.
      * @param key Key object for crypto.
-     * @throws FileNotFoundException
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidAlgorithmParameterException
-     * @throws InvalidKeyException
+     * @throws FileNotFoundException When an input file is not found.
+     * @throws InvalidAlgorithmParameterException When the AES/CBC is not supported.
+     * @throws NoSuchAlgorithmException When the AES algorithm is not supported.
+     * @throws InvalidKeyException When a bad key is used, usually the wrong bit length.
+     * @throws NoSuchPaddingException When the AES/CBC/PKCS5PADDING is not supported.
      */
     public EncryptedFileOutputStream(File file, KeyData key) throws FileNotFoundException, NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
@@ -64,7 +64,7 @@ public class EncryptedFileOutputStream extends OutputStream {
     /**
      * Write a byte to the stream.
      * @param n The byte to write.
-     * @throws IOException
+     * @throws IOException When a stream cannot be written.
      */
     @Override
     public void write(int n) throws IOException {
@@ -74,7 +74,7 @@ public class EncryptedFileOutputStream extends OutputStream {
     /**
      * Write bytes to the stream.
      * @param bytes The bytes to write.
-     * @throws IOException
+     * @throws IOException When a stream cannot be written.
      */
     @Override
     public void write(byte[] bytes) throws IOException {
@@ -86,7 +86,7 @@ public class EncryptedFileOutputStream extends OutputStream {
      * @param bytes The bytes to write.
      * @param off offset in byte buffer.
      * @param len length of bytes.
-     * @throws IOException
+     * @throws IOException When a stream cannot be written.
      */
     @Override
     public void write(byte[] bytes, int off, int len) throws IOException {
@@ -95,7 +95,7 @@ public class EncryptedFileOutputStream extends OutputStream {
 
     /**
      * Close the stream.
-     * @throws IOException
+     * @throws IOException When a stream cannot be closed.
      */
     @Override
     public void close() throws IOException {
@@ -105,7 +105,7 @@ public class EncryptedFileOutputStream extends OutputStream {
 
     /**
      * Flush bytes to disk.
-     * @throws IOException
+     * @throws IOException When a stream cannot be written.
      */
     @Override
     public void flush() throws IOException {
