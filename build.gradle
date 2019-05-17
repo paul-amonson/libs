@@ -46,16 +46,35 @@ subprojects {
         doLast {
             copy {
                 from(javadoc.outputs)
+                from(file("${rootProject.projectDir}/index.html"))
                 into "${rootProject.buildDir}/docs/${project.name}"
             }
             copy {
-                from(file("${rootProject.projectDir}/index.html"))
-                from(file("${rootProject.projectDir}/stylesheet.css"))
+                from(file("${rootProject.projectDir}/html_src/stylesheet.css"))
                 into "${rootProject.buildDir}/docs"
             }
+            new File((String)"${rootProject.buildDir}/docs/index.html").text = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>libs API Java Documentation</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+</head>
+<body style="background-color:#dee3e9;">
+<h1 style="text-indent:20px">libs API Java Documentation (${project.version})</h1>
+<ul>
+    <li>Package: <a href="crypto/index.html">crypto</a></li>
+    <li>Package: <a href="logger/index.html">logger</a></li>
+    <li>Package: <a href="prop_store/index.html">prop_store</a></li>
+    <li>Package: <a href="xdg/index.html">xdg</a></li>
+</ul>
+</body>
+</html>
+"""
         }
     }
-    
+
     check {
         finalizedBy(javadoc)
     }
