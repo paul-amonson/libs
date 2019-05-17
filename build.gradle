@@ -46,14 +46,17 @@ subprojects {
         doLast {
             copy {
                 from(javadoc.outputs)
-                from(file("${rootProject.projectDir}/index.html"))
-                into "${rootProject.buildDir}/docs/${project.name}"
+                into "${rootProject.buildDir}/docs/documentation/${project.name}"
             }
             copy {
                 from(file("${rootProject.projectDir}/html_src/stylesheet.css"))
-                into "${rootProject.buildDir}/docs"
+                into "${rootProject.buildDir}/docs/documentation"
             }
-            new File((String)"${rootProject.buildDir}/docs/index.html").text = """
+            copy {
+                from(file("${rootProject.buildDir}/reports"))
+                into "${rootProject.buildDir}/docs/reports"
+            }
+            new File((String)"${rootProject.buildDir}/docs/documentation/index.html").text = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
