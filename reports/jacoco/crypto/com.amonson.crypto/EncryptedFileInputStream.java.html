@@ -32,11 +32,11 @@ public class EncryptedFileInputStream extends InputStream {
      * Open a file for read.
      * @param filename File to open for read.
      * @param key Key object for crypto.
-     * @throws FileNotFoundException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @throws NoSuchPaddingException
+     * @throws FileNotFoundException When an input file is not found.
+     * @throws InvalidAlgorithmParameterException When the AES/CBC is not supported.
+     * @throws NoSuchAlgorithmException When the AES algorithm is not supported.
+     * @throws InvalidKeyException When a bad key is used, usually the wrong bit length.
+     * @throws NoSuchPaddingException When the AES/CBC/PKCS5PADDING is not supported.
      */
     public EncryptedFileInputStream(String filename, KeyData key) throws FileNotFoundException,
             InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
@@ -49,11 +49,11 @@ public class EncryptedFileInputStream extends InputStream {
      * Open a file for read.
      * @param file File to open for read.
      * @param key Key object for crypto.
-     * @throws FileNotFoundException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @throws NoSuchPaddingException
+     * @throws FileNotFoundException When an input file is not found.
+     * @throws InvalidAlgorithmParameterException When the AES/CBC is not supported.
+     * @throws NoSuchAlgorithmException When the AES algorithm is not supported.
+     * @throws InvalidKeyException When a bad key is used, usually the wrong bit length.
+     * @throws NoSuchPaddingException When the AES/CBC/PKCS5PADDING is not supported.
      */
     public EncryptedFileInputStream(File file, KeyData key) throws FileNotFoundException,
             InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
@@ -65,7 +65,7 @@ public class EncryptedFileInputStream extends InputStream {
     /**
      * Read a byte.
      * @return The byte read.
-     * @throws IOException
+     * @throws IOException When a stream cannot be read.
      */
     @Override
     public int read() throws IOException {
@@ -76,7 +76,7 @@ public class EncryptedFileInputStream extends InputStream {
      * Read bytes.
      * @param bytes Buffer for bytes.
      * @return count of bytes read.
-     * @throws IOException
+     * @throws IOException When a stream cannot be read.
      */
     @Override
     public int read(byte[] bytes) throws IOException {
@@ -89,7 +89,7 @@ public class EncryptedFileInputStream extends InputStream {
      * @param off offset in byte buffer.
      * @param len length of bytes.
      * @return count of bytes read.
-     * @throws IOException
+     * @throws IOException When a stream cannot be read.
      */
     @Override
     public int read(byte[] bytes, int off, int len) throws IOException {
@@ -98,7 +98,7 @@ public class EncryptedFileInputStream extends InputStream {
 
     /**
      * Close the stream.
-     * @throws IOException
+     * @throws IOException When a stream cannot be closed.
      */
     @Override
     public void close() throws IOException {
