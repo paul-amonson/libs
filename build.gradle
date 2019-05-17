@@ -65,7 +65,7 @@ subprojects {
     <link rel="stylesheet" type="text/css" href="/stylesheet.css" title="Style">
 </head>
 <body style="background-color:#dee3e9;">
-<h1 style="text-indent:20px"><a>${project.name}</a> API Java Documentation (${project.version})</h1>
+<h1 style="text-indent:20px"><a>${rootProject.name}</a> API Java Documentation (${rootProject.version})</h1>
 <ul>
     <li>Package: <a href="crypto/index.html">crypto</a></li>
     <li>Package: <a href="logger/index.html">logger</a></li>
@@ -84,7 +84,8 @@ subprojects {
     <link rel="stylesheet" type="text/css" href="/stylesheet.css" title="Style">
 </head>
 <body style="background-color:#dee3e9;">
-<h1>Build Reports for <a href="https://github.com/paul-amonson/libs">${project.name}</a> Build: <i>${project.version}</i></h1>
+<h1>Build Reports for <a href="https://github.com/paul-amonson/libs">${rootProject.name}</a>
+Build: <i>${rootProject.version}</i></h1>
 <h2 style="text-indent:20px">Test Reports</h2>
 <ul>
     <li>Tests: <a href="test/crypto/index.html">crypto</a></li>
