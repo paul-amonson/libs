@@ -25,49 +25,48 @@ import com.amonson.prop_store.*;
 /**
  * Class to create/store initialization vectors and keys for AES encryption/decryption.
  */
-@SuppressWarnings(&quot;serial&quot;)
 public class KeyData {
     /**
      * Constructor that takes a IV and Key Strings for AES encryption encoded with Base64.
      * @param iv The Base64 encoded initialization vector.
      * @param key The base64 encoded key.
      */
-<span class="fc" id="L35">    public KeyData(String iv, String key) {</span>
-<span class="fc" id="L36">        iv_ = iv;</span>
-<span class="fc" id="L37">        key_ = key;</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L34">    public KeyData(String iv, String key) {</span>
+<span class="fc" id="L35">        iv_ = iv;</span>
+<span class="fc" id="L36">        key_ = key;</span>
+<span class="fc" id="L37">    }</span>
 
     /**
      * Duplicating constructor for Key data.
      * @param data The KeyData instance to copy from.
      */
-<span class="fc" id="L44">    public KeyData(KeyData data) {</span>
-<span class="fc" id="L45">        iv_ = data.IV();</span>
-<span class="fc" id="L46">        key_ = data.key();</span>
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L43">    public KeyData(KeyData data) {</span>
+<span class="fc" id="L44">        iv_ = data.IV();</span>
+<span class="fc" id="L45">        key_ = data.key();</span>
+<span class="fc" id="L46">    }</span>
 
     /**
      * Generates new strong IV and Key's for AES encryption/decryption.
      * @throws NoSuchAlgorithmException Thrown when the JRE platform does not support strong algorithms for
      * IV/Key generation.
      */
-<span class="fc" id="L54">    public KeyData() throws NoSuchAlgorithmException {</span>
-<span class="fc" id="L55">        SecureRandom randomSecureRandom = SecureRandom.getInstanceStrong();</span>
-<span class="fc" id="L56">        byte[] iv = new byte[16];</span>
-<span class="fc" id="L57">        randomSecureRandom.nextBytes(iv);</span>
-<span class="fc" id="L58">        iv_ = Base64.getEncoder().encodeToString(iv);</span>
-<span class="fc" id="L59">        KeyGenerator kgen = KeyGenerator.getInstance(&quot;AES&quot;);</span>
-<span class="fc" id="L60">        kgen.init(128);</span>
-<span class="fc" id="L61">        SecretKey aesKey = kgen.generateKey();</span>
-<span class="fc" id="L62">        key_ = Base64.getEncoder().encodeToString(aesKey.getEncoded());</span>
-<span class="fc" id="L63">    }</span>
+<span class="fc" id="L53">    public KeyData() throws NoSuchAlgorithmException {</span>
+<span class="fc" id="L54">        SecureRandom randomSecureRandom = SecureRandom.getInstanceStrong();</span>
+<span class="fc" id="L55">        byte[] iv = new byte[16];</span>
+<span class="fc" id="L56">        randomSecureRandom.nextBytes(iv);</span>
+<span class="fc" id="L57">        iv_ = Base64.getEncoder().encodeToString(iv);</span>
+<span class="fc" id="L58">        KeyGenerator kgen = KeyGenerator.getInstance(&quot;AES&quot;);</span>
+<span class="fc" id="L59">        kgen.init(128);</span>
+<span class="fc" id="L60">        SecretKey aesKey = kgen.generateKey();</span>
+<span class="fc" id="L61">        key_ = Base64.getEncoder().encodeToString(aesKey.getEncoded());</span>
+<span class="fc" id="L62">    }</span>
 
     /**
      * IV Accessor method.
      * @return The base64 encoded initialization vector.
      */
     public String IV() {
-<span class="fc" id="L70">        return iv_;</span>
+<span class="fc" id="L69">        return iv_;</span>
     }
 
     /**
@@ -75,7 +74,7 @@ public class KeyData {
      * @return The base64 encoded key.
      */
     public String key() {
-<span class="fc" id="L78">        return key_;</span>
+<span class="fc" id="L77">        return key_;</span>
     }
 
     /**
@@ -84,7 +83,7 @@ public class KeyData {
      */
     @Override
     public String toString() {
-<span class="fc" id="L87">        return String.format(&quot;IV='%s'; Key='%s'&quot;, iv_, key_);</span>
+<span class="fc" id="L86">        return String.format(&quot;IV='%s'; Key='%s'&quot;, iv_, key_);</span>
     }
 
     /**
@@ -93,11 +92,11 @@ public class KeyData {
      */
     @Override
     public boolean equals(Object o) {
-<span class="fc bfc" id="L96" title="All 2 branches covered.">        if(KeyData.class.isInstance(o)) {</span>
-<span class="fc" id="L97">            KeyData kd = (KeyData)o;</span>
-<span class="fc bfc" id="L98" title="All 4 branches covered.">            return kd.iv_.equals(iv_) &amp;&amp; kd.key_.equals(key_);</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if(o instanceof KeyData) {</span>
+<span class="fc" id="L96">            KeyData kd = (KeyData)o;</span>
+<span class="fc bfc" id="L97" title="All 4 branches covered.">            return kd.iv_.equals(iv_) &amp;&amp; kd.key_.equals(key_);</span>
         }
-<span class="fc" id="L100">        return super.equals(o);</span>
+<span class="fc" id="L99">        return super.equals(o);</span>
     }
 
     /**
@@ -106,7 +105,7 @@ public class KeyData {
      */
     @Override
     public int hashCode() {
-<span class="nc" id="L109">        return super.hashCode();</span>
+<span class="nc" id="L108">        return super.hashCode();</span>
     }
 
     /**
@@ -114,7 +113,7 @@ public class KeyData {
      * @return The IV as bytes.
      */
     public byte[] IVAsBytes() {
-<span class="fc" id="L117">        return Base64.getDecoder().decode(iv_);</span>
+<span class="fc" id="L116">        return Base64.getDecoder().decode(iv_);</span>
     }
 
     /**
@@ -122,7 +121,7 @@ public class KeyData {
      * @return The Key as bytes.
      */
     public byte[] keyAsBytes() {
-<span class="fc" id="L125">        return Base64.getDecoder().decode(key_);</span>
+<span class="fc" id="L124">        return Base64.getDecoder().decode(key_);</span>
     }
 
     /**
@@ -130,10 +129,10 @@ public class KeyData {
      * @return The PropMap representation of this object.
      */
     public PropMap toPropMap() {
-<span class="fc" id="L133">        return new PropMap() {{</span>
-<span class="fc" id="L134">            put(&quot;A&quot;, iv_);</span>
-<span class="fc" id="L135">            put(&quot;B&quot;, key_);</span>
-<span class="fc" id="L136">        }};</span>
+<span class="fc" id="L132">        return new PropMap() {{</span>
+<span class="fc" id="L133">            put(&quot;A&quot;, iv_);</span>
+<span class="fc" id="L134">            put(&quot;B&quot;, key_);</span>
+<span class="fc" id="L135">        }};</span>
     }
 
     /**
@@ -142,9 +141,9 @@ public class KeyData {
      * @return The new KeyData instance.
      */
     public static KeyData fromPropMap(PropMap keyProp) {
-<span class="fc" id="L145">        String iv = keyProp.getString(&quot;A&quot;);</span>
-<span class="fc" id="L146">        String key = keyProp.getString(&quot;B&quot;);</span>
-<span class="fc" id="L147">        return new KeyData(iv, key);</span>
+<span class="fc" id="L144">        String iv = keyProp.getString(&quot;A&quot;);</span>
+<span class="fc" id="L145">        String key = keyProp.getString(&quot;B&quot;);</span>
+<span class="fc" id="L146">        return new KeyData(iv, key);</span>
     }
 
     String iv_;

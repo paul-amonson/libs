@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.474s</div>
+<div class="counter">0.419s</div>
 <p>duration</p>
 </div>
 </td>
@@ -82,17 +82,17 @@
 </thead>
 <tr>
 <td class="success">levelTests</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">negativeTests</td>
-<td class="success">0.334s</td>
+<td class="success">0.320s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">test</td>
-<td class="success">0.139s</td>
+<td class="success">0.099s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -100,15 +100,15 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2019-05-17T02:49:49.934Z: INFO    : (LoggerTest.java:42): Informational
-2019-05-17T02:49:49.945Z: WARN    : (LoggerTest.java:43): Warning
+<pre>2019-05-17T03:04:10.414Z: INFO    : (LoggerTest.java:42): Informational
+2019-05-17T03:04:10.416Z: WARN    : (LoggerTest.java:43): Warning
 </pre>
 </span>
 </div>
 <div id="tab2" class="tab">
 <h2>Standard error</h2>
 <span class="code">
-<pre>2019-05-17T02:49:49.651659Z: ERROR   : (LoggerTest.java:59): Test Message
+<pre>2019-05-17T03:04:10.175383Z: ERROR   : (LoggerTest.java:59): Test Message
   Exception: java.lang.RuntimeException: Test Exception Message
       at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:59)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
@@ -209,7 +209,7 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-05-17T02:49:49.775001Z: ERROR   : (LoggerTest.java:60): Logged Exception...
+2019-05-17T03:04:10.257859Z: ERROR   : (LoggerTest.java:60): Logged Exception...
   Exception: java.lang.RuntimeException: Test Exception Message
       at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:60)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
@@ -310,7 +310,7 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-05-17T02:49:49.862598Z: ERROR   : (LoggerTest.java:63): Test Message
+2019-05-17T03:04:10.301867Z: ERROR   : (LoggerTest.java:63): Test Message
   Exception: java.lang.RuntimeException: Test Exception Message
       at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:63)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
@@ -411,7 +411,7 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-05-17T02:49:49.879582Z: ERROR   : (LoggerTest.java:64): Logged Exception...
+2019-05-17T03:04:10.360126Z: ERROR   : (LoggerTest.java:64): Logged Exception...
   Exception: java.lang.RuntimeException: Test Exception Message
       at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:64)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
@@ -512,9 +512,9 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-05-17T02:49:49.947Z: ERROR   : (LoggerTest.java:44): Error
-2019-05-17T02:49:49.949Z: CRITICAL: (LoggerTest.java:45): Critical
-2019-05-17T02:49:49.958Z: ERROR   : (LoggerTest.java:46): Test Message
+2019-05-17T03:04:10.417Z: ERROR   : (LoggerTest.java:44): Error
+2019-05-17T03:04:10.418Z: CRITICAL: (LoggerTest.java:45): Critical
+2019-05-17T03:04:10.423Z: ERROR   : (LoggerTest.java:46): Test Message
   Exception: java.lang.RuntimeException: Test Exception Message
       at com.amonson.logger.LoggerTest.test(LoggerTest.java:46)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
@@ -615,7 +615,7 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-05-17T02:49:50.022Z: ERROR   : (LoggerTest.java:47): Logged Exception...
+2019-05-17T03:04:10.475Z: ERROR   : (LoggerTest.java:47): Logged Exception...
   Exception: java.lang.RuntimeException: Test Exception Message
       at com.amonson.logger.LoggerTest.test(LoggerTest.java:47)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
@@ -727,7 +727,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 5.4</a> at May 17, 2019, 2:49:50 AM</p>
+<a href="http://www.gradle.org">Gradle 5.4</a> at May 17, 2019, 3:04:10 AM</p>
 </div>
 </div>
 </body>
