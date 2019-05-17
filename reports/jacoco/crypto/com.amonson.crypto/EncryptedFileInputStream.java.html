@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EncryptedFileInputStream.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">crypto</a> &gt; <a href="index.source.html" class="el_package">com.amonson.crypto</a> &gt; <span class="el_source">EncryptedFileInputStream.java</span></div><h1>EncryptedFileInputStream.java</h1><pre class="source lang-java linenums">// Copyright 2018 Paul Amonson
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+//        You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package com.amonson.crypto;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+/**
+ * Class to open an encrypted file stream for read.
+ */
+public class EncryptedFileInputStream extends InputStream {
+    /**
+     * Open a file for read.
+     * @param filename File to open for read.
+     * @param key Key object for crypto.
+     * @throws FileNotFoundException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     */
+    public EncryptedFileInputStream(String filename, KeyData key) throws FileNotFoundException,
+            InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
+<span class="fc" id="L43">        super();</span>
+<span class="fc" id="L44">        key_ = key;</span>
+<span class="fc" id="L45">        init(new File(filename));</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Open a file for read.
+     * @param file File to open for read.
+     * @param key Key object for crypto.
+     * @throws FileNotFoundException
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     */
+    public EncryptedFileInputStream(File file, KeyData key) throws FileNotFoundException,
+            InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
+<span class="fc" id="L60">        super();</span>
+<span class="fc" id="L61">        key_ = key;</span>
+<span class="fc" id="L62">        init(file);</span>
+<span class="fc" id="L63">    }</span>
+
+    /**
+     * Read a byte.
+     * @return The byte read.
+     * @throws IOException
+     */
+    @Override
+    public int read() throws IOException {
+<span class="fc" id="L72">        return in_.read();</span>
+    }
+
+    /**
+     * Read bytes.
+     * @param bytes Buffer for bytes.
+     * @return count of bytes read.
+     * @throws IOException
+     */
+    @Override
+    public int read(byte[] bytes) throws IOException {
+<span class="fc" id="L83">        return in_.read(bytes);</span>
+    }
+
+    /**
+     * Read bytes.
+     * @param bytes Buffer for bytes.
+     * @param off offset in byte buffer.
+     * @param len length of bytes.
+     * @return count of bytes read.
+     * @throws IOException
+     */
+    @Override
+    public int read(byte[] bytes, int off, int len) throws IOException {
+<span class="fc" id="L96">        return in_.read(bytes, off, len);</span>
+    }
+
+    /**
+     * Close the stream.
+     * @throws IOException
+     */
+    @Override
+    public void close() throws IOException {
+<span class="fc" id="L105">        super.close();</span>
+<span class="fc" id="L106">        in_.close();</span>
+<span class="fc" id="L107">    }</span>
+
+    private void init(File file) throws NoSuchPaddingException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException, InvalidKeyException, FileNotFoundException {
+<span class="fc" id="L111">        IvParameterSpec ivSpec = new IvParameterSpec(key_.IVAsBytes());</span>
+<span class="fc" id="L112">        SecretKeySpec keySpec = new SecretKeySpec(key_.keyAsBytes(), &quot;AES&quot;);</span>
+<span class="fc" id="L113">        Cipher cipher = Cipher.getInstance(&quot;AES/CBC/PKCS5PADDING&quot;);</span>
+<span class="fc" id="L114">        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);</span>
+<span class="fc" id="L115">        in_ = new CipherInputStream(new FileInputStream(file), cipher);</span>
+<span class="fc" id="L116">    }</span>
+
+    private KeyData key_;
+    private CipherInputStream in_;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

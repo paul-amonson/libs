@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">prop_store</a> &gt; <a href="index.source.html" class="el_package">com.amonson.prop_store</a> &gt; <span class="el_source">JsonStore.java</span></div><h1>JsonStore.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.prop_store;
+
+import java.util.Properties;
+
+import com.github.cliftonlabs.json_simple.*;
+
+/**
+ * PropStore implementation for JSON.
+ */
+class JsonStore extends PropStore {
+    /**
+     * Default constructor that takes a amp of configuration values for the property store.
+     *
+     * @param config The Properties of configuration parameters that may or may not be used by the derived classes.
+     *              This may be null.
+     */
+    public JsonStore(Properties config) {
+<span class="fc" id="L23">        super(config);</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if(config != null)</span>
+<span class="fc" id="L25">            indent_ = Integer.parseInt(config.getProperty(&quot;com.amonson.prop_store.indent&quot;, &quot;0&quot;));</span>
+<span class="fc" id="L26">    }</span>
+
+    /**
+     * Convert the PropMap to the text Store format.
+     *
+     * @param map The map to Store.
+     * @return The String version of the PropMap.
+     */
+    @Override
+    public String toString(PropMap map) {
+<span class="fc" id="L36">        JsonObject json = new JsonObject(map);</span>
+<span class="fc" id="L37">        String str = json.toJson();</span>
+<span class="fc bfc" id="L38" title="All 4 branches covered.">        if(indent_ &gt; 0 &amp;&amp; indent_ &lt;= 8) str = Jsoner.prettyPrint(str, indent_);</span>
+<span class="fc" id="L39">        return str;</span>
+    }
+
+    /**
+     * Convert the PropList to the text Store format.
+     *
+     * @param list The list to Store.
+     * @return The String version of the PropList.
+     */
+    @Override
+    public String toString(PropList list) {
+<span class="fc" id="L50">        JsonArray json = new JsonArray(list);</span>
+<span class="fc" id="L51">        String str = json.toJson();</span>
+<span class="fc bfc" id="L52" title="All 4 branches covered.">        if(indent_ &gt; 0 &amp;&amp; indent_ &lt;= 8) str = Jsoner.prettyPrint(str, indent_);</span>
+<span class="fc" id="L53">        return str;</span>
+    }
+
+    /**
+     * Convert a String representation of the properties to a PropMap.
+     *
+     * @param storeText The String representation of the properties.
+     * @return The parsed PropMap.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    @Override
+    public PropMap fromStringToMap(String storeText) throws PropStoreException {
+        Object obj;
+        try {
+<span class="fc" id="L67">            obj = Jsoner.deserialize(storeText);</span>
+<span class="fc" id="L68">        } catch(JsonException e) {</span>
+<span class="fc" id="L69">            throw new PropStoreException(&quot;Failed to parse the text as JSON!&quot;, e);</span>
+<span class="fc" id="L70">        }</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if(obj instanceof JsonObject)</span>
+<span class="fc" id="L72">            return parseMap((JsonObject)obj);</span>
+<span class="fc" id="L73">        throw new PropStoreException(&quot;The JSON text was not a map!&quot;);</span>
+    }
+
+    /**
+     * Convert a String representation of the properties to a PropList.
+     *
+     * @param storeText The String representation of the properties.
+     * @return The parsed PropList.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    @Override
+    public PropList fromStringToList(String storeText) throws PropStoreException {
+        Object obj;
+        try {
+<span class="fc" id="L87">            obj = Jsoner.deserialize(storeText);</span>
+<span class="fc" id="L88">        } catch(JsonException e) {</span>
+<span class="fc" id="L89">            throw new PropStoreException(&quot;Failed to parse the text as JSON!&quot;, e);</span>
+<span class="fc" id="L90">        }</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if(obj instanceof JsonArray)</span>
+<span class="fc" id="L92">            return parseArray((JsonArray)obj);</span>
+<span class="fc" id="L93">        throw new PropStoreException(&quot;The JSON text was not a list!&quot;);</span>
+    }
+
+    private PropMap parseMap(JsonObject map) {
+<span class="fc" id="L97">        PropMap result = new PropMap();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for(String key: map.keySet()) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            if(map.get(key) instanceof JsonObject)</span>
+<span class="fc" id="L100">                result.put(key, parseMap((JsonObject)map.get(key)));</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            else if(map.get(key) instanceof JsonArray)</span>
+<span class="fc" id="L102">                result.put(key, parseArray((JsonArray)map.get(key)));</span>
+            else
+<span class="fc" id="L104">                result.put(key, map.get(key));</span>
+<span class="fc" id="L105">        }</span>
+<span class="fc" id="L106">        return result;</span>
+    }
+
+    private PropList parseArray(JsonArray array) {
+<span class="fc" id="L110">        PropList result = new PropList();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        for (Object anArray : array) {</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (anArray instanceof JsonObject)</span>
+<span class="fc" id="L113">                result.add(parseMap((JsonObject)anArray));</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">            else if (anArray instanceof JsonArray)</span>
+<span class="fc" id="L115">                result.add(parseArray((JsonArray)anArray));</span>
+            else
+<span class="fc" id="L117">                result.add(anArray);</span>
+<span class="fc" id="L118">        }</span>
+<span class="fc" id="L119">        return result;</span>
+    }
+
+<span class="fc" id="L122">    private int indent_ = 0;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
