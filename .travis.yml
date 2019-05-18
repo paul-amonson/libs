@@ -20,9 +20,11 @@ deploy:
     on:
       tags: true
     local_dir: ./build/docs/
+
   - provider: releases
     api_key: $GITHUB_TOKEN
-    file: ./build/libs/*
+    file: "./build/libs/**"
     skip_cleanup: true
     on:
-      tags: true
+      branch: master
+#      tags: true
