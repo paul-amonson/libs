@@ -85,9 +85,8 @@ public final class PropStoreFactory {
     /**
      * Setup supplied internal implementations.
      */
-    @SuppressWarnings("serial")
     static Map<String, Class<? extends PropStore>> supportedImplementations_ =
-            new HashMap<String, Class<? extends PropStore>>() {{
+            new HashMap<>() {{
         put("json", JsonStore.class);
         put("yaml", YamlStore.class);
     }};

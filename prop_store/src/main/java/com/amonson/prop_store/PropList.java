@@ -92,10 +92,9 @@ public class PropList extends ArrayList<Object> {
     
     @Override
     public boolean addAll(Collection<?> collection) {
-        boolean rv = true;
         for(Object item: collection)
-            rv = rv && add(item);
-        return rv;
+            add(item);
+        return true;
     }
 
     @Override

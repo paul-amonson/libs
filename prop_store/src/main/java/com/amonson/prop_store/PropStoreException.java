@@ -10,8 +10,8 @@ package com.amonson.prop_store;
  */
 @SuppressWarnings("serial")
 public class PropStoreException extends Exception {
-    public PropStoreException() { super(); }
-    public PropStoreException(String msg) { super(msg); }
-    public PropStoreException(Throwable e) { super(e); }
-    public PropStoreException(String msg, Throwable e) { super(msg, e); }
+    PropStoreException() { super(); }
+    PropStoreException(String msg) { super(msg); }
+    PropStoreException(Throwable e) { super(e); }
+    PropStoreException(String msg, Throwable e) { super(msg, e); }
 }

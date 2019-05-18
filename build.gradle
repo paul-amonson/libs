@@ -123,19 +123,18 @@ Build: <i>${rootProject.version}</i></h1>
         options.forkOptions.executable = 'javac'
     }
 
-    task copyJars(type: Copy) {
-        from jar.outputs
-        from configurations.compile
-        into "${rootProject.buildDir}/libs"
-    }
-    jar.finalizedBy(copyJars)
-
     test {
         reports {
             html.destination file("${rootProject.buildDir}/docs/reports/test/${project.name}")
             junitXml.destination file("${rootProject.buildDir}/tests/${project.name}")
         }
         finalizedBy(jacocoTestReport, pmdMain)
+    }
+
+    jar {
+        from {
+            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        }
     }
 
     pmdTest.enabled = false
@@ -185,10 +184,9 @@ Build: <i>${rootProject.version}</i></h1>
     }
 }
 
-project(':crypto') {
+project(':logger') {
     group = 'com.amonson'
     dependencies {
-        compile project(':prop_store')
     }
 }
 
@@ -200,8 +198,18 @@ project(':prop_store') {
     }
 }
 
-project(':logger') {
+project(':crypto') {
     group = 'com.amonson'
     dependencies {
+        compile project(':prop_store')
     }
 }
+
+task fatJar(type: Jar, dependsOn: subprojects.jar) {
+    subprojects.each { subproject ->
+        from subproject.configurations.archives.allArtifacts.files.collect {
+            zipTree(it)
+        }
+    }
+}
+check.finalizedBy(fatJar)

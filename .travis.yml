@@ -11,11 +11,18 @@ cache:
 env:
   global:
     secure: MdNoM2E/w7GKdLqCsWPjf9+FwH1SGWkrYKUygXazpevDZhQ0jSfdfAtdLdLjjFR2bas74m1ID5etVdq2n/L5sFimnmsnEKrLZnd3yAVLGnBtE3U7NzZC7Et6jSAx8QLo9IpEyO9s8Z0dm0sJEWUL58Dl7DvGJwVeMTHqcgICM6pbvcOfGRVCHd9zqCuQFpYPnrLDmLNa4Uf9/XcJ+gAc2nb2fHIzfXUi5Z8z2D8kwhE7TOLcUrUHRWpPxSKxufJ2eKkSSktSXv33Uw07xyGzD8GaeUj8cAisYq3gC24fk7dZbhU8WiSwp1rAy4UITVKHZ+9aZ8HvaXcjueBPpRcWWE6i2CP5nZYRazbGS2sv5cgzX9ewk+LO7K4Ah2ZzDlo/Gdp5qHwOCq7rKCynyq4BbO1xI8Dh+EmHh5u3J5U7Y8PFhV0lSGLGD6lEUfFWKW5sSMvJHCG5ntNJBLBiIJd1PA/WbhOqE54pESW8fZBJy9M44ePqwqBLUIXgeN0mgOuv9JxshtUmtVnGqo1qZ2sgk8PPjgVXwna2FCjzls473btKqPcfvrBZtXYhis9pzzhpCyu+3S318Fv0kPm1RU9wOMZM9O+8n76z3ulTwN4CLxES54bo34ehkJ2n7XbXu5bIHILKqYwh4C7p7SQFnAq6M186pbrhwJCCNz71hspKDEE=
+
 deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  keep_history: true
-  on:
-    tags: true
-  local_dir: ./build/docs/
+  - provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    keep_history: true
+    on:
+      tags: true
+    local_dir: ./build/docs/
+  - provider: releases
+    api_key: $GITHUB_TOKEN
+    file: build/libs/*
+    skip_cleanup: true
+    on:
+      tags: true

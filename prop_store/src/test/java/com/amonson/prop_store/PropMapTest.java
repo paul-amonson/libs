@@ -97,5 +97,17 @@ public class PropMapTest {
             map.put(null, "Null");
             fail();
         } catch(NullPointerException e) { /* PASS */ }
+        try {
+            map.merge("key", null, null);
+            fail();
+        } catch(UnsupportedOperationException e) { /* PASS */ }
+        try {
+            map.replaceAll(null);
+            fail();
+        } catch(UnsupportedOperationException e) { /* PASS */ }
+        PropMap map3 = new PropMap();
+        map3.putAll(new HashMap<String,String>() {{ put("a", "val"); put("b", "val"); }});
+        assertEquals("val", map3.get("a"));
+        assertEquals("val", map3.get("b"));
     }
 }
