@@ -92,23 +92,22 @@ public class PropList extends ArrayList&lt;Object&gt; {
     
     @Override
     public boolean addAll(Collection&lt;?&gt; collection) {
-<span class="nc" id="L95">        boolean rv = true;</span>
-<span class="nc bnc" id="L96" title="All 2 branches missed.">        for(Object item: collection)</span>
-<span class="nc bnc" id="L97" title="All 4 branches missed.">            rv = rv &amp;&amp; add(item);</span>
-<span class="nc" id="L98">        return rv;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        for(Object item: collection)</span>
+<span class="fc" id="L96">            add(item);</span>
+<span class="fc" id="L97">        return true;</span>
     }
 
     @Override
     public boolean addAll(int index, Collection&lt;?&gt; collection) {
-<span class="fc bfc" id="L103" title="All 2 branches covered.">        for(Object item: collection)</span>
-<span class="fc" id="L104">            add(index++, item);</span>
-<span class="fc" id="L105">        return true;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for(Object item: collection)</span>
+<span class="fc" id="L103">            add(index++, item);</span>
+<span class="fc" id="L104">        return true;</span>
     }
     
     @Override
     public Object set(int index, Object value) {
-<span class="fc" id="L110">        PropMap.checkType(value);</span>
-<span class="fc" id="L111">        return super.set(index, PropMap.makeStoredValue(value));</span>
+<span class="fc" id="L109">        PropMap.checkType(value);</span>
+<span class="fc" id="L110">        return super.set(index, PropMap.makeStoredValue(value));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

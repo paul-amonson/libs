@@ -85,11 +85,10 @@ public final class PropStoreFactory {
     /**
      * Setup supplied internal implementations.
      */
-    @SuppressWarnings(&quot;serial&quot;)
-<span class="fc" id="L89">    static Map&lt;String, Class&lt;? extends PropStore&gt;&gt; supportedImplementations_ =</span>
-<span class="fc" id="L90">            new HashMap&lt;String, Class&lt;? extends PropStore&gt;&gt;() {{</span>
-<span class="fc" id="L91">        put(&quot;json&quot;, JsonStore.class);</span>
-<span class="fc" id="L92">        put(&quot;yaml&quot;, YamlStore.class);</span>
-<span class="fc" id="L93">    }};</span>
+<span class="fc" id="L88">    static Map&lt;String, Class&lt;? extends PropStore&gt;&gt; supportedImplementations_ =</span>
+<span class="fc" id="L89">            new HashMap&lt;&gt;() {{</span>
+<span class="fc" id="L90">        put(&quot;json&quot;, JsonStore.class);</span>
+<span class="fc" id="L91">        put(&quot;yaml&quot;, YamlStore.class);</span>
+<span class="fc" id="L92">    }};</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
