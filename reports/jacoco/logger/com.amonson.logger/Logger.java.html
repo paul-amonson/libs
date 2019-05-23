@@ -1,16 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Logger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">Logger.java</span></div><h1>Logger.java</h1><pre class="source lang-java linenums">// Copyright 2018 Paul Amonson
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Logger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">Logger.java</span></div><h1>Logger.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018-2019 Paul Amonson
 //
-// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
-// you may not use this file except in compliance with the License.
-//        You may obtain a copy of the License at
+// SPDX-License-Identifier: Apache-2.0
 //
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 package com.amonson.logger;
 
@@ -29,8 +20,8 @@ public class Logger {
      * Default logger to the console.
      */
     public Logger() {
-<span class="fc" id="L32">        this(null);</span>
-<span class="fc" id="L33">    }</span>
+<span class="fc" id="L23">        this(null);</span>
+<span class="fc" id="L24">    }</span>
 
     /**
      * Default logger to the console that takes config properties. The following properties are used:
@@ -39,11 +30,11 @@ public class Logger {
      * &lt;/ul&gt;
      * @param config The proerties for the logger.
      */
-<span class="fc" id="L42">    public Logger(Properties config) {</span>
-<span class="fc" id="L43">        targets_.add(this::outputFinalString);</span>
-<span class="fc" id="L44">        setEarlyLogMethod(null);</span>
-<span class="fc" id="L45">        initialize(config);</span>
-<span class="fc" id="L46">    }</span>
+<span class="fc" id="L33">    public Logger(Properties config) {</span>
+<span class="fc" id="L34">        targets_.add(this::outputFinalString);</span>
+<span class="fc" id="L35">        setEarlyLogMethod(null);</span>
+<span class="fc" id="L36">        initialize(config);</span>
+<span class="fc" id="L37">    }</span>
 
     /**
      * Log a debug level message.
@@ -52,8 +43,8 @@ public class Logger {
      * @param args The arguments for the format string.
      */
     public void debug(String msg, Object... args) {
-<span class="fc" id="L55">        log(Level.DEBUG, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
-<span class="fc" id="L56">    }</span>
+<span class="fc" id="L46">        log(Level.DEBUG, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
+<span class="fc" id="L47">    }</span>
 
     /**
      * Log a informational level message.
@@ -62,8 +53,8 @@ public class Logger {
      * @param args The arguments for the format string.
      */
     public void info(String msg, Object... args) {
-<span class="fc" id="L65">        log(Level.INFO, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L56">        log(Level.INFO, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
+<span class="fc" id="L57">    }</span>
 
     /**
      * Log a warning level message.
@@ -72,8 +63,8 @@ public class Logger {
      * @param args The arguments for the format string.
      */
     public void warn(String msg, Object... args) {
-<span class="fc" id="L75">        log(Level.WARN, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L66">        log(Level.WARN, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
+<span class="fc" id="L67">    }</span>
 
     /**
      * Log a error level message.
@@ -82,8 +73,8 @@ public class Logger {
      * @param args The arguments for the format string.
      */
     public void error(String msg, Object... args) {
-<span class="fc" id="L85">        log(Level.ERROR, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
-<span class="fc" id="L86">    }</span>
+<span class="fc" id="L76">        log(Level.ERROR, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
+<span class="fc" id="L77">    }</span>
 
     /**
      * Log a critical level message.
@@ -92,8 +83,8 @@ public class Logger {
      * @param args The arguments for the format string.
      */
     public void critical(String msg, Object... args) {
-<span class="fc" id="L95">        log(Level.CRITICAL, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
-<span class="fc" id="L96">    }</span>
+<span class="fc" id="L86">        log(Level.CRITICAL, Thread.currentThread().getStackTrace()[STACK_INDEX], msg, args);</span>
+<span class="fc" id="L87">    }</span>
 
     /**
      * Log an exception with the full stack trace to the error log level.
@@ -101,11 +92,11 @@ public class Logger {
      * @param throwable The exception to log.
      */
     public void except(Throwable throwable) {
-<span class="fc" id="L104">        StackTraceElement element = Thread.currentThread().getStackTrace()[STACK_INDEX];</span>
-<span class="fc" id="L105">        List&lt;String&gt; exceptionLines = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L106">        dumpExceptionTrace(exceptionLines, throwable);</span>
-<span class="fc" id="L107">        log(Level.ERROR, element, &quot;Logged Exception...&quot; + exceptionSeparator_ + String.join(exceptionSeparator_, exceptionLines));</span>
-<span class="fc" id="L108">    }</span>
+<span class="fc" id="L95">        StackTraceElement element = Thread.currentThread().getStackTrace()[STACK_INDEX];</span>
+<span class="fc" id="L96">        List&lt;String&gt; exceptionLines = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L97">        dumpExceptionTrace(exceptionLines, throwable);</span>
+<span class="fc" id="L98">        log(Level.ERROR, element, &quot;Logged Exception...&quot; + exceptionSeparator_ + String.join(exceptionSeparator_, exceptionLines));</span>
+<span class="fc" id="L99">    }</span>
 
     /**
      * Log an exception with the full stack trace and a message to the error log level.
@@ -115,25 +106,25 @@ public class Logger {
      * @param args The arguments for the format string.
      */
     public void except(Throwable throwable, String msg, Object... args) {
-<span class="fc" id="L118">        StackTraceElement element = Thread.currentThread().getStackTrace()[STACK_INDEX];</span>
-<span class="fc" id="L119">        List&lt;String&gt; exceptionLines = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L120">        dumpExceptionTrace(exceptionLines, throwable);</span>
-<span class="fc" id="L121">        log(Level.ERROR, element, msg + exceptionSeparator_ + String.join(exceptionSeparator_, exceptionLines), args);</span>
-<span class="fc" id="L122">    }</span>
+<span class="fc" id="L109">        StackTraceElement element = Thread.currentThread().getStackTrace()[STACK_INDEX];</span>
+<span class="fc" id="L110">        List&lt;String&gt; exceptionLines = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L111">        dumpExceptionTrace(exceptionLines, throwable);</span>
+<span class="fc" id="L112">        log(Level.ERROR, element, msg + exceptionSeparator_ + String.join(exceptionSeparator_, exceptionLines), args);</span>
+<span class="fc" id="L113">    }</span>
 
     /**
      * Sets the date format string (see SimpleDateFormat for string descriptions of this string's format)
      *
      * @param format The date timestamp format to use in the log line.
      */
-<span class="fc" id="L129">    public void setDateFormatString(String format) { dateFormat_ = format; }</span>
+<span class="fc" id="L120">    public void setDateFormatString(String format) { dateFormat_ = format; }</span>
 
     /**
      * Gets the date format string currently used for the timestamp.
      *
      * @return The current format string.
      */
-<span class="fc" id="L136">    public String getDateFormatString() { return dateFormat_; }</span>
+<span class="fc" id="L127">    public String getDateFormatString() { return dateFormat_; }</span>
 
     /**
      * Sets the log line format string.
@@ -145,28 +136,28 @@ public class Logger {
      * %S - Class/file/line information
      * %M - User message or exception information.
      */
-<span class="fc" id="L148">    public void setLogFormatString(String format) { logLineFormat_ = format; }</span>
+<span class="fc" id="L139">    public void setLogFormatString(String format) { logLineFormat_ = format; }</span>
 
     /**
      * Gets the log line format string. See setLogFormatString for details.
      *
      * @return The format string for the log line.
      */
-<span class="fc" id="L155">    public String getLogFormatString() { return logLineFormat_; }</span>
+<span class="fc" id="L146">    public String getLogFormatString() { return logLineFormat_; }</span>
 
     /**
      * Sets the delimiter used when dumping an exception stack trace (defaults to a newline).
      *
      * @param delimiter Usually a single character delimiter used when dumping an exception stack.
      */
-<span class="fc" id="L162">    public void setExceptionSeparator(String delimiter) { exceptionSeparator_ = delimiter; }</span>
+<span class="fc" id="L153">    public void setExceptionSeparator(String delimiter) { exceptionSeparator_ = delimiter; }</span>
 
     /**
      * Gets the delimiter used when dumping an exception stack trace (defaults to a newline).
      *
      * @return Usually a single character delimiter used when dumping an exception stack.
      */
-<span class="fc" id="L169">    public String getExceptionSeparator() { return exceptionSeparator_; }</span>
+<span class="fc" id="L160">    public String getExceptionSeparator() { return exceptionSeparator_; }</span>
 
     /**
      * Sets the new threshold for log filtering. The base class does not filter, should be used by derived
@@ -174,7 +165,7 @@ public class Logger {
      *
      * @param newLevel The log level used for filtering log messages.
      */
-<span class="fc" id="L177">    public void setLevel(Level newLevel) { currentLevel_ = newLevel; }</span>
+<span class="fc" id="L168">    public void setLevel(Level newLevel) { currentLevel_ = newLevel; }</span>
 
     /**
      * Gets the new threshold for log filtering. The base class does not filter, should be used by derived
@@ -182,7 +173,7 @@ public class Logger {
      *
      * @return the current logging filter level.
      */
-<span class="fc" id="L185">    public Level getLevel() { return currentLevel_; }</span>
+<span class="fc" id="L176">    public Level getLevel() { return currentLevel_; }</span>
 
     /**
      * Add a output target to the Logger.
@@ -190,23 +181,23 @@ public class Logger {
      * @param target The output target.
      */
     public void addOutputTarget(OutputTargetInterface target) {
-<span class="fc bfc" id="L193" title="All 2 branches covered.">        if(target != null)</span>
-<span class="fc" id="L194">            targets_.add(target);</span>
-<span class="fc" id="L195">    }</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">        if(target != null)</span>
+<span class="fc" id="L185">            targets_.add(target);</span>
+<span class="fc" id="L186">    }</span>
 
     /**
      * Remove all output targets. Use when you don't want the default console output.
      */
     public void clearOutputTargets() {
-<span class="fc" id="L201">        targets_.clear();</span>
-<span class="fc" id="L202">    }</span>
+<span class="fc" id="L192">        targets_.clear();</span>
+<span class="fc" id="L193">    }</span>
 
     /**
      * Set the default logging method.
      */
     public void setDefaultLogMethod() {
-<span class="fc" id="L208">        logMethod_ = this::defaultLogMethod;</span>
-<span class="fc" id="L209">    }</span>
+<span class="fc" id="L199">        logMethod_ = this::defaultLogMethod;</span>
+<span class="fc" id="L200">    }</span>
 
     /**
      * Set the new early log response method.
@@ -214,82 +205,82 @@ public class Logger {
      * @param method The replacement method to call when the public logging methods are called.
      */
     public void setEarlyLogMethod(EarlyInterceptLog method) {
-<span class="fc bfc" id="L217" title="All 2 branches covered.">        if(method != null)</span>
-<span class="fc" id="L218">            logMethod_ = method;</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">        if(method != null)</span>
+<span class="fc" id="L209">            logMethod_ = method;</span>
         else
-<span class="fc" id="L220">            setDefaultLogMethod();</span>
-<span class="fc" id="L221">    }</span>
+<span class="fc" id="L211">            setDefaultLogMethod();</span>
+<span class="fc" id="L212">    }</span>
 
     private void initialize(Properties config) {
-<span class="fc" id="L224">        String levelKey = &quot;com.amonson.logger.Level&quot;;</span>
-<span class="fc" id="L225">        String level = &quot;INFO&quot;;</span>
-<span class="fc bfc" id="L226" title="All 2 branches covered.">        if (config != null)</span>
-<span class="fc" id="L227">            level = config.getProperty(levelKey, System.getProperty(levelKey, level)).toUpperCase();</span>
+<span class="fc" id="L215">        String levelKey = &quot;com.amonson.logger.Level&quot;;</span>
+<span class="fc" id="L216">        String level = &quot;INFO&quot;;</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        if (config != null)</span>
+<span class="fc" id="L218">            level = config.getProperty(levelKey, System.getProperty(levelKey, level)).toUpperCase();</span>
         else
-<span class="fc" id="L229">            level = System.getProperty(levelKey, level).toUpperCase();</span>
-<span class="fc" id="L230">        currentLevel_ = Level.valueOf(level);</span>
-<span class="fc" id="L231">    }</span>
+<span class="fc" id="L220">            level = System.getProperty(levelKey, level).toUpperCase();</span>
+<span class="fc" id="L221">        currentLevel_ = Level.valueOf(level);</span>
+<span class="fc" id="L222">    }</span>
 
     private void log(Level lvl, StackTraceElement callingLocation, String msg, Object... args) {
-<span class="fc" id="L234">        logMethod_.log(lvl, callingLocation, msg, args);</span>
-<span class="fc" id="L235">    }</span>
+<span class="fc" id="L225">        logMethod_.log(lvl, callingLocation, msg, args);</span>
+<span class="fc" id="L226">    }</span>
 
     private void defaultLogMethod(Level lvl, StackTraceElement callingLocation, String msg, Object... args) {
-<span class="fc" id="L238">        String fullMsg = String.format(msg, args);</span>
-<span class="fc bfc" id="L239" title="All 2 branches covered.">        for(OutputTargetInterface output: targets_)</span>
-<span class="fc" id="L240">            output.outputFinalString(lvl, buildLogLine(callingLocation, lvl, fullMsg), currentLevel_);</span>
-<span class="fc" id="L241">    }</span>
+<span class="fc" id="L229">        String fullMsg = String.format(msg, args);</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">        for(OutputTargetInterface output: targets_)</span>
+<span class="fc" id="L231">            output.outputFinalString(lvl, buildLogLine(callingLocation, lvl, fullMsg), currentLevel_);</span>
+<span class="fc" id="L232">    }</span>
 
     private String buildLogLine(StackTraceElement trace, Level lvl, String msg) {
-<span class="fc" id="L244">        String result = &quot;%D: %L: (%S): %M&quot;;</span>
-<span class="fc bfc" id="L245" title="All 4 branches covered.">        if(logLineFormat_ != null &amp;&amp; !logLineFormat_.trim().equals(&quot;&quot;))</span>
-<span class="fc" id="L246">            result = logLineFormat_;</span>
-<span class="fc" id="L247">        result = result.replace(&quot;%D&quot;, getTimeStamp());</span>
-<span class="fc" id="L248">        result = result.replace(&quot;%L&quot;, String.format(&quot;%-8s&quot;, lvl));</span>
-<span class="fc" id="L249">        result = result.replace(&quot;%S&quot;, String.format(&quot;%s:%d&quot;, trace.getFileName(), trace.getLineNumber()));</span>
-<span class="fc" id="L250">        result = result.replace(&quot;%M&quot;, msg);</span>
-<span class="fc" id="L251">        return result;</span>
+<span class="fc" id="L235">        String result = &quot;%D: %L: (%S): %M&quot;;</span>
+<span class="fc bfc" id="L236" title="All 4 branches covered.">        if(logLineFormat_ != null &amp;&amp; !logLineFormat_.trim().equals(&quot;&quot;))</span>
+<span class="fc" id="L237">            result = logLineFormat_;</span>
+<span class="fc" id="L238">        result = result.replace(&quot;%D&quot;, getTimeStamp());</span>
+<span class="fc" id="L239">        result = result.replace(&quot;%L&quot;, String.format(&quot;%-8s&quot;, lvl));</span>
+<span class="fc" id="L240">        result = result.replace(&quot;%S&quot;, String.format(&quot;%s:%d&quot;, trace.getFileName(), trace.getLineNumber()));</span>
+<span class="fc" id="L241">        result = result.replace(&quot;%M&quot;, msg);</span>
+<span class="fc" id="L242">        return result;</span>
     }
 
     private String getTimeStamp() {
-<span class="fc bfc" id="L255" title="All 4 branches covered.">        if(dateFormat_ != null &amp;&amp; !dateFormat_.trim().equals(&quot;&quot;)) {</span>
-<span class="fc" id="L256">            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat_).withZone(ZoneId.of(&quot;UTC&quot;));</span>
-<span class="fc" id="L257">            return formatter.format(Instant.now());</span>
+<span class="fc bfc" id="L246" title="All 4 branches covered.">        if(dateFormat_ != null &amp;&amp; !dateFormat_.trim().equals(&quot;&quot;)) {</span>
+<span class="fc" id="L247">            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat_).withZone(ZoneId.of(&quot;UTC&quot;));</span>
+<span class="fc" id="L248">            return formatter.format(Instant.now());</span>
         } else
-<span class="fc" id="L259">            return Instant.now().toString();</span>
+<span class="fc" id="L250">            return Instant.now().toString();</span>
     }
 
     private void dumpExceptionTrace(List&lt;String&gt; exceptionLines, Throwable throwable) {
-<span class="fc" id="L263">        dumpExceptionTrace(exceptionLines, throwable, false);</span>
-<span class="fc" id="L264">    }</span>
+<span class="fc" id="L254">        dumpExceptionTrace(exceptionLines, throwable, false);</span>
+<span class="fc" id="L255">    }</span>
 
     private void dumpExceptionTrace(List&lt;String&gt; exceptionLines, Throwable throwable, boolean isCausedBy) {
-<span class="fc bfc" id="L267" title="All 2 branches covered.">        if(isCausedBy)</span>
-<span class="fc" id="L268">            exceptionLines.add(&quot;  Caused By: &quot; + throwable.getClass().getCanonicalName() + &quot;: &quot; + throwable.getMessage());</span>
+<span class="fc bfc" id="L258" title="All 2 branches covered.">        if(isCausedBy)</span>
+<span class="fc" id="L259">            exceptionLines.add(&quot;  Caused By: &quot; + throwable.getClass().getCanonicalName() + &quot;: &quot; + throwable.getMessage());</span>
         else
-<span class="fc" id="L270">            exceptionLines.add(&quot;  Exception: &quot; + throwable.getClass().getCanonicalName() + &quot;: &quot; + throwable.getMessage());</span>
+<span class="fc" id="L261">            exceptionLines.add(&quot;  Exception: &quot; + throwable.getClass().getCanonicalName() + &quot;: &quot; + throwable.getMessage());</span>
 
-<span class="fc bfc" id="L272" title="All 2 branches covered.">        for(StackTraceElement e: throwable.getStackTrace())</span>
-<span class="fc" id="L273">            exceptionLines.add(String.format(&quot;      at %s.%s(%s:%d)&quot;, e.getClassName(), e.getMethodName(),</span>
-<span class="fc" id="L274">                    e.getFileName(), e.getLineNumber()));</span>
-<span class="fc bfc" id="L275" title="All 2 branches covered.">        if(throwable.getCause() != null)</span>
-<span class="fc" id="L276">            dumpExceptionTrace(exceptionLines, throwable.getCause(), true);</span>
-<span class="fc" id="L277">    }</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">        for(StackTraceElement e: throwable.getStackTrace())</span>
+<span class="fc" id="L264">            exceptionLines.add(String.format(&quot;      at %s.%s(%s:%d)&quot;, e.getClassName(), e.getMethodName(),</span>
+<span class="fc" id="L265">                    e.getFileName(), e.getLineNumber()));</span>
+<span class="fc bfc" id="L266" title="All 2 branches covered.">        if(throwable.getCause() != null)</span>
+<span class="fc" id="L267">            dumpExceptionTrace(exceptionLines, throwable.getCause(), true);</span>
+<span class="fc" id="L268">    }</span>
 
     private void outputFinalString(Level lvl, String logLine, Level filter) {
-<span class="fc bfc" id="L280" title="All 2 branches covered.">        if (lvl.ordinal() &gt;= filter.ordinal()) {</span>
-<span class="fc bfc" id="L281" title="All 2 branches covered.">            if (lvl.ordinal() &gt;= Level.ERROR.ordinal())</span>
-<span class="fc" id="L282">                System.err.println(logLine);</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">        if (lvl.ordinal() &gt;= filter.ordinal()) {</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">            if (lvl.ordinal() &gt;= Level.ERROR.ordinal())</span>
+<span class="fc" id="L273">                System.err.println(logLine);</span>
             else
-<span class="fc" id="L284">                System.out.println(logLine);</span>
+<span class="fc" id="L275">                System.out.println(logLine);</span>
         }
-<span class="fc" id="L286">    }</span>
+<span class="fc" id="L277">    }</span>
 
-<span class="fc" id="L288">    private String dateFormat_ = &quot;yyyy-MM-dd'T'kk:mm:ss.SSS'Z'&quot;;</span>
-<span class="fc" id="L289">    private String logLineFormat_ = &quot;%D: %L: (%S): %M&quot;;</span>
-<span class="fc" id="L290">    private String exceptionSeparator_ = &quot;\n&quot;;</span>
-<span class="fc" id="L291">    private Level currentLevel_ = Level.INFO;</span>
-<span class="fc" id="L292">    private List&lt;OutputTargetInterface&gt; targets_ = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L279">    private String dateFormat_ = &quot;yyyy-MM-dd'T'kk:mm:ss.SSS'Z'&quot;;</span>
+<span class="fc" id="L280">    private String logLineFormat_ = &quot;%D: %L: (%S): %M&quot;;</span>
+<span class="fc" id="L281">    private String exceptionSeparator_ = &quot;\n&quot;;</span>
+<span class="fc" id="L282">    private Level currentLevel_ = Level.INFO;</span>
+<span class="fc" id="L283">    private List&lt;OutputTargetInterface&gt; targets_ = new ArrayList&lt;&gt;();</span>
     private EarlyInterceptLog logMethod_;
 
     private static final int STACK_INDEX = 2;
