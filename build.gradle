@@ -1,4 +1,4 @@
-// Copyright (C) 2018 Paul Amonson
+// Copyright (C) 2018-2019 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -190,6 +190,12 @@ project(':logger') {
     }
 }
 
+project(':xdg') {
+    group = 'com.amonson'
+    dependencies {
+    }
+}
+
 project(':prop_store') {
     group = 'com.amonson'
     dependencies {
@@ -202,6 +208,13 @@ project(':crypto') {
     group = 'com.amonson'
     dependencies {
         compile project(':prop_store')
+    }
+}
+
+project(':factory') {
+    group = 'com.amonson'
+    dependencies {
+        compile project(':logger')
     }
 }
 

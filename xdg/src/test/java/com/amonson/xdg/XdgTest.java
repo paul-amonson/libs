@@ -1,3 +1,8 @@
+// Copyright (C) 2018-2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
 package com.amonson.xdg;
 
 import java.io.*;
