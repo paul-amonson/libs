@@ -66,6 +66,7 @@ subprojects {
 <ul>
     <li>Package: <a href="crypto/index.html">crypto</a></li>
     <li>Package: <a href="logger/index.html">logger</a></li>
+    <li>Package: <a href="factory/index.html">factory</a></li>
     <li>Package: <a href="prop_store/index.html">prop_store</a></li>
     <li>Package: <a href="xdg/index.html">xdg</a></li>
 </ul>
@@ -87,6 +88,7 @@ Build: <i>${rootProject.version}</i></h1>
 <h2 style="text-indent:20px">Test Reports</h2>
 <ul>
     <li>Tests: <a href="test/crypto/index.html">crypto</a></li>
+    <li>Tests: <a href="test/factory/index.html">factory</a></li>
     <li>Tests: <a href="test/logger/index.html">logger</a></li>
     <li>Tests: <a href="test/prop_store/index.html">prop_store</a></li>
     <li>Tests: <a href="test/xdg/index.html">xdg</a></li>
@@ -95,6 +97,7 @@ Build: <i>${rootProject.version}</i></h1>
 <ul>
     <li>Coverage: <a href="jacoco/crypto/index.html">crypto</a></li>
     <li>Coverage: <a href="jacoco/logger/index.html">logger</a></li>
+    <li>Coverage: <a href="jacoco/factory/index.html">factory</a></li>
     <li>Coverage: <a href="jacoco/prop_store/index.html">prop_store</a></li>
     <li>Coverage: <a href="jacoco/xdg/index.html">xdg</a></li>
 </ul>
@@ -102,6 +105,7 @@ Build: <i>${rootProject.version}</i></h1>
 <ul>
     <li>Analysis: <a href="pmd/crypto.html">crypto</a></li>
     <li>Analysis: <a href="pmd/logger.html">logger</a></li>
+    <li>Analysis: <a href="pmd/factory.html">factory</a></li>
     <li>Analysis: <a href="pmd/prop_store.html">prop_store</a></li>
     <li>Analysis: <a href="pmd/xdg.html">xdg</a></li>
 </ul>
