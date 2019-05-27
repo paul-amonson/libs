@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.amonson.task_manager","l":"TaskMonitor.Callback"},{"p":"com.amonson.task_manager","l":"Task"},{"p":"com.amonson.task_manager","l":"TaskMonitor"},{"p":"com.amonson.task_manager","l":"Task.Type"}]
