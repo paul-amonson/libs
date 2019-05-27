@@ -24,10 +24,10 @@ public class TaskMonitorTest {
 
     @Test
     public void addTask() throws Exception {
-        Task task = Task.execute(TestApp.class, new String[] {pid_, "300", "Print me!"},
+        Task task = Task.execute(TestApp.class, new String[] {pid_, "250", "Print me!"},
                 Task.Type.Default, null);
         monitor_.addTask(task);
-        Thread.sleep(400);
+        Thread.sleep(500);
         assertNotNull(task_);
         monitor_.close();
         monitor_.close();
