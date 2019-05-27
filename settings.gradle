@@ -9,5 +9,6 @@ include 'crypto'
 include 'logger'
 include 'xdg'
 include 'factory'
+include 'task_manager'
 
 rootProject.name = 'libs'
