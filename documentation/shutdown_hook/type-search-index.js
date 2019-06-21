@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.amonson.shutdown_hook","l":"ShutdownHook"}]
