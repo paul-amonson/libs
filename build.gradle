@@ -233,6 +233,13 @@ project(':task_manager') {
     }
 }
 
+project(':shutdown_hook') {
+    group = 'com.amonson'
+    dependencies {
+        compile project(':logger')
+    }
+}
+
 task fatJar(type: Jar, dependsOn: subprojects.jar) {
     subprojects.each { subproject ->
         from subproject.configurations.archives.allArtifacts.files.collect {

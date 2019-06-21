@@ -10,5 +10,6 @@ include 'logger'
 include 'xdg'
 include 'factory'
 include 'task_manager'
+include 'shutdown_hook'
 
 rootProject.name = 'libs'
