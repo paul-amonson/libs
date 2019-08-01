@@ -13,9 +13,12 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * General light weight logger for output implementations.
+ * General light weight logger for output implementations. The default logger goes to the console with log Levels
+ * ERROR and CRITICAL going to stderr and the others going to stdout. The default logger uses the following properties:
+ *
+ * com.amonson.logger.Level - Sets the filter level of the Logger.
  */
-public class Logger {
+public final class Logger {
     /**
      * Default logger to the console.
      */
@@ -31,9 +34,10 @@ public class Logger {
      * @param config The proerties for the logger.
      */
     public Logger(Properties config) {
-        targets_.add(this::outputFinalString);
+        configuration_ = config;
+        targets_.add(this::defaultOutputFinalString);
         setEarlyLogMethod(null);
-        initialize(config);
+        initialize();
     }
 
     /**
@@ -188,47 +192,35 @@ public class Logger {
     /**
      * Remove all output targets. Use when you don't want the default console output.
      */
-    public void clearOutputTargets() {
-        targets_.clear();
-    }
-
-    /**
-     * Set the default logging method.
-     */
-    public void setDefaultLogMethod() {
-        logMethod_ = this::defaultLogMethod;
-    }
+    public void clearOutputTargets() { targets_.clear(); }
 
     /**
      * Set the new early log response method.
      *
      * @param method The replacement method to call when the public logging methods are called.
      */
-    public void setEarlyLogMethod(EarlyInterceptLog method) {
-        if(method != null)
-            logMethod_ = method;
-        else
-            setDefaultLogMethod();
-    }
+    public void setEarlyLogMethod(EarlyInterceptLog method) { logMethod_ = method; }
 
-    private void initialize(Properties config) {
-        String levelKey = "com.amonson.logger.Level";
+    private void initialize() {
+        String levelKey = "Level";
         String level = "INFO";
-        if (config != null)
-            level = config.getProperty(levelKey, System.getProperty(levelKey, level)).toUpperCase();
+        if (configuration_ != null)
+            level = configuration_.getProperty(levelKey,
+                    System.getProperty(getClass().getCanonicalName() + "." + levelKey, level)).toUpperCase();
         else
             level = System.getProperty(levelKey, level).toUpperCase();
         currentLevel_ = Level.valueOf(level);
     }
 
     private void log(Level lvl, StackTraceElement callingLocation, String msg, Object... args) {
-        logMethod_.log(lvl, callingLocation, msg, args);
-    }
-
-    private void defaultLogMethod(Level lvl, StackTraceElement callingLocation, String msg, Object... args) {
+        boolean callTargets = true;
         String fullMsg = String.format(msg, args);
-        for(OutputTargetInterface output: targets_)
-            output.outputFinalString(lvl, buildLogLine(callingLocation, lvl, fullMsg), currentLevel_);
+        if(logMethod_ != null)
+            callTargets = logMethod_.log(configuration_, lvl, currentLevel_, callingLocation, msg, args);
+        if(callTargets)
+            for(OutputTargetInterface output: targets_)
+                output.outputFinalString(configuration_, lvl, callingLocation, this::buildLogLine, fullMsg,
+                        currentLevel_);
     }
 
     private String buildLogLine(StackTraceElement trace, Level lvl, String msg) {
@@ -267,7 +259,9 @@ public class Logger {
             dumpExceptionTrace(exceptionLines, throwable.getCause(), true);
     }
 
-    private void outputFinalString(Level lvl, String logLine, Level filter) {
+    private void defaultOutputFinalString(Properties unused, Level lvl, StackTraceElement location,
+                                          BuildLogLineInterface buildLine, String fullMessage, Level filter) {
+        String logLine = buildLine.buildLogLine(location, lvl, fullMessage);
         if (lvl.ordinal() >= filter.ordinal()) {
             if (lvl.ordinal() >= Level.ERROR.ordinal())
                 System.err.println(logLine);
@@ -281,7 +275,8 @@ public class Logger {
     private String exceptionSeparator_ = "\n";
     private Level currentLevel_ = Level.INFO;
     private List<OutputTargetInterface> targets_ = new ArrayList<>();
-    private EarlyInterceptLog logMethod_;
+    private EarlyInterceptLog logMethod_ = null;
+    private Properties configuration_;
 
     private static final int STACK_INDEX = 2;
 }

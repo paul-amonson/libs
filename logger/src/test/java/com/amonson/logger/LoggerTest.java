@@ -13,11 +13,20 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 
 public class LoggerTest {
-    void outputFinalString(Level lvl, String logLine, Level filter) {
+    private void outputFinalString(Properties config, Level lvl, StackTraceElement location,
+                                   BuildLogLineInterface buildLine, String message, Level filter) {
+        String logLine = buildLine.buildLogLine(location, lvl, message);
         output_.append(logLine);output_.append("\n");
     }
 
-    void earlyMethod(Level level, StackTraceElement stackTraceElement, String s, Object... objects) {
+    private boolean earlyMethod(Properties config, Level level, Level filter, StackTraceElement stackTraceElement,
+                                String s, Object... objects) {
+        return true;
+    }
+
+    private boolean earlyMethod2(Properties config, Level level, Level filter, StackTraceElement stackTraceElement,
+                                 String s, Object... objects) {
+        return false;
     }
 
     @Before
@@ -51,7 +60,10 @@ public class LoggerTest {
         logger_.except(new RuntimeException("Test Exception Message", new RuntimeException("Inner Test Exception Message")), "Test Message");
         logger_.except(new RuntimeException("Test Exception Message", new RuntimeException("Inner Test Exception Message")));
         logger_.setEarlyLogMethod(this::earlyMethod);
-        logger_.setDefaultLogMethod();
+        logger_.info("Informational");
+        logger_.setEarlyLogMethod(this::earlyMethod2);
+        logger_.info("Informational");
+        logger_.setEarlyLogMethod(null);
         logger_.clearOutputTargets();
         logger_.addOutputTarget(null);
         new Logger(new Properties());
