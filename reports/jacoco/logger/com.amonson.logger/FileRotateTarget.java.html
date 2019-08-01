@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileRotateTarget.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">FileRotateTarget.java</span></div><h1>FileRotateTarget.java</h1><pre class="source lang-java linenums">// Copyright (C) 2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.logger;
+
+import java.io.*;
+import java.time.Instant;
+import java.util.Properties;
+import java.util.zip.GZIPOutputStream;
+
+/**
+ * Description for class FileRotateTarget
+ */
+public class FileRotateTarget implements OutputTargetInterface {
+<span class="fc" id="L17">    public FileRotateTarget(File filename) {</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        if(filename == null)</span>
+<span class="fc" id="L19">            throw new RuntimeException(&quot;Must specify a real filename for this output target class&quot;);</span>
+<span class="fc" id="L20">        filename_ = filename;</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Method definition for an output target of a logger line.
+     *
+     * @param config          The configuration passed to the logger.
+     * @param loggedLevel     The Logger.Level of the line being output.
+     * @param location        The location of the code that logged the line.
+     * @param buildLineMethod The callback that will format the full log line with the Logger settings.
+     * @param fullMessage     The actual predefined formatted line to output.
+     * @param filter          If the Logger filter is to be used this is the current filter level.
+     *
+     * &lt;b&gt;Configuration properties:&lt;/b&gt;&lt;br&gt;
+     * &lt;ul&gt;
+     *   &lt;li&gt;com.amonson.logger.FileRotateTarget.maxRotateSize - Size in bytes when passed will force log rotation.&lt;/li&gt;
+     *   &lt;li&gt;com.amonson.logger.FileRotateTarget.compress - true/false compress the rotated logs with GZip.&lt;/li&gt;
+     * &lt;/ul&gt;
+     */
+    @Override
+    public void outputFinalString(Properties config, Level loggedLevel, StackTraceElement location,
+                                  BuildLogLineInterface buildLineMethod, String fullMessage, Level filter) {
+<span class="fc" id="L42">        processConfiguration(config);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(loggedLevel.ordinal() &gt;= filter.ordinal()) {</span>
+<span class="fc" id="L44">            synchronized(this) {</span>
+<span class="fc" id="L45">                try (FileWriter writer = new FileWriter(filename_, true)) {</span>
+<span class="fc" id="L46">                    writer.write(String.format(&quot;%s\n&quot;, fullMessage));</span>
+<span class="pc" id="L47">                } catch(IOException e) { /* File out failed, silently rely on other OutputTargetInterface objects */ }</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">                if(filename_.length() &gt; rotateFileMaxSize_)</span>
+<span class="fc" id="L49">                    rotateLog();</span>
+<span class="fc" id="L50">            }</span>
+        }
+<span class="fc" id="L52">    }</span>
+
+    private void rotateLog() {
+<span class="fc" id="L55">        String timestamp = Instant.now().toString().replace(' ', 'T');</span>
+<span class="fc" id="L56">        File newName = new File(filename_.toString() + &quot;.&quot; + timestamp);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if(!filename_.renameTo(newName))</span>
+<span class="nc" id="L58">            return;</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if(compress_)</span>
+<span class="fc" id="L60">            copyFileAndCompress(newName);</span>
+<span class="fc" id="L61">        filename_.delete();</span>
+<span class="fc" id="L62">    }</span>
+
+    private void copyFileAndCompress(File file) {
+<span class="fc" id="L65">        File compressed = new File(file.toString() + &quot;.gz&quot;);</span>
+<span class="fc" id="L66">        try (InputStream input = new FileInputStream(file)) {</span>
+<span class="fc" id="L67">            try (OutputStream output = new FileOutputStream(compressed)) {</span>
+<span class="fc" id="L68">                try (OutputStream gzip = new GZIPOutputStream(output)) {</span>
+<span class="fc" id="L69">                    input.transferTo(gzip);</span>
+                }
+            }
+<span class="nc" id="L72">        } catch(IOException e) {</span>
+<span class="nc" id="L73">            return;</span>
+<span class="fc" id="L74">        }</span>
+<span class="fc" id="L75">        file.delete();</span>
+<span class="fc" id="L76">    }</span>
+
+    private void processConfiguration(Properties config) {
+<span class="pc bpc" id="L79" title="1 of 4 branches missed.">        if(configuration_ == null &amp;&amp; config != null) {</span>
+<span class="fc" id="L80">            configuration_ = config;</span>
+<span class="fc" id="L81">            rotateFileMaxSize_ = Long.parseLong(configuration_.getProperty(getClass().getCanonicalName() +</span>
+<span class="fc" id="L82">                    &quot;.maxRotateSize&quot;, Long.toString(rotateFileMaxSize_)));</span>
+<span class="fc" id="L83">            compress_ = Boolean.parseBoolean(configuration_.getProperty(getClass().getCanonicalName() +</span>
+<span class="fc" id="L84">                    &quot;.compress&quot;, Boolean.toString(compress_)));</span>
+        }
+<span class="fc" id="L86">    }</span>
+
+<span class="fc" id="L88">    private Properties configuration_ = null;</span>
+    private File filename_;
+<span class="fc" id="L90">    private long rotateFileMaxSize_ = 20000000; // Default 20MB</span>
+<span class="fc" id="L91">    private boolean compress_ = true; // compress rotated logs.</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

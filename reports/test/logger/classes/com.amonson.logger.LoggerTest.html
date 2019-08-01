@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.378s</div>
+<div class="counter">0.470s</div>
 <p>duration</p>
 </div>
 </td>
@@ -82,17 +82,17 @@
 </thead>
 <tr>
 <td class="success">levelTests</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">negativeTests</td>
-<td class="success">0.291s</td>
+<td class="success">0.336s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">test</td>
-<td class="success">0.087s</td>
+<td class="success">0.133s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -100,17 +100,18 @@
 <div id="tab1" class="tab">
 <h2>Standard output</h2>
 <span class="code">
-<pre>2019-06-21T03:47:53.880Z: INFO    : (LoggerTest.java:47): Informational
-2019-06-21T03:47:53.881Z: WARN    : (LoggerTest.java:48): Warning
+<pre>2019-08-01T03:27:55.074Z: INFO    : (LoggerTest.java:56): Informational
+2019-08-01T03:27:55.077Z: WARN    : (LoggerTest.java:57): Warning
+2019-08-01T03:27:55.178Z: INFO    : (LoggerTest.java:63): Informational
 </pre>
 </span>
 </div>
 <div id="tab2" class="tab">
 <h2>Standard error</h2>
 <span class="code">
-<pre>2019-06-21T03:47:53.650553Z: ERROR   : (LoggerTest.java:64): Test Message
+<pre>2019-08-01T03:27:54.827542Z: ERROR   : (LoggerTest.java:76): Test Message
   Exception: java.lang.RuntimeException: Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:64)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:76)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -160,7 +161,7 @@
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
   Caused By: java.lang.RuntimeException: Inner Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:64)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:76)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -209,9 +210,9 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-06-21T03:47:53.791971Z: ERROR   : (LoggerTest.java:65): Logged Exception...
+2019-08-01T03:27:54.938836Z: ERROR   : (LoggerTest.java:77): Logged Exception...
   Exception: java.lang.RuntimeException: Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:65)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:77)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -261,7 +262,7 @@
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
   Caused By: java.lang.RuntimeException: Inner Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:65)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:77)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -310,9 +311,9 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-06-21T03:47:53.811439Z: ERROR   : (LoggerTest.java:68): Test Message
+2019-08-01T03:27:54.980224Z: ERROR   : (LoggerTest.java:80): Test Message
   Exception: java.lang.RuntimeException: Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:68)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:80)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -362,7 +363,7 @@
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
   Caused By: java.lang.RuntimeException: Inner Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:68)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:80)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -411,9 +412,9 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-06-21T03:47:53.828183Z: ERROR   : (LoggerTest.java:69): Logged Exception...
+2019-08-01T03:27:55.020857Z: ERROR   : (LoggerTest.java:81): Logged Exception...
   Exception: java.lang.RuntimeException: Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:69)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:81)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -463,7 +464,7 @@
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
   Caused By: java.lang.RuntimeException: Inner Test Exception Message
-      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:69)
+      at com.amonson.logger.LoggerTest.negativeTests(LoggerTest.java:81)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -512,11 +513,11 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-06-21T03:47:53.881Z: ERROR   : (LoggerTest.java:49): Error
-2019-06-21T03:47:53.882Z: CRITICAL: (LoggerTest.java:50): Critical
-2019-06-21T03:47:53.887Z: ERROR   : (LoggerTest.java:51): Test Message
+2019-08-01T03:27:55.081Z: ERROR   : (LoggerTest.java:58): Error
+2019-08-01T03:27:55.082Z: CRITICAL: (LoggerTest.java:59): Critical
+2019-08-01T03:27:55.091Z: ERROR   : (LoggerTest.java:60): Test Message
   Exception: java.lang.RuntimeException: Test Exception Message
-      at com.amonson.logger.LoggerTest.test(LoggerTest.java:51)
+      at com.amonson.logger.LoggerTest.test(LoggerTest.java:60)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -566,7 +567,7 @@
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
   Caused By: java.lang.RuntimeException: Inner Test Exception Message
-      at com.amonson.logger.LoggerTest.test(LoggerTest.java:51)
+      at com.amonson.logger.LoggerTest.test(LoggerTest.java:60)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -615,9 +616,9 @@
       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
-2019-06-21T03:47:53.911Z: ERROR   : (LoggerTest.java:52): Logged Exception...
+2019-08-01T03:27:55.140Z: ERROR   : (LoggerTest.java:61): Logged Exception...
   Exception: java.lang.RuntimeException: Test Exception Message
-      at com.amonson.logger.LoggerTest.test(LoggerTest.java:52)
+      at com.amonson.logger.LoggerTest.test(LoggerTest.java:61)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -667,7 +668,7 @@
       at org.gradle.internal.concurrent.ThreadFactoryImpl$ManagedThreadRunnable.run(ThreadFactoryImpl.java:55)
       at java.lang.Thread.run(Thread.java:834)
   Caused By: java.lang.RuntimeException: Inner Test Exception Message
-      at com.amonson.logger.LoggerTest.test(LoggerTest.java:52)
+      at com.amonson.logger.LoggerTest.test(LoggerTest.java:61)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)
       at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
       at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -727,7 +728,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 5.4</a> at Jun 21, 2019, 3:47:54 AM</p>
+<a href="http://www.gradle.org">Gradle 5.4</a> at Aug 1, 2019, 3:27:55 AM</p>
 </div>
 </div>
 </body>

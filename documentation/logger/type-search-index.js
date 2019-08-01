@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.amonson.logger","l":"EarlyInterceptLog"},{"p":"com.amonson.logger","l":"Level"},{"p":"com.amonson.logger","l":"Logger"},{"p":"com.amonson.logger","l":"OutputTargetInterface"}]
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.amonson.logger","l":"EarlyInterceptLog"},{"p":"com.amonson.logger","l":"FileRotateTarget"},{"p":"com.amonson.logger","l":"Level"},{"p":"com.amonson.logger","l":"Logger"},{"p":"com.amonson.logger","l":"OutputTargetInterface"}]
