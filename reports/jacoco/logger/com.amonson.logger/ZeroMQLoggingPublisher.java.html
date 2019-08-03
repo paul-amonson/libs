@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ZeroMQLoggingPublisher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">ZeroMQLoggingPublisher.java</span></div><h1>ZeroMQLoggingPublisher.java</h1><pre class="source lang-java linenums">// Copyright (C) 2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.logger;
+
+import org.zeromq.ZSocket;
+import zmq.ZMQ;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Properties;
+import java.net.InetAddress;
+
+/**
+ * Description for class ZeroMQLoggingPublisher
+ */
+public class ZeroMQLoggingPublisher implements EarlyInterceptLog, AutoCloseable, Closeable {
+    /**
+     * Create a EarlyInterceptLog version that publishes to a ZeroMQ SUB server. This uses a DEFAULT_TOPIC and passes
+     * &lt;b&gt;true&lt;/b&gt; to the callTargets parameter of the complete constructor.
+     *
+     * @param zeroMQUrl The ZeroMQ formatted url to publish data to. This us usually a SUB socket
+     */
+    public ZeroMQLoggingPublisher(String zeroMQUrl) {
+<span class="fc" id="L30">        this(zeroMQUrl, DEFAULT_TOPIC, true);</span>
+<span class="fc" id="L31">    }</span>
+
+    /**
+     * Create a EarlyInterceptLog version that publishes to a ZeroMQ SUB server. This passes &lt;b&gt;true&lt;/b&gt; to the
+     * callTargets parameter of the complete constructor.
+     *
+     * @param zeroMQUrl The ZeroMQ formatted url to publish data to. This us usually a SUB socket
+     * @param topic The PUB topic all log messages are published to.
+     */
+    public ZeroMQLoggingPublisher(String zeroMQUrl, String topic) {
+<span class="fc" id="L41">        this(zeroMQUrl, topic, true);</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Create a EarlyInterceptLog version that publishes to a ZeroMQ SUB server.
+     *
+     * @param zeroMQUrl The ZeroMQ formatted url to publish data to. This us usually a SUB socket
+     * @param callTargets This determine whether subsequent output targets (like the default console). &lt;b&gt;true&lt;/b&gt;
+     *        indicated to make the output target calls and &lt;b&gt;false&lt;/b&gt; indicated to skipp the calls.
+     */
+    public ZeroMQLoggingPublisher(String zeroMQUrl, boolean callTargets) {
+<span class="fc" id="L52">        this(zeroMQUrl, DEFAULT_TOPIC, callTargets);</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Create a EarlyInterceptLog version that publishes to a ZeroMQ SUB server.
+     *
+     * @param zeroMQUrl The ZeroMQ formatted url to publish data to. This us usually a SUB socket
+     * @param topic The PUB topic all log messages are published to.
+     * @param callTargets This determine whether subsequent output targets (like the default console). &lt;b&gt;true&lt;/b&gt;
+     *        indicated to make the output target calls and &lt;b&gt;false&lt;/b&gt; indicated to skipp the calls.
+     */
+<span class="fc" id="L63">    public ZeroMQLoggingPublisher(String zeroMQUrl, String topic, boolean callTargets) {</span>
+<span class="fc" id="L64">        topic_ = Objects.requireNonNullElse(topic, &quot;default&quot;);</span>
+<span class="fc" id="L65">        callTargets_ = callTargets;</span>
+<span class="fc" id="L66">        publish_ = CREATOR.create(zeroMQUrl);</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Method to intercept logging process early to completely customize the logger.
+     *
+     * @param config          The configuration passed to the logger.
+     * @param lvl             The Level of this log message.
+     * @param filterLevel     The current logger filter level of the logger.
+     * @param callingLocation Either null or the calling stack location of an exception.
+     * @param msg             The logged message format string.
+     * @param args            The arguments for the format string.
+     * @return true to call output targets or false to skip calling output targets.
+     */
+    @Override
+    public boolean log(Properties config, Level lvl, Level filterLevel, StackTraceElement callingLocation, String msg,
+                       Object... args) {
+<span class="fc" id="L83">        StringBuilder json = new StringBuilder();</span>
+<span class="fc" id="L84">        json.append(&quot;{&quot;);</span>
+<span class="fc" id="L85">        stringValue(json, &quot;timestamp&quot;, Instant.now().toString()).append(',');</span>
+<span class="fc" id="L86">        stringValue(json, &quot;file&quot;, callingLocation.getFileName()).append(',');</span>
+<span class="fc" id="L87">        json.append('&quot;').append(&quot;line&quot;).append('&quot;').append(&quot;:&quot;).append('&quot;').append(callingLocation.getLineNumber()).</span>
+<span class="fc" id="L88">                append('&quot;').append(',');</span>
+<span class="fc" id="L89">        stringValue(json, &quot;module&quot;, callingLocation.getModuleName()).append(',');</span>
+<span class="fc" id="L90">        stringValue(json, &quot;module_version&quot;, callingLocation.getModuleVersion()).append(',');</span>
+<span class="fc" id="L91">        stringValue(json, &quot;class&quot;, callingLocation.getClassName()).append(',');</span>
+<span class="fc" id="L92">        stringValue(json, &quot;method&quot;, callingLocation.getMethodName()).append(',');</span>
+<span class="fc" id="L93">        stringValue(json, &quot;level&quot;, lvl.toString()).append(',');</span>
+<span class="fc" id="L94">        stringValue(json, &quot;filter&quot;, filterLevel.toString()).append(',');</span>
+<span class="fc" id="L95">        stringValue(json, &quot;message&quot;, String.format(msg, args)).append(',');</span>
+<span class="fc" id="L96">        stringValue(json, &quot;topic&quot;, topic_);</span>
+        try {
+<span class="fc" id="L98">            InetAddress inetAddress = InetAddress.getLocalHost();</span>
+<span class="fc" id="L99">            json.append(',');</span>
+<span class="fc" id="L100">            stringValue(json, &quot;hostname&quot;, inetAddress.getHostName()).append(',');</span>
+<span class="fc" id="L101">            stringValue(json, &quot;ip&quot;, inetAddress.getHostAddress());</span>
+<span class="pc" id="L102">        } catch(UnknownHostException e) { /* Skip hostname and ip if the host is not properly setup.*/ }</span>
+<span class="fc" id="L103">        json.append(&quot;}&quot;);</span>
+<span class="fc" id="L104">        publish_.sendStringUtf8(topic_, ZMQ.ZMQ_MORE);</span>
+<span class="fc" id="L105">        publish_.sendStringUtf8(json.toString());</span>
+<span class="fc" id="L106">        return callTargets_;</span>
+    }
+
+    /**
+     * Closes the socket then context.
+     *
+     * @throws IOException When the close of either close operation fails.
+     */
+    @Override
+    public void close() throws IOException {
+<span class="fc" id="L116">        publish_.close();</span>
+<span class="fc" id="L117">    }</span>
+
+    private StringBuilder stringValue(StringBuilder builder, String name, String value) {
+<span class="fc" id="L120">        return builder.append('&quot;').append(name).append('&quot;').append(&quot;:&quot;).append('&quot;').append(value).append('&quot;');</span>
+    }
+
+    private static ZSocket createPublishSocket(String zeroMQUrl) {
+<span class="nc" id="L124">        ZSocket socket = new ZSocket(ZMQ.ZMQ_PUB);</span>
+<span class="nc" id="L125">        socket.connect(zeroMQUrl);</span>
+<span class="nc" id="L126">        return socket;</span>
+    }
+
+    private final String topic_;
+    private final boolean callTargets_;
+    private final ZSocket publish_;
+    private static final String DEFAULT_TOPIC = &quot;default&quot;;
+
+<span class="fc" id="L134">    static ZeroMQSocketCreator CREATOR = ZeroMQLoggingPublisher::createPublishSocket;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
