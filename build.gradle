@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2019 Paul Amonson
+// Copyright (C) 2018-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -34,8 +34,8 @@ subprojects {
     sourceCompatibility = 11
 
     dependencies {
-        testCompile 'junit:junit:4.12+'
-        testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
+        testImplementation 'junit:junit:4.12+'
+        testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     }
 
     clean {
@@ -145,16 +145,17 @@ Build: <i>${rootProject.version}</i></h1>
     }
 
     jar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         from {
-            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+            configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
         }
     }
 
     pmdTest.enabled = false
     pmdMain {
         group = "Reporting"
+        rulesMinimumPriority = 2
         consoleOutput = true
-        rulePriority = 2
         ignoreFailures = !honorScanningRules
         reports {
             xml.enabled = true
@@ -200,9 +201,9 @@ Build: <i>${rootProject.version}</i></h1>
 project(':logger') {
     group = 'com.amonson'
     dependencies {
-        compile group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
+        implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
 
-        testCompile project(':prop_store')
+        testImplementation project(':prop_store')
     }
 }
 
@@ -215,40 +216,41 @@ project(':xdg') {
 project(':prop_store') {
     group = 'com.amonson'
     dependencies {
-        compile group: 'com.github.cliftonlabs', name: 'json-simple', version: '3.0.2+'
-        compile group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
+        implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '3.0.2+'
+        implementation group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
     }
 }
 
 project(':crypto') {
     group = 'com.amonson'
     dependencies {
-        compile project(':prop_store')
+        implementation project(':prop_store')
     }
 }
 
 project(':factory') {
     group = 'com.amonson'
     dependencies {
-        compile project(':logger')
+        implementation project(':logger')
     }
 }
 
 project(':task_manager') {
     group = 'com.amonson'
     dependencies {
-        compile project(':logger')
+        implementation project(':logger')
     }
 }
 
 project(':shutdown_hook') {
     group = 'com.amonson'
     dependencies {
-        compile project(':logger')
+        implementation project(':logger')
     }
 }
 
 task fatJar(type: Jar, dependsOn: subprojects.jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     subprojects.each { subproject ->
         from subproject.configurations.archives.allArtifacts.files.collect {
             zipTree(it)
