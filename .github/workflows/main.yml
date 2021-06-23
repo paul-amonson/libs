@@ -20,5 +20,6 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - run: sudo apt install -y git
       - name: Build with Gradle
         run: ./gradlew build
