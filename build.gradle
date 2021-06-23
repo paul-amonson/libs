@@ -7,16 +7,20 @@ apply plugin: 'idea'
 
 def honorScanningRules = true
 
-def gitVersionString = { ->
+String gitVersionString() {
     def stdout = new ByteArrayOutputStream()
+    def stderr = new ByteArrayOutputStream()
     exec {
-        commandLine 'git', 'describe', '--tags'
+        ignoreExitValue = true
         standardOutput = stdout
+        errorOutput = stderr
+        commandLine "/usr/bin/git", "--git-dir=${rootProject.projectDir}/.git", "describe", "--tags"
     }
-    return stdout.toString().trim()
+    String localVersion = stdout.toString().trim()
+    return (localVersion == null || localVersion.isEmpty())?'0.0.0':localVersion
 }
 
-println("*** Building version: " + gitVersionString() + "\n")
+System.out.printf("*** Building version: %s\n\n", gitVersionString())
 
 allprojects {
     apply plugin: 'java'
@@ -154,24 +158,24 @@ Build: <i>${rootProject.version}</i></h1>
     pmdTest.enabled = false
     pmdMain {
         group = "Reporting"
-        rulesMinimumPriority = 2
         consoleOutput = true
+        rulesMinimumPriority = 2
         ignoreFailures = !honorScanningRules
         reports {
-            xml.enabled = true
-            xml.destination = file("${rootProject.buildDir}/pmd/${project.name}.xml")
-            html.enabled = true
-            html.destination = file("${rootProject.buildDir}/docs/reports/pmd/${project.name}.html")
+            xml.enabled(true)
+            xml.destination(file("${rootProject.buildDir}/pmd/${project.name}.xml"))
+            html.enabled(true)
+            html.destination(file("${rootProject.buildDir}/docs/reports/pmd/${project.name}.html"))
         }
     }
 
     jacocoTestReport {
         group = "Reporting"
         reports {
-            xml.enabled = true
-            csv.enabled = false
-            html.destination file("${rootProject.buildDir}/docs/reports/jacoco/${project.name}")
-            xml.destination file("${rootProject.buildDir}/jacoco/${project.name}.xml")
+            xml.enabled(true)
+            csv.enabled(false)
+            html.destination(file("${rootProject.buildDir}/docs/reports/jacoco/${project.name}"))
+            xml.destination(file("${rootProject.buildDir}/jacoco/${project.name}.xml"))
         }
         finalizedBy(jacocoTestCoverageVerification)
     }
