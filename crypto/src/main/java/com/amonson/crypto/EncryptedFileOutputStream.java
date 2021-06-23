@@ -113,6 +113,6 @@ public class EncryptedFileOutputStream extends OutputStream {
         out_ = new CipherOutputStream(new FileOutputStream(file), cipher);
     }
 
-    private KeyData key_;
+    private final KeyData key_;
     private CipherOutputStream out_;
 }

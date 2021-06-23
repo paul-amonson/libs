@@ -106,6 +106,6 @@ public class EncryptedFileInputStream extends InputStream {
         in_ = new CipherInputStream(new FileInputStream(file), cipher);
     }
 
-    private KeyData key_;
+    private final KeyData key_;
     private CipherInputStream in_;
 }
