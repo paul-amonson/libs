@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Paul Amonson
+// Copyright (C) 2019-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -40,6 +40,7 @@ public class TaskMonitor implements Closeable, AutoCloseable {
                         checkTask(task);
                     for(Task remove: removeList_)
                         tasks_.remove(remove);
+                    removeList_.clear();
                     if(Thread.currentThread().isInterrupted()) halt_.set(true);
                 }
             }
@@ -54,6 +55,15 @@ public class TaskMonitor implements Closeable, AutoCloseable {
      */
     public void addTask(Task task) {
         tasks_.add(task);
+    }
+
+    /**
+     * Remove a task from the monitored tasks.
+     *
+     * @param task The task to remove from the monitor list.
+     */
+    public void removeTask(Task task) {
+        removeList_.add(task);
     }
 
     /**
@@ -78,14 +88,14 @@ public class TaskMonitor implements Closeable, AutoCloseable {
         }
     }
 
-    private ConcurrentLinkedQueue<Task> tasks_ = new ConcurrentLinkedQueue<>();
-    private ConcurrentLinkedQueue<Task> removeList_ = new ConcurrentLinkedQueue<>();
-    private Thread monitoringThread_;
-    private Callback callback_;
-    private AtomicBoolean halt_ = new AtomicBoolean(false);
+    private final ConcurrentLinkedQueue<Task> tasks_ = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Task> removeList_ = new ConcurrentLinkedQueue<>();
+    private final Thread monitoringThread_;
+    private final Callback callback_;
+    private final AtomicBoolean halt_ = new AtomicBoolean(false);
 
-    private static long MONITOR_LOOP = Integer.parseInt(System.getProperty(
+    private final static long MONITOR_LOOP = Integer.parseInt(System.getProperty(
             "com.amonson.task_manager.monitor_pause", "50"));
-    private static long CLOSE_TIMEOUT = Integer.parseInt(System.getProperty(
+    private final static long CLOSE_TIMEOUT = Integer.parseInt(System.getProperty(
             "com.amonson.task_manager.shutdown_timeout", "5000"));
 }

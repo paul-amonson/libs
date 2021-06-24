@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Paul Amonson
+// Copyright (C) 2019-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -175,6 +175,7 @@ public class Task {
         cmds[3] = class_.getCanonicalName();
         System.arraycopy(arguments_, 0, cmds, 4, arguments_.length);
         builder.command(cmds);
+        builder.inheritIO();
         try {
             process_ = builder.start();
         } catch(IOException e) {
@@ -194,11 +195,11 @@ public class Task {
         thread_.start();
     }
 
-    private Class<?> class_;
-    private String[] arguments_;
-    private Thread thread_ = null;
-    private AtomicInteger result_ = new AtomicInteger(0);
-    private AtomicReference<Throwable> exception_ = new AtomicReference<>(null);
-    private Process process_ = null;
-    private Object userData_ = null;
+    private final Class<?> class_;
+    private final String[] arguments_;
+    private final AtomicInteger result_ = new AtomicInteger(0);
+    private final AtomicReference<Throwable> exception_ = new AtomicReference<>(null);
+    private final Object userData_ = null;
+    private       Process process_ = null;
+    private       Thread thread_ = null;
 }

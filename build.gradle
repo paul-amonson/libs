@@ -5,7 +5,7 @@
 
 apply plugin: 'idea'
 
-def honorScanningRules = true
+def honorScanningRules = false
 
 String gitVersionString() {
     def stdout = new ByteArrayOutputStream()
@@ -240,9 +240,13 @@ project(':factory') {
 }
 
 project(':task_manager') {
+    apply plugin: 'groovy'
     group = 'com.amonson'
     dependencies {
         implementation project(':logger')
+
+        testImplementation 'org.codehaus.groovy:groovy:3.0.7'
+        testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
     }
 }
 
