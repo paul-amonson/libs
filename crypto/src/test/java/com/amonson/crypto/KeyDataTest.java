@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 public class KeyDataTest {
     @Before
     public void setup() {
+        KeyData.RNG_ALGORITHM = "NativePRNGNonBlocking";
         byte[] zero = new byte[16];
         byte[] ones = new byte[16];
         for(int i = 0; i < 16; i++) {

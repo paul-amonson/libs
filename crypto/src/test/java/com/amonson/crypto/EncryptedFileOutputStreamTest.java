@@ -16,6 +16,7 @@ public class EncryptedFileOutputStreamTest {
 
     @Before
     public void setup() {
+        KeyData.RNG_ALGORITHM = "NativePRNGNonBlocking";
         if(key_ == null) {
             try {
                 key_ = new KeyData();

@@ -42,7 +42,7 @@ public class KeyData {
      * IV/Key generation.
      */
     public KeyData() throws NoSuchAlgorithmException {
-        SecureRandom randomSecureRandom = SecureRandom.getInstanceStrong();
+        SecureRandom randomSecureRandom = SecureRandom.getInstance(RNG_ALGORITHM);
         byte[] iv = new byte[16];
         randomSecureRandom.nextBytes(iv);
         iv_ = Base64.getEncoder().encodeToString(iv);
@@ -139,4 +139,7 @@ public class KeyData {
 
     String iv_;
     String key_;
+
+    // Strong but may block on some OSes. Try "NativePRNGNonBlocking" if you have problems.
+    static String RNG_ALGORITHM = "NativePRNGBlocking";
 }
