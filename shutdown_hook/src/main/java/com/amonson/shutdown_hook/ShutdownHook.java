@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Class to use for Java application at shutdown that will close AutoCloseable objects in the reverse order that they
  * were added.
  */
+@Deprecated(forRemoval = true, since = "1.3.0")
 public class ShutdownHook {
     /**
      * Create a ShutdownHook singleton with a Logger.

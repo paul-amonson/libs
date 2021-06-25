@@ -30,6 +30,10 @@ System.out.printf("*** Building version: %s\n\n", gitVersionString())
 
 version = gitVersionString()
 
+build.group = "_favorites"
+clean.group = "_favorites"
+test.group = "_favorites"
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'

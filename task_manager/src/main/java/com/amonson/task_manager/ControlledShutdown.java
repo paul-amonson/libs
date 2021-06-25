@@ -34,7 +34,8 @@ public final class ControlledShutdown {
     }
 
     /**
-     * Called near the end of main to signal that all application cleanup was done and the process can end.
+     * Called near the end of main to signal that all application cleanup was done, child processes or threads
+     * and stopped, and the process can end.
      *
      * @throws IllegalApplicationState when called with a state other than 'ShuttingDown'.
      */
@@ -69,7 +70,7 @@ public final class ControlledShutdown {
     }
 
     /**
-     * Call this method if you wish to shutdown the application from a different thread of for a abnormal reason.
+     * Call this method if you wish to shutdown the application from a different thread of for a any reason.
      *
      * @throws IllegalApplicationState when called with a state other than 'Started'.
      */
