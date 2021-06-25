@@ -1,8 +1,8 @@
-// Copyright (C) 2021 Intel Corporation
+// Copyright (C) 2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package com.amonson.task_manager;
+package com.amonson.task_manager
 
 import spock.lang.Specification
 
@@ -14,6 +14,7 @@ class ControlledShutdownSpec extends Specification {
             ControlledShutdown.shuttingDown()
         }
     }
+
     void setup() {
         cleanup()
     }

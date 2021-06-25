@@ -3,7 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-apply plugin: 'idea'
+plugins {
+    id 'idea'
+    id 'java'
+    id 'jacoco'
+    id 'pmd'
+    id 'groovy'
+}
 
 def honorScanningRules = false
 
@@ -22,18 +28,17 @@ String gitVersionString() {
 
 System.out.printf("*** Building version: %s\n\n", gitVersionString())
 
-allprojects {
+version = gitVersionString()
+
+subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
     apply plugin: 'pmd'
 
-    version = gitVersionString()
     repositories {
         mavenCentral()
     }
-}
 
-subprojects {
     targetCompatibility = 11
     sourceCompatibility = 11
 
@@ -241,6 +246,7 @@ project(':factory') {
 
 project(':task_manager') {
     apply plugin: 'groovy'
+
     group = 'com.amonson'
     dependencies {
         implementation project(':logger')
