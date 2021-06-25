@@ -5,7 +5,7 @@
 
 package com.amonson.prop_store;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 public class PropStoreExceptionTest {
     @Test

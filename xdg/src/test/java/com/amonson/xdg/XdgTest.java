@@ -9,15 +9,13 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class XdgTest {
     private static String tmpFolder = Paths.get(File.separator, "tmp").toString();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         Xdg.home_ = tmpFolder;
         Xdg.environment_.remove("XDG_DATA_HOME");
@@ -35,7 +33,7 @@ public class XdgTest {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         assertTrue(deleteTree(Paths.get(tmpFolder, ".local").toString()));
         assertTrue(deleteTree(Paths.get(tmpFolder, ".config").toString()));
@@ -122,22 +120,26 @@ public class XdgTest {
         xdg.openDataReader("testFile1");
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void openDataInputStreamTestsNegative() throws IOException {
         Xdg.environment_.put("XDG_DATA_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CONFIG_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CACHE_HOME", tmpFolder);
         Xdg xdg = new Xdg();
-        xdg.openDataInputStream("testFile2");
+        assertThrows(IOException.class, () -> {
+            xdg.openDataInputStream("testFile2");
+        });
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void openDataReaderTestsNegative() throws IOException {
         Xdg.environment_.put("XDG_DATA_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CONFIG_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CACHE_HOME", tmpFolder);
         Xdg xdg = new Xdg();
-        xdg.openDataReader("testFile2");
+        assertThrows(IOException.class, () -> {
+            xdg.openDataReader("testFile2");
+        });
     }
 
     @Test
@@ -176,22 +178,26 @@ public class XdgTest {
         xdg.openCacheReader("testFile1");
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void openConfigInputStreamTestsNegative() throws IOException {
         Xdg.environment_.put("XDG_DATA_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CONFIG_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CACHE_HOME", tmpFolder);
         Xdg xdg = new Xdg();
-        xdg.openConfigInputStream("testFile2");
+        assertThrows(IOException.class, () -> {
+            xdg.openConfigInputStream("testFile2");
+        });
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void openConfigReaderTestsNegative() throws IOException {
         Xdg.environment_.put("XDG_DATA_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CONFIG_HOME", tmpFolder);
         Xdg.environment_.put("XDG_CACHE_HOME", tmpFolder);
         Xdg xdg = new Xdg();
-        xdg.openConfigReader("testFile2");
+        assertThrows(IOException.class, () -> {
+            xdg.openConfigReader("testFile2");
+        });
     }
 
     @Test

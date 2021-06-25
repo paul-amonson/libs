@@ -1,11 +1,12 @@
 package com.amonson.logger;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileRotateTargetTest {
     @Test
@@ -21,8 +22,10 @@ public class FileRotateTargetTest {
         log.debug("DEBUG LINE");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void negativeTest() {
-        new FileRotateTarget(null);
+        assertThrows(RuntimeException.class, () -> {
+            new FileRotateTarget(null);
+        });
     }
 }

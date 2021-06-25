@@ -11,7 +11,7 @@ plugins {
     id 'groovy'
 }
 
-def honorScanningRules = false
+def honorScanningRules = true
 
 String gitVersionString() {
     def stdout = new ByteArrayOutputStream()
@@ -34,6 +34,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
     apply plugin: 'pmd'
+    apply plugin: 'groovy'
 
     repositories {
         mavenCentral()
@@ -43,8 +44,12 @@ subprojects {
     sourceCompatibility = 11
 
     dependencies {
-        testImplementation 'junit:junit:4.12+'
-        testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
+        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
+
+        testImplementation 'org.codehaus.groovy:groovy:3.0.7'
+        testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
     }
 
     clean {
@@ -146,9 +151,10 @@ Build: <i>${rootProject.version}</i></h1>
     }
 
     test {
+        useJUnitPlatform()
         reports {
-            html.destination file("${rootProject.buildDir}/docs/reports/test/${project.name}")
-            junitXml.destination file("${rootProject.buildDir}/tests/${project.name}")
+            html.outputLocation = file("${rootProject.buildDir}/docs/reports/test/${project.name}")
+            junitXml.outputLocation = file("${rootProject.buildDir}/tests/${project.name}")
         }
         finalizedBy(jacocoTestReport, pmdMain)
     }
@@ -167,20 +173,20 @@ Build: <i>${rootProject.version}</i></h1>
         rulesMinimumPriority = 2
         ignoreFailures = !honorScanningRules
         reports {
-            xml.enabled(true)
-            xml.destination(file("${rootProject.buildDir}/pmd/${project.name}.xml"))
-            html.enabled(true)
-            html.destination(file("${rootProject.buildDir}/docs/reports/pmd/${project.name}.html"))
+            xml.required = true
+            xml.outputLocation = file("${rootProject.buildDir}/pmd/${project.name}.xml")
+            html.required = true
+            html.outputLocation = file("${rootProject.buildDir}/docs/reports/pmd/${project.name}.html")
         }
     }
 
     jacocoTestReport {
         group = "Reporting"
         reports {
-            xml.enabled(true)
-            csv.enabled(false)
-            html.destination(file("${rootProject.buildDir}/docs/reports/jacoco/${project.name}"))
-            xml.destination(file("${rootProject.buildDir}/jacoco/${project.name}.xml"))
+            xml.required = true
+            xml.outputLocation = file("${rootProject.buildDir}/jacoco/${project.name}.xml")
+            html.required = true
+            html.outputLocation = file("${rootProject.buildDir}/docs/reports/jacoco/${project.name}")
         }
         finalizedBy(jacocoTestCoverageVerification)
     }
@@ -245,14 +251,9 @@ project(':factory') {
 }
 
 project(':task_manager') {
-    apply plugin: 'groovy'
-
     group = 'com.amonson'
     dependencies {
         implementation project(':logger')
-
-        testImplementation 'org.codehaus.groovy:groovy:3.0.7'
-        testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
     }
 }
 

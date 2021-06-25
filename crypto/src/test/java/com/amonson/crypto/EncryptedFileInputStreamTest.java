@@ -5,18 +5,19 @@
 
 package com.amonson.crypto;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
+
 import java.io.File;
 import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EncryptedFileInputStreamTest {
     private String golden_ = "0123456789012345678901234567890123456789";
     private KeyData key_ = null;
 
-    @Before
+    @BeforeEach
     public void setup() {
         KeyData.RNG_ALGORITHM = "NativePRNGNonBlocking";
         if(key_ == null) {
@@ -38,7 +39,7 @@ public class EncryptedFileInputStreamTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         File file = new File("file.tmp");
         assertTrue(file.delete());

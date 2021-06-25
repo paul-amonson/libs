@@ -6,16 +6,15 @@
 package com.amonson.crypto;
 
 import com.amonson.prop_store.*;
-import org.junit.Test;
-import org.junit.Before;
+import org.junit.jupiter.api.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class KeyDataTest {
-    @Before
+    @BeforeEach
     public void setup() {
         KeyData.RNG_ALGORITHM = "NativePRNGNonBlocking";
         byte[] zero = new byte[16];

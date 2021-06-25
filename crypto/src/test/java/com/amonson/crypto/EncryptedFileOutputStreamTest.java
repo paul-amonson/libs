@@ -8,13 +8,13 @@ package com.amonson.crypto;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EncryptedFileOutputStreamTest {
     private KeyData key_ = null;
 
-    @Before
+    @BeforeEach
     public void setup() {
         KeyData.RNG_ALGORITHM = "NativePRNGNonBlocking";
         if(key_ == null) {
@@ -26,7 +26,7 @@ public class EncryptedFileOutputStreamTest {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         File file = new File("file2.tmp");
         file.delete();

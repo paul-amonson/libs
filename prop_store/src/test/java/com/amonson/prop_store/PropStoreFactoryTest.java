@@ -5,13 +5,11 @@
 
 package com.amonson.prop_store;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PropStoreFactoryTest {
     static class TestStoreOK extends PropStore {
@@ -66,7 +64,7 @@ public class PropStoreFactoryTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         PropStoreFactory.supportedImplementations_ = new HashMap<String, Class<? extends PropStore>>() {{
             put("json", JsonStore.class);
@@ -83,19 +81,25 @@ public class PropStoreFactoryTest {
         assertTrue(PropStoreFactory.getNames().contains("yaml"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void badName() throws Exception {
-        PropStoreFactory.getStore("");
+        assertThrows(IllegalArgumentException.class, () -> {
+            PropStoreFactory.getStore("");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullName() throws Exception {
-        PropStoreFactory.getStore(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            PropStoreFactory.getStore(null);
+        });
     }
 
-    @Test(expected = PropStoreFactoryException.class)
+    @Test
     public void negative() throws Exception {
-        PropStoreFactory.getStore("test1");
+        assertThrows(PropStoreFactoryException.class, () -> {
+            PropStoreFactory.getStore("test1");
+        });
     }
 
     @Test
@@ -104,24 +108,32 @@ public class PropStoreFactoryTest {
         assertFalse(PropStoreFactory.registerNewStore("testStore", TestStoreOK.class));
     }
 
-    @Test(expected = PropStoreFactoryException.class)
+    @Test
     public void registerNewStoreNegative() throws Exception {
-        PropStoreFactory.registerNewStore("testStore", TestStoreBAD.class);
-        PropStoreFactory.supportedImplementations_.remove("testStore");
+        assertThrows(PropStoreFactoryException.class, () -> {
+            PropStoreFactory.registerNewStore("testStore", TestStoreBAD.class);
+            PropStoreFactory.supportedImplementations_.remove("testStore");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void registerNewStoreBadName() throws Exception {
-        PropStoreFactory.registerNewStore("", TestStoreOK.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            PropStoreFactory.registerNewStore("", TestStoreOK.class);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void registerNewStoreNullName() throws Exception {
-        PropStoreFactory.registerNewStore(null, TestStoreOK.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            PropStoreFactory.registerNewStore(null, TestStoreOK.class);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void registerNewStoreBadClass() throws Exception {
-        PropStoreFactory.registerNewStore("wontStore", null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            PropStoreFactory.registerNewStore("wontStore", null);
+        });
     }
 }

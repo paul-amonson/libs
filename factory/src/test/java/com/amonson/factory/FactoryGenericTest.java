@@ -1,13 +1,11 @@
 package com.amonson.factory;
 
 import com.amonson.logger.Logger;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 interface InterfaceType {
 }
@@ -28,7 +26,7 @@ class FactoryType extends FactoryGeneric<InterfaceType> {
 }
 
 public class FactoryGenericTest {
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         logger = new Logger();
         factory = new FactoryType();
@@ -41,22 +39,28 @@ public class FactoryGenericTest {
         factory.getInstance("good", null,  new Logger());
     }
 
-    @Test(expected = FactoryException.class)
+    @Test
     public void getInstanceNegative1() throws Exception {
-        factory.getInstance("good", null,  new Logger());
+        assertThrows(FactoryException.class, () -> {
+            factory.getInstance("good", null, new Logger());
+        });
     }
 
-    @Test(expected = FactoryException.class)
+    @Test
     public void getInstanceNegative2() throws Exception {
         factory.registerClass("bad", BadType.class);
-        factory.getInstance("bad", null,  new Logger());
+        assertThrows(FactoryException.class, () -> {
+            factory.getInstance("bad", null,  new Logger());
+        });
     }
 
-    @Test(expected = FactoryException.class)
+    @Test
     public void unregisterClass() throws Exception {
         factory.registerClass("good", GoodType.class);
         factory.unregisterClass("good", GoodType.class);
-        factory.getInstance("good", null,  new Logger());
+        assertThrows(FactoryException.class, () -> {
+            factory.getInstance("good", null,  new Logger());
+        });
     }
 
     @Test

@@ -1,9 +1,9 @@
 package com.amonson.shutdown_hook;
 
 import com.amonson.logger.Logger;
-import org.junit.Test;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ShutdownHookTest {
     @Test

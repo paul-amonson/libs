@@ -9,16 +9,14 @@ import com.amonson.prop_store.PropStore;
 import com.amonson.prop_store.PropStoreException;
 import com.amonson.prop_store.PropStoreFactory;
 import com.amonson.prop_store.PropStoreFactoryException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.zeromq.ZSocket;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -29,14 +27,14 @@ public class ZeroMQLoggingPublisherTest {
         return socket_;
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         if(socket_ == null)
             socket_ = mock(ZSocket.class);
         ZeroMQLoggingPublisher.CREATOR = ZeroMQLoggingPublisherTest::testCreator;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         log_.clear();
         when(socket_.sendStringUtf8(anyString())).thenAnswer(invocation -> {

@@ -5,13 +5,11 @@
 
 package com.amonson.prop_store;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.*;
-import java.util.Map;
 import java.util.Properties;
+
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PropStoreTest {
     static final class MockPropStore extends PropStore {
@@ -40,14 +38,14 @@ public class PropStoreTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         try (Writer stream = new FileWriter(file_)) {
             stream.write("{\n  \"life\": 42\n}\n");
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         file_.delete();
     }
@@ -68,30 +66,38 @@ public class PropStoreTest {
         store.writeTo(file_.toString(), map);
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test
     public void readTestsNegative1() throws Exception {
         PropStore store = new MockPropStore(null);
-        store.readMap(badFile_.toString());
+        assertThrows(FileNotFoundException.class, () -> {
+            store.readMap(badFile_.toString());
+        });
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test
     public void readTestsNegative2() throws Exception {
         PropStore store = new MockPropStore(null);
-        store.readList(badFile_.toString());
+        assertThrows(FileNotFoundException.class, () -> {
+            store.readList(badFile_.toString());
+        });
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void writeTestsNegative1() throws Exception {
         PropStore store = new MockPropStore(null);
         PropMap map = new PropMap();
-        store.writeTo(badFile_.toString(), map);
+        assertThrows(IOException.class, () -> {
+            store.writeTo(badFile_.toString(), map);
+        });
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void writeTestsNegative2() throws Exception {
         PropStore store = new MockPropStore(null);
         PropList array = new PropList();
-        store.writeTo(badFile_.toString(), array);
+        assertThrows(IOException.class, () -> {
+            store.writeTo(badFile_.toString(), array);
+        });
     }
 
     private File file_ = new File("/tmp/test_file.txt");

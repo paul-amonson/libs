@@ -5,12 +5,10 @@
 
 package com.amonson.logger;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LoggerTest {
     private void outputFinalString(Properties config, Level lvl, StackTraceElement location,
@@ -29,7 +27,7 @@ public class LoggerTest {
         return false;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         output_ = new StringBuilder();
         logger_ = new Logger();

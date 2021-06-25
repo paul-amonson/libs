@@ -5,14 +5,10 @@
 
 package com.amonson.prop_store;
 
-import com.amonson.prop_store.JsonStore;
-import com.amonson.prop_store.PropList;
-import com.amonson.prop_store.PropMap;
-import com.amonson.prop_store.PropStoreException;
-import java.util.HashMap;
 import java.util.Properties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JsonStoreTest {
     @Test
@@ -98,7 +94,7 @@ public class JsonStoreTest {
         String json = store.toString(data);
     }
 
-    @Test(expected = PropStoreException.class)
+    @Test
     public void roundTripMapNegative() throws Exception {
         String originalJson = "{\n" +
                 "  \"number\": 1.0,\n" +
@@ -109,7 +105,9 @@ public class JsonStoreTest {
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
         JsonStore store = new JsonStore(null);
-        store.fromStringToList(originalJson);
+        assertThrows(PropStoreException.class, () -> {
+            store.fromStringToList(originalJson);
+        });
     }
 
     @Test
@@ -178,7 +176,7 @@ public class JsonStoreTest {
         String json = store.toString(data);
     }
 
-    @Test(expected = PropStoreException.class)
+    @Test
     public void roundTripArrayNegative() throws Exception {
         String originalJson = "[{\n" +
                 "  \"number\": 1.0,\n" +
@@ -189,20 +187,26 @@ public class JsonStoreTest {
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}]\n";
         JsonStore store = new JsonStore(null);
-        store.fromStringToMap(originalJson);
+        assertThrows(PropStoreException.class, () -> {
+            store.fromStringToMap(originalJson);
+        });
     }
 
-    @Test(expected = PropStoreException.class)
+    @Test
     public void badJson1() throws Exception {
         String originalJson = "{]";
         JsonStore store = new JsonStore(null);
-        store.fromStringToMap(originalJson);
+        assertThrows(PropStoreException.class, () -> {
+            store.fromStringToMap(originalJson);
+        });
     }
 
-    @Test(expected = PropStoreException.class)
+    @Test
     public void badJson2() throws Exception {
         String originalJson = "{]";
         JsonStore store = new JsonStore(null);
-        store.fromStringToList(originalJson);
+        assertThrows(PropStoreException.class, () -> {
+            store.fromStringToList(originalJson);
+        });
     }
 }

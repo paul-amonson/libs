@@ -5,13 +5,10 @@
 
 package com.amonson.prop_store;
 
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class YamlStoreTest {
     @Test
