@@ -9,6 +9,7 @@ package com.amonson.logger;
  * Callback for OutputTargetInterface callbacks to build the output line if desired.
  */
 @FunctionalInterface
+@Deprecated(forRemoval = true, since = "1.3.1")
 interface BuildLogLineInterface {
     /**
      * Method called to build a log line using the logger settings.

@@ -19,6 +19,7 @@ import java.net.InetAddress;
 /**
  * Description for class ZeroMQLoggingPublisher
  */
+@Deprecated(forRemoval = true, since = "1.3.1")
 public class ZeroMQLoggingPublisher implements EarlyInterceptLog, AutoCloseable, Closeable {
     /**
      * Create a EarlyInterceptLog version that publishes to a ZeroMQ SUB server. This uses a DEFAULT_TOPIC and passes

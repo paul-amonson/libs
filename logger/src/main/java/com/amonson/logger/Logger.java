@@ -18,6 +18,7 @@ import java.util.Properties;
  *
  * com.amonson.logger.Level - Sets the filter level of the Logger.
  */
+@Deprecated(forRemoval = true, since = "1.3.1")
 public final class Logger {
     /**
      * Default logger to the console.

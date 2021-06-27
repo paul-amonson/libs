@@ -8,6 +8,7 @@ package com.amonson.logger;
 import org.zeromq.ZSocket;
 
 @FunctionalInterface
+@Deprecated(forRemoval = true, since = "1.3.1")
 interface ZeroMQSocketCreator {
     ZSocket create(String zeroMQUrl);
 }

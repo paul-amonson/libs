@@ -8,6 +8,7 @@ package com.amonson.logger;
 /**
  * Enum for logger levels.
  */
+@Deprecated(forRemoval = true, since = "1.3.1")
 public enum Level {
     /**
      * Debug level for attempting to debug problems in an application.

@@ -11,6 +11,7 @@ import java.util.Properties;
  * Class defining the final output string target.
  */
 @FunctionalInterface
+@Deprecated(forRemoval = true, since = "1.3.1")
 public interface OutputTargetInterface {
     /**
      * Method definition for an output target of a logger line.

@@ -11,6 +11,7 @@ import java.util.Properties;
  * Interface for early capture of logging to customize the Logger.
  */
 @FunctionalInterface
+@Deprecated(forRemoval = true, since = "1.3.1")
 public interface EarlyInterceptLog {
     /**
      * Method to intercept logging process early to completely customize the logger.

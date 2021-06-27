@@ -13,6 +13,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Description for class FileRotateTarget
  */
+@Deprecated(forRemoval = true, since = "1.3.1")
 public class FileRotateTarget implements OutputTargetInterface {
     public FileRotateTarget(File filename) {
         if(filename == null)
