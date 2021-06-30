@@ -218,6 +218,14 @@ Build: <i>${rootProject.version}</i></h1>
     }
 }
 
+project(':prop_store') {
+    group = 'com.amonson'
+    dependencies {
+        implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '3.0.2+'
+        implementation group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
+    }
+}
+
 project(':logger') {
     group = 'com.amonson'
     dependencies {
@@ -230,14 +238,6 @@ project(':logger') {
 project(':xdg') {
     group = 'com.amonson'
     dependencies {
-    }
-}
-
-project(':prop_store') {
-    group = 'com.amonson'
-    dependencies {
-        implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '3.0.2+'
-        implementation group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
     }
 }
 
