@@ -7,12 +7,10 @@ plugins {
     id 'idea'
     id 'java'
     id 'jacoco'
-    id 'pmd'
     id 'groovy'
 }
 
-def honorScanningRules = false
-
+def honorScanningRules = true
 String gitVersionString() {
     def stdout = new ByteArrayOutputStream()
     def stderr = new ByteArrayOutputStream()
@@ -38,7 +36,6 @@ javadoc.group = "_favorites"
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
-    apply plugin: 'pmd'
     apply plugin: 'groovy'
 
     repositories {
@@ -148,7 +145,7 @@ Build: <i>${rootProject.version}</i></h1>
     }
 
     compileJava {
-//        options.compilerArgs << '-Werror' // TODO: Restore after deprecated classed are removed.
+        options.compilerArgs << '-Werror'
         options.compilerArgs << '-Xlint:all,-processing,-path'
         options.compilerArgs << '-XDignore.symbol.file=true'
         options.fork = true
@@ -161,27 +158,13 @@ Build: <i>${rootProject.version}</i></h1>
             html.outputLocation = file("${rootProject.buildDir}/docs/reports/test/${project.name}")
             junitXml.outputLocation = file("${rootProject.buildDir}/tests/${project.name}")
         }
-        finalizedBy(jacocoTestReport, pmdMain)
+        finalizedBy(jacocoTestReport)
     }
 
     jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         from {
             configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-        }
-    }
-
-    pmdTest.enabled = false
-    pmdMain {
-        group = "Reporting"
-        consoleOutput = true
-        rulesMinimumPriority = 2
-        ignoreFailures = !honorScanningRules
-        reports {
-            xml.required = true
-            xml.outputLocation = file("${rootProject.buildDir}/pmd/${project.name}.xml")
-            html.required = true
-            html.outputLocation = file("${rootProject.buildDir}/docs/reports/pmd/${project.name}.html")
         }
     }
 
@@ -264,6 +247,7 @@ project(':task_manager') {
 
 project(':config_location') {
     group = 'com.amonson'
+
     dependencies {
         implementation project(':prop_store')
         implementation group: 'redis.clients', name: 'jedis', version: '3.6.1'
