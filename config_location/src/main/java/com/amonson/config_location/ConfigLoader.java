@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 /**
  * Description for class ConfigLoader which finds and opens configuration to multiple sources. These sources are:
  *
- * <blockquote><table border=1>
+ * <blockquote><table border=1 summary="List of ">
  *     <tr style="background:lightgrey;font-weight:bold"><td>Name</td><td>Location</td></tr>
  *     <tr><td>system</td><td>/etc/<i>application_name</i>.d/</td></tr>
  *     <tr><td>custom</td><td>/<i>custom_path</i>/ Note: this overrides use of the application_name in the path</td></tr>
@@ -44,7 +44,7 @@ public class ConfigLoader {
      * Create a configuration file locator object for finding application configuration files or other streams.
      *
      * @param applicationName This is the application name that is used as the base filename for the indirect
-     *                        configuration file in /etc. i.e. <b>/etc/<applicationName>.conf</b>.
+     *                        configuration file in /etc. i.e. <b>/etc/<i>applicationName</i>.conf</b>.
      * @param logger Logger created from {@link java.util.logging.LogManager}.
      * @throws PropStoreFactoryException when the PropStore fails to load and parse the configuration file.
      * @throws IllegalArgumentException if any of the input arguments are null or applicationName is blank.
