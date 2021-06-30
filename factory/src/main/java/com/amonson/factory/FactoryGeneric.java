@@ -5,10 +5,9 @@
 
 package com.amonson.factory;
 
-import com.amonson.logger.Logger;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.*;
 import java.util.*;
 
 /**

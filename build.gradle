@@ -262,13 +262,6 @@ project(':task_manager') {
     }
 }
 
-project(':shutdown_hook') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':logger')
-    }
-}
-
 project(':config_location') {
     group = 'com.amonson'
     dependencies {

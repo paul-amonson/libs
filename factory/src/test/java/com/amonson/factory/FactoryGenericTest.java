@@ -1,11 +1,11 @@
 package com.amonson.factory;
 
-import com.amonson.logger.Logger;
-
 import java.util.Properties;
+import java.util.logging.*;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 interface InterfaceType {
 }
@@ -28,7 +28,7 @@ class FactoryType extends FactoryGeneric<InterfaceType> {
 public class FactoryGenericTest {
     @BeforeEach
     public void setUp() throws Exception {
-        logger = new Logger();
+        logger = mock(Logger.class);
         factory = new FactoryType();
     }
 
@@ -36,13 +36,13 @@ public class FactoryGenericTest {
     public void getInstance() throws Exception {
         factory.registerClass("good", GoodType.class);
         factory.registerClass("good", GoodType.class);
-        factory.getInstance("good", null,  new Logger());
+        factory.getInstance("good", null,  logger);
     }
 
     @Test
     public void getInstanceNegative1() throws Exception {
         assertThrows(FactoryException.class, () -> {
-            factory.getInstance("good", null, new Logger());
+            factory.getInstance("good", null, logger);
         });
     }
 
@@ -50,7 +50,7 @@ public class FactoryGenericTest {
     public void getInstanceNegative2() throws Exception {
         factory.registerClass("bad", BadType.class);
         assertThrows(FactoryException.class, () -> {
-            factory.getInstance("bad", null,  new Logger());
+            factory.getInstance("bad", null,  logger);
         });
     }
 
@@ -59,15 +59,15 @@ public class FactoryGenericTest {
         factory.registerClass("good", GoodType.class);
         factory.unregisterClass("good", GoodType.class);
         assertThrows(FactoryException.class, () -> {
-            factory.getInstance("good", null,  new Logger());
+            factory.getInstance("good", null,  logger);
         });
     }
 
     @Test
     public void getSingltonInstance() throws Exception {
         factory.registerClass("good", GoodType.class);
-        InterfaceType instance1 = factory.getSingletonInstance("good", null,  new Logger());
-        InterfaceType instance2 = factory.getSingletonInstance("good", null,  new Logger());
+        InterfaceType instance1 = factory.getSingletonInstance("good", null,  logger);
+        InterfaceType instance2 = factory.getSingletonInstance("good", null,  logger);
         assertEquals(instance1, instance2);
     }
 
