@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 /**
  * Description for class ConfigLoader which finds and opens configuration to multiple sources. These sources are:
- * <p></p>
+ * <br />
  * <blockquote><table border=1>
  *     <tr style="background:lightgrey;font-weight:bold"><td>Name</td><td>Location</td></tr>
  *     <tr><td>system</td><td>/etc/<i>application_name</i>.d/</td></tr>
@@ -26,16 +26,16 @@ import java.util.regex.Pattern;
  *     <tr><td>user</td><td>${HOME}/.config/<i>application_name</i>.d/</td></tr>
  *     <tr><td>redis</td><td>Redis Server</td></tr>
  * </table></blockquote>
- * <p></p>
+ * <br />
  * There is a definite order to the search for a specific configuration locations and and values can be overridden:
- * <p></p>
+ * <br />
  * <ol>
  *     <li>user: This allows the user of an application to override all or some of the default configuration.</li>
  *     <li>system: This allows the system install to override any multi-system redis server configuration.</li>
  *     <li>redis: This allows the multi-system redis server to be the default source for configuration. Format must be JSON.</li>
  *     <li>custom: This specifies a specific folder with the configuration files in it.</li>
  * </ol>
- * <p></p>
+ * <br />
  * Configuration files can be in one of 2 formats, JSON or YAML. The files must end with either a ".json" or ".yml".
  *
  * Redis configuration if used must be found in /etc/<i>application_name</i>.{json|yml}.
@@ -47,6 +47,8 @@ public class ConfigLoader {
      * @param applicationName This is the application name that is used as the base filename for the indirect
      *                        configuration file in /etc. i.e. <b>/etc/<applicationName>.conf</b>.
      * @param logger Logger created from {@link java.util.logging.LogManager}.
+     * @throws PropStoreFactoryException when the PropStore fails to load and parse the configuration file.
+     * @throws IllegalArgumentException if any of the input arguments are null or applicationName is blank.
      */
     public ConfigLoader(String applicationName, Logger logger) throws PropStoreFactoryException {
         if(applicationName == null || applicationName.isBlank())
