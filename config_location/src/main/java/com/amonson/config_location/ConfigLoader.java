@@ -18,13 +18,12 @@ import java.util.regex.Pattern;
 /**
  * <p>Description for class ConfigLoader which finds and opens configuration to multiple sources. These sources are:</p>
  *
- * <table border=1 caption="List of configuration location types">
- *     <tr style="background:lightgrey;font-weight:bold"><td>Name</td><td>Location</td></tr>
- *     <tr><td>system</td><td>/etc/<i>application_name</i>.d/</td></tr>
- *     <tr><td>custom</td><td>/<i>custom_path</i>/ Note: this overrides use of the application_name in the path</td></tr>
- *     <tr><td>user</td><td>${HOME}/.config/<i>application_name</i>.d/</td></tr>
- *     <tr><td>redis</td><td>Redis Server</td></tr>
- * </table>
+ * <dl>
+ *     <dt>system</dt><dd>/etc/<i>application_name</i>.d/</dd>
+ *     <dt>custom</dt><dd>/<i>custom_path</i>/ Note: this overrides use of the application_name in the path</dd>
+ *     <dt>user</dt><dd>${HOME}/.config/<i>application_name</i>.d/</dd>
+ *     <dt>redis</dt><dd>Redis Server</dd>
+ * </dl>
  *
  * <p>There is a definite order to the search for a specific configuration locations and and values can be overridden:</p>
  *
