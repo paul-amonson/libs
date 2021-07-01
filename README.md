@@ -1,7 +1,4 @@
 # Library of hopefully useful functions.
 
-### Last Release Build Results are [here](https://paul-amonson.github.io/libs/reports/index.html).
-
-### Last Release Build javadoc are [here](https://paul-amonson.github.io/libs/documentation/index.html).
-
-### The Release Build on Travis-CI is [here](https://travis-ci.com/paul-amonson/libs)
+![Build Workflow](https://github.com/paul-amonson/libs/actions/workflows/main.yml/badge.svg)
+![Static Analysis](https://github.com/paul-amonson/libs/actions/workflows/codeql-analysis.yml/badge.svg)
