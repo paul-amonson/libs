@@ -4,83 +4,94 @@
 //
 package com.amonson.logger;
 
+import com.amonson.prop_store.*;
+import org.zeromq.SocketType;
 import org.zeromq.ZMQException;
-import org.zeromq.ZSocket;
-import zmq.ZMQ;
+import org.zeromq.ZMQ;
 
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
 /**
- * Create a handler to use ZeroMQ PUB to a SUB server (i.e. PUB connect to SUB).
+ * Create a handler to use ZeroMQ PUB to a SUB server (i.e. PUB connect to SUB). The topic use to send to is the
+ * hostname of the sending logs.
  */
 public class ZeroMQPublishHandler extends Handler {
     /**
      * Create a ZeroMQ PUB Handler for logging.
      *
      * @param zeroMQUrl The zeroMQ URL to connect to (must be a SUB server).
-     * @param topic The topic to use when sending the log message.
+     * @param topic  The topic to publish to at the above url.
+     * @throws RuntimeException when the JSON parser cannot be created. This should be very rare.
      */
     public ZeroMQPublishHandler(String zeroMQUrl, String topic) {
         url_ = zeroMQUrl;
         topic_ = topic;
+        try {
+            store_ = PropStoreFactory.getStore("json");
+        } catch(PropStoreFactoryException e) {
+            throw new RuntimeException("Failed to create a JSON parser instance!", e);
+        }
+        ctx_ = ZMQ.context(1);
     }
 
     /**
      * Send the topic and message to the PUB socket connected to the SUB server.
      *
      * @param logRecord The LogRecord given from the logger.
+     * @throws RuntimeException when the log record cannot be sent. 15 retries will be tried before giving up.
      */
     @Override
     public void publish(LogRecord logRecord) {
-        String message = getFormatter().format(logRecord);
-        publishZeroMQ(message);
+        if(publish_ == null)
+            repairConnection();
+        publishZeroMQ(getFormatter().format(logRecord));
     }
 
     private synchronized void publishZeroMQ(String message) {
         boolean sent = false;
-        while(!sent) {
+        int retries = 0;
+        while(!sent && retries < 15) {
             try {
-                publish_.sendStringUtf8(topic_, ZMQ.ZMQ_MORE);
-                publish_.sendStringUtf8(message);
+                publish_.send(topic_, ZMQ.SNDMORE);
+                publish_.send(message);
                 sent = true;
             } catch (ZMQException | NullPointerException e) {
-                cleanupConnection();
-                try { Thread.sleep(50); } catch(InterruptedException e2) { /* */ }
-                connect();
+                repairConnection();
+                retries++;
             }
         }
+        if(retries >= 15)
+            throw new RuntimeException("Failed to send message: " + message);
     }
 
     @Override public void flush() { }
     @Override public void close() throws SecurityException { }
 
-    private void cleanupConnection() {
+    private void repairConnection() {
         if(publish_ != null) {
             try {
                 publish_.disconnect(url_);
             } catch(ZMQException e) { /* Ignore error as we are resetting... */ }
         }
         publish_ = creator_.create();
+        publish_.connect(url_);
+        try { Thread.sleep(50); } catch(InterruptedException e2) { /* */ }
     }
 
-    private void connect() {
-        try {
-            publish_.connect(url_);
-        } catch(ZMQException e) { /* Ignore, the loop above will retry. */ }
+    private ZMQ.Socket createSocket() {
+        return ctx_.socket(SocketType.PUB);
     }
 
-    private ZSocket createSocket() {
-        return new ZSocket(ZMQ.ZMQ_PUB);
-    }
-
+    private final PropStore store_;
     private final String url_;
     private final String topic_;
-    private       ZSocket publish_ = null;
+    private final ZMQ.Context  ctx_;
+    private       ZMQ.Socket publish_ = null;
     private       SocketCreator creator_ = this::createSocket;
 
     @FunctionalInterface
     interface SocketCreator {
-        ZSocket create();
+        ZMQ.Socket create();
     }
 }

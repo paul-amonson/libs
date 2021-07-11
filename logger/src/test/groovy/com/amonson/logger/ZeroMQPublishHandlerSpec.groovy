@@ -4,15 +4,22 @@
 //
 package com.amonson.logger
 
-import org.zeromq.ZSocket
+import org.zeromq.ZMQException
+import org.zeromq.ZMQ
 import spock.lang.Specification
 
 import java.util.logging.LogRecord
 import java.util.logging.Level
 
 class ZeroMQPublishHandlerSpec extends Specification {
-    ZSocket creator() {
-        return Mock(ZSocket)
+    ZMQ.Socket creator() {
+        return Mock(ZMQ.Socket)
+    }
+
+    ZMQ.Socket creator2() {
+        ZMQ.Socket socket = Mock(ZMQ.Socket)
+        socket.send(_ as String, _ as Integer) >> { throw new ZMQException("Message", -1) }
+        return socket
     }
 
     def underTest_
@@ -26,6 +33,16 @@ class ZeroMQPublishHandlerSpec extends Specification {
         LogRecord record = new LogRecord(Level.INFO, "some message")
         underTest_.publish(record)
         expect: true
+    }
+
+    def "Test Publish Negative"() {
+        given:
+            underTest_.creator_ = this::creator2
+            LogRecord record = new LogRecord(Level.INFO, "some message")
+        when:
+            underTest_.publish(record)
+        then:
+            thrown(RuntimeException)
     }
 
     def "Test createSocket"() {
