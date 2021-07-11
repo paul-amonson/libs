@@ -6,6 +6,7 @@ package com.amonson.logger
 
 import com.amonson.prop_store.PropMap
 import com.amonson.prop_store.PropStoreFactory
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.util.logging.LogRecord
@@ -47,6 +48,7 @@ class ZeroMQTests extends Specification {
         pid_ = remoteProcessId
     }
 
+    @Ignore
     def "Test Client and Server"() {
         logger_.info("Test Message")
         Thread.sleep(250)
@@ -54,6 +56,7 @@ class ZeroMQTests extends Specification {
         and:    lastMessage_.getMessage() == "Test Message"
     }
 
+    @Ignore
     def "Test Client and Server with Exception"() {
         def exception = new Exception("MyException")
         logger_.throwing("MyClass", "MyMethod", exception)
