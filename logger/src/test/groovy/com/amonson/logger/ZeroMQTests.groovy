@@ -48,7 +48,6 @@ class ZeroMQTests extends Specification {
         pid_ = remoteProcessId
     }
 
-    @Ignore
     def "Test Client and Server"() {
         logger_.info("Test Message")
         Thread.sleep(250)
@@ -56,7 +55,6 @@ class ZeroMQTests extends Specification {
         and:    lastMessage_.getMessage() == "Test Message"
     }
 
-    @Ignore
     def "Test Client and Server with Exception"() {
         def exception = new Exception("MyException")
         logger_.throwing("MyClass", "MyMethod", exception)
