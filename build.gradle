@@ -19,7 +19,7 @@ void updateGitTags() {
         ignoreExitValue = true
         standardOutput = stdout
 //        errorOutput = stderr
-        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "fetch", "origin/master", "--tags"
+        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "fetch", "origin", "master", "--tags"
     }
 }
 
