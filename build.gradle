@@ -24,6 +24,7 @@ void updateGitTags() {
 }
 
 String gitVersionString() {
+    updateGitTags()
     def stdout = new ByteArrayOutputStream()
 //    def stderr = new ByteArrayOutputStream()
     exec {
