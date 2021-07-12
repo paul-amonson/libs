@@ -18,16 +18,16 @@ import java.util.logging.Level;
  * intended to be used to send the log data over a network or unix socket to a log receiver outside the current
  * process.
  */
-final class LogRecordSerialization {
+public final class LogRecordSerialization {
     private LogRecordSerialization() {}
 
     /**
-     * Serioalize a LogRecord to a PropMap type. This does not include ResourceBundle, ResourceBundleName or Parameters.
+     * Serialize a LogRecord to a PropMap type. This does not include ResourceBundle, ResourceBundleName or Parameters.
      *
      * @param record The LogRecord to serialize.
      * @return The PropMap containing the contents of the LogRecord minus the above listed exceptions.
      */
-    static PropMap serializeLogRecord(LogRecord record) {
+    public static PropMap serializeLogRecord(LogRecord record) {
         PropMap map = new PropMap();
         map.put("timestamp", (record.getInstant().getEpochSecond() * 1_000_000_000L) +
                 ((long)record.getInstant().getNano()));
@@ -48,7 +48,7 @@ final class LogRecordSerialization {
      * @param map The data to convert back to a LogRecord.
      * @return The converted LogRecord.
      */
-    static LogRecord deserializeLogRecord(PropMap map) {
+    public static LogRecord deserializeLogRecord(PropMap map) {
         LogRecord record = new LogRecord(Level.parse(map.getString("severity")), map.getString("message"));
         long ts = map.getLong("timestamp");
         record.setInstant(Instant.ofEpochSecond(ts / 1_000_000_000L, (int)(ts % 1_000_000_000L)));
@@ -99,7 +99,7 @@ final class LogRecordSerialization {
     }
 
     private static Throwable deserializeThrowable(PropMap map) {
-        Throwable cause = null;
+        Throwable cause;
         try {
             if (map.getMap("cause") != null)
                 cause = createThrowableDynamically(map.getString("class"), map.getString("message"),

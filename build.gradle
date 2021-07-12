@@ -13,12 +13,12 @@ plugins {
 def honorScanningRules = false
 String gitVersionString() {
     def stdout = new ByteArrayOutputStream()
-    def stderr = new ByteArrayOutputStream()
+//    def stderr = new ByteArrayOutputStream()
     exec {
         ignoreExitValue = true
         standardOutput = stdout
-        errorOutput = stderr
-        commandLine "/usr/bin/git", "--git-dir=${rootProject.projectDir}/.git", "describe", "--tags"
+//        errorOutput = stderr
+        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "--tags"
     }
     String localVersion = stdout.toString().trim()
     return (localVersion == null || localVersion.isEmpty())?'0.0.0':localVersion
@@ -33,12 +33,6 @@ clean.group = "_favorites"
 test.group = "_favorites"
 javadoc.group = "_favorites"
 
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
@@ -46,6 +40,10 @@ subprojects {
 
     targetCompatibility = 11
     sourceCompatibility = 11
+
+    repositories {
+        mavenCentral()
+    }
 
     dependencies {
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
@@ -215,9 +213,42 @@ project(':logger') {
     group = 'com.amonson'
     dependencies {
         implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
+        implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
         implementation project(':prop_store')
 
         testImplementation project(':prop_store')
+    }
+}
+
+project(':logger_server') {
+    apply plugin: 'application'
+
+    group = 'com.amonson'
+    dependencies {
+        implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
+        implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+        implementation project(':prop_store')
+        implementation project(':logger')
+
+        testImplementation project(':prop_store')
+    }
+
+    project.mainClassName = "com.amonson.logger_server.LogServerApp"
+
+    jar {
+        doFirst {
+        }
+        manifest {
+            attributes('Main-Class': project.mainClassName, 'Implementation-Version': rootProject.version)
+        }
+
+        doLast {
+            copy {
+                from "${buildDir}/libs/${project.name}.jar"
+                rename "${project.name}.jar", "${project.name}-${rootProject.version}.jar"
+                into "${rootProject.buildDir}/libs"
+            }
+        }
     }
 }
 
@@ -260,7 +291,8 @@ project(':config_location') {
 task fatJar(type: Jar, dependsOn: subprojects.jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     subprojects.each { subproject ->
-        from subproject.configurations.archives.allArtifacts.files.collect {
+        from subproject.configurations.runtimeClasspath.findAll {
+            it.name.endsWith('jar') && !it.name.contains('logger_server') }.collect {
             zipTree(it)
         }
     }
