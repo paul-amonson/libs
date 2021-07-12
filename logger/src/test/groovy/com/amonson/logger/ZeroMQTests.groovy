@@ -6,7 +6,6 @@ package com.amonson.logger
 
 import com.amonson.prop_store.PropMap
 import com.amonson.prop_store.PropStoreFactory
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.util.logging.LogRecord
