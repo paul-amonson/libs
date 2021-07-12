@@ -12,6 +12,17 @@ plugins {
 
 def honorScanningRules = false
 
+void updateGitTags() {
+    def stdout = new ByteArrayOutputStream()
+//    def stderr = new ByteArrayOutputStream()
+    exec {
+        ignoreExitValue = true
+        standardOutput = stdout
+//        errorOutput = stderr
+        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "fetch", "origin/master", "--tags"
+    }
+}
+
 String gitVersionString() {
     def stdout = new ByteArrayOutputStream()
 //    def stderr = new ByteArrayOutputStream()
