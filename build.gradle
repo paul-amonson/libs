@@ -14,11 +14,11 @@ def honorScanningRules = false
 
 void updateGitTags() {
     def stdout = new ByteArrayOutputStream()
-    def stderr = new ByteArrayOutputStream()
+//    def stderr = new ByteArrayOutputStream()
     exec {
         ignoreExitValue = true
         standardOutput = stdout
-        errorOutput = stderr
+//        errorOutput = stderr
         commandLine "git", "fetch", "--tags"
     }
 }
