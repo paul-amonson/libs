@@ -197,6 +197,42 @@ Build: <i>${rootProject.version}</i></h1>
             }
         }
     }
+    configurations {
+        integrationImplementation.extendsFrom testImplementation
+        integrationRuntime.extendsFrom testRuntime
+    }
+
+    sourceSets {
+        integration {
+            groovy.srcDir "$projectDir/src/integration/groovy"
+            resources.srcDir "$projectDir/src/integration/resources"
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
+
+    task integrationTest(type: Test) {
+        group = '_favorites'
+        useJUnitPlatform()
+        testClassesDirs = sourceSets.integration.output.classesDirs
+        classpath = sourceSets.integration.runtimeClasspath
+
+        testLogging {
+            outputs.upToDateWhen {false}
+            showCauses = true
+            showExceptions = true
+            showStackTraces = true
+            showStandardStreams = true
+            exceptionFormat = 'full'
+        }
+        reports {
+            html.outputLocation = file("${rootProject.buildDir}/docs/reports/test/${project.name}")
+            junitXml.outputLocation = file("${rootProject.buildDir}/tests/${project.name}")
+        }
+        finalizedBy(jacocoTestReport)
+    }
+
+    check.finalizedBy(integrationTest)
 }
 
 project(':prop_store') {
