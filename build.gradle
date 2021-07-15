@@ -73,7 +73,7 @@ subprojects {
             new File((String)"${rootProject.buildDir}/docs/documentation").mkdirs()
             def links=""
             for(Object sub: rootProject.subprojects)
-                links += "    <li>Package: <a href=\"${sub.name}/index.html\">${sub.name}</a></li>\n"
+                links += """    <li><b>Package: <a href="${sub.name}/index.html">${sub.name}</a></b></li>\n"""
             new File((String)"${rootProject.buildDir}/docs/documentation/index.html").text = """
 <!DOCTYPE html>
 <html lang="en">
