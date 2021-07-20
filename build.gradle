@@ -238,7 +238,7 @@ Build: <i>${rootProject.version}</i></h1>
 project(':prop_store') {
     group = 'com.amonson'
     dependencies {
-        implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '3.0.2+'
+        implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '4.0.0'
         implementation group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
     }
 }

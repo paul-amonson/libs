@@ -5,9 +5,12 @@
 
 package com.amonson.prop_store;
 
-import java.util.Properties;
+import com.github.cliftonlabs.json_simple.JsonArray;
+import com.github.cliftonlabs.json_simple.JsonException;
+import com.github.cliftonlabs.json_simple.JsonObject;
+import com.github.cliftonlabs.json_simple.Jsoner;
 
-import com.github.cliftonlabs.json_simple.*;
+import java.util.Properties;
 
 /**
  * PropStore implementation for JSON.
@@ -21,8 +24,6 @@ class JsonStore extends PropStore {
      */
     public JsonStore(Properties config) {
         super(config);
-        if(config != null)
-            indent_ = Integer.parseInt(config.getProperty("com.amonson.prop_store.indent", "0"));
     }
 
     /**
@@ -34,9 +35,7 @@ class JsonStore extends PropStore {
     @Override
     public String toString(PropMap map) {
         JsonObject json = new JsonObject(map);
-        String str = json.toJson();
-        if(indent_ > 0 && indent_ <= 8) str = Jsoner.prettyPrint(str, indent_);
-        return str;
+        return json.toJson();
     }
 
     /**
@@ -48,9 +47,7 @@ class JsonStore extends PropStore {
     @Override
     public String toString(PropList list) {
         JsonArray json = new JsonArray(list);
-        String str = json.toJson();
-        if(indent_ > 0 && indent_ <= 8) str = Jsoner.prettyPrint(str, indent_);
-        return str;
+        return json.toJson();
     }
 
     /**
@@ -118,6 +115,4 @@ class JsonStore extends PropStore {
         }
         return result;
     }
-
-    private int indent_ = 0;
 }

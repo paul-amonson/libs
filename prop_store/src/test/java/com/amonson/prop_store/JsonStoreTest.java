@@ -25,7 +25,7 @@ public class JsonStoreTest {
             setProperty("com.amonson.prop_store.indent", "3");
         }});
         PropMap data = store.fromStringToMap(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -38,11 +38,9 @@ public class JsonStoreTest {
                 "  },\n" +
                 "  \"list\": [\"list string\", 2.0, {\"array\": []}, [ \"\" ]]\n" +
                 "}\n";
-        JsonStore store = new JsonStore(new Properties() {{
-            setProperty("com.amonson.prop_store.indent", "2");
-        }});
+        JsonStore store = new JsonStore(new Properties());
         PropMap data = store.fromStringToMap(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -57,7 +55,7 @@ public class JsonStoreTest {
                 "}\n";
         JsonStore store = new JsonStore(new Properties());
         PropMap data = store.fromStringToMap(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class JsonStoreTest {
             setProperty("com.amonson.prop_store.indent", "-1");
         }});
         PropMap data = store.fromStringToMap(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -91,7 +89,7 @@ public class JsonStoreTest {
             setProperty("com.amonson.prop_store.indent", "9");
         }});
         PropMap data = store.fromStringToMap(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -122,7 +120,7 @@ public class JsonStoreTest {
                 "}]\n";
         JsonStore store = new JsonStore(null);
         PropList data = store.fromStringToList(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -139,7 +137,7 @@ public class JsonStoreTest {
             setProperty("com.amonson.prop_store.indent", "9");
         }});
         PropList data = store.fromStringToList(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -156,7 +154,7 @@ public class JsonStoreTest {
             setProperty("com.amonson.prop_store.indent", "-1");
         }});
         PropList data = store.fromStringToList(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
@@ -173,7 +171,7 @@ public class JsonStoreTest {
             setProperty("com.amonson.prop_store.indent", "2");
         }});
         PropList data = store.fromStringToList(originalJson);
-        String json = store.toString(data);
+        assertNotNull(store.toString(data));
     }
 
     @Test
