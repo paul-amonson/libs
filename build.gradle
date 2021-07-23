@@ -254,6 +254,14 @@ project(':logger') {
     }
 }
 
+project(':node_monitoring') {
+    group = 'com.amonson'
+
+    dependencies {
+        implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
+    }
+}
+
 project(':logger_server') {
     apply plugin: 'application'
 

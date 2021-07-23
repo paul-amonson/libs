@@ -12,5 +12,6 @@ include 'xdg'
 include 'factory'
 include 'task_manager'
 include 'config_location'
+include 'node_monitoring'
 
 rootProject.name = 'libs'
