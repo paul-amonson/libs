@@ -5,9 +5,9 @@
 
 plugins {
     id 'idea'
-    id 'java'
     id 'jacoco'
     id 'groovy'
+    id 'maven-publish'
 }
 
 def honorScanningRules = false
@@ -28,14 +28,38 @@ String gitVersionString() {
 System.out.printf("*** Building version: %s\n\n", gitVersionString())
 
 version = gitVersionString()
+def baseVersion = version.split("-")[0]
+def release = false
+if(version == baseVersion)
+    release = true
 
 build.group = "_favorites"
 clean.group = "_favorites"
 test.group = "_favorites"
 javadoc.group = "_favorites"
+jar.group = "_favorites"
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.amonson'
+            artifactId = 'libs'
+            version = baseVersion
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = 'MyRepo'
+            url = "http://synology:8090/" + (release ? "releases" : "snapshots")
+            allowInsecureProtocol = true
+        }
+    }
+}
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'jacoco'
     apply plugin: 'groovy'
 
@@ -256,7 +280,6 @@ project(':logger') {
 
 project(':node_monitoring') {
     group = 'com.amonson'
-
     dependencies {
         implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
     }
@@ -296,8 +319,6 @@ project(':logger_server') {
 
 project(':xdg') {
     group = 'com.amonson'
-    dependencies {
-    }
 }
 
 project(':crypto') {
@@ -323,20 +344,26 @@ project(':task_manager') {
 
 project(':config_location') {
     group = 'com.amonson'
-
     dependencies {
         implementation project(':prop_store')
         implementation group: 'redis.clients', name: 'jedis', version: '3.6.1'
     }
 }
 
-task fatJar(type: Jar, dependsOn: subprojects.jar) {
+jar {
+    dependsOn(subprojects.jar)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     subprojects.each { subproject ->
         from subproject.configurations.runtimeClasspath.findAll {
-            it.name.endsWith('jar') && !it.name.contains('logger_server') }.collect {
+            it.name.endsWith('jar')
+        }.collect {
             zipTree(it)
         }
+        if(subproject.name != 'logger_server')
+            from zipTree(new File("${projectDir}/${subproject.name}/build/libs/${subproject.name}.jar"))
+    }
+
+    manifest {
+        attributes('Implementation-Version': rootProject.version)
     }
 }
-check.finalizedBy(fatJar)
