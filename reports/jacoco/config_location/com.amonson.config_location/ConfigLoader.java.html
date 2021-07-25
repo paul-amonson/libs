@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfigLoader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">config_location</a> &gt; <a href="index.source.html" class="el_package">com.amonson.config_location</a> &gt; <span class="el_source">ConfigLoader.java</span></div><h1>ConfigLoader.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.config_location;
+
+import com.amonson.prop_store.*;
+import redis.clients.jedis.*;
+import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+/**
+ * &lt;p&gt;Description for class ConfigLoader which finds and opens configuration to multiple sources. These sources are:&lt;/p&gt;
+ *
+ * &lt;dl&gt;
+ *     &lt;dt&gt;system&lt;/dt&gt;&lt;dd&gt;/etc/&lt;i&gt;application_name&lt;/i&gt;.d/&lt;/dd&gt;
+ *     &lt;dt&gt;custom&lt;/dt&gt;&lt;dd&gt;/&lt;i&gt;custom_path&lt;/i&gt;/ Note: this overrides use of the application_name in the path&lt;/dd&gt;
+ *     &lt;dt&gt;user&lt;/dt&gt;&lt;dd&gt;${HOME}/.config/&lt;i&gt;application_name&lt;/i&gt;.d/&lt;/dd&gt;
+ *     &lt;dt&gt;redis&lt;/dt&gt;&lt;dd&gt;Redis Server&lt;/dd&gt;
+ * &lt;/dl&gt;
+ *
+ * &lt;p&gt;There is a definite order to the search for a specific configuration locations and and values can be overridden:&lt;/p&gt;
+ *
+ * &lt;ol&gt;
+ *     &lt;li&gt;user: This allows the user of an application to override all or some of the default configuration.&lt;/li&gt;
+ *     &lt;li&gt;system: This allows the system install to override any multi-system redis server configuration.&lt;/li&gt;
+ *     &lt;li&gt;redis: This allows the multi-system redis server to be the default source for configuration. Format must be JSON.&lt;/li&gt;
+ *     &lt;li&gt;custom: This specifies a specific folder with the configuration files in it.&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * &lt;p&gt;Configuration files can be in one of 2 formats, JSON or YAML. The files must end with either a &quot;.json&quot; or &quot;.yml&quot;.&lt;/p&gt;
+ *
+ * &lt;p&gt;Redis configuration if used must be found in /etc/&lt;i&gt;application_name&lt;/i&gt;.{json|yml}.&lt;/p&gt;
+ */
+public class ConfigLoader {
+    /**
+     * Create a configuration file locator object for finding application configuration files or other streams.
+     *
+     * @param applicationName This is the application name that is used as the base filename for the indirect
+     *                        configuration file in /etc. i.e. &lt;b&gt;/etc/&lt;i&gt;applicationName&lt;/i&gt;.conf&lt;/b&gt;.
+     * @param logger Logger created from {@link java.util.logging.LogManager}.
+     * @throws PropStoreFactoryException when the PropStore fails to load and parse the configuration file.
+     * @throws IllegalArgumentException if any of the input arguments are null or applicationName is blank.
+     */
+<span class="fc" id="L51">    public ConfigLoader(String applicationName, Logger logger) throws PropStoreFactoryException {</span>
+<span class="fc bfc" id="L52" title="All 4 branches covered.">        if(applicationName == null || applicationName.isBlank())</span>
+<span class="fc" id="L53">            throw new IllegalArgumentException(&quot;applicationName must not be null or empty&quot;);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if(!Pattern.compile(&quot;[a-zA-Z]+[-_a-zA-Z0-9]*&quot;).matcher(applicationName).matches())</span>
+<span class="fc" id="L55">            throw new IllegalArgumentException(&quot;ApplicationName must be a valid name starting with a alpha character &quot; +</span>
+                    &quot;and containing alpha-numeric characters or a dash or underscore.&quot;);
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if(logger == null)</span>
+<span class="fc" id="L58">            throw new IllegalArgumentException(&quot;You must pass a valid logger to this class.&quot;);</span>
+<span class="fc" id="L59">        applicationName_ = applicationName;</span>
+<span class="fc" id="L60">        log_ = logger;</span>
+<span class="fc" id="L61">        userDir_ = System.getProperty(&quot;user.home&quot;) + &quot;/.config/&quot; + applicationName_ + &quot;.d&quot;;</span>
+<span class="fc" id="L62">        systemDir_ = &quot;/etc/&quot; +  applicationName_ + &quot;.d&quot;;</span>
+<span class="fc" id="L63">        jsonParser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="fc" id="L64">        yamlParser_ = PropStoreFactory.getStore(&quot;yaml&quot;);</span>
+<span class="fc" id="L65">        baseConfig_ = new PropMap();</span>
+<span class="fc" id="L66">        getConfigurationByNameFromFile(ETC_DIR + &quot;/&quot; + applicationName_, baseConfig_);</span>
+<span class="fc" id="L67">        customDir_ = baseConfig_.getStringOrDefault(CUSTOM_DIR_KEY, null);</span>
+<span class="fc" id="L68">    }</span>
+
+    /**
+     * Get the PropMap parsed from the specified configuration name.
+     *
+     * @param name The base name for the configuration to retrieve, this does not include the extension like
+     *            &quot;.json&quot; or &quot;.yml&quot;.
+     * @return The map of the merged configurations. If there was no configuration found the PropMap will be
+     * empty but not null.
+     */
+    public PropMap getConfigurationByName(String name) {
+<span class="fc" id="L79">        PropMap config = new PropMap();</span>
+<span class="fc" id="L80">        getConfigurationByNameFromRedis(name, config);</span>
+<span class="fc" id="L81">        getConfigurationByNameFromSystem(name, config);</span>
+<span class="fc" id="L82">        getConfigurationByNameFromCustom(name, config);</span>
+<span class="fc" id="L83">        getConfigurationByNameFromUser(name, config);</span>
+<span class="fc" id="L84">        return config;</span>
+    }
+
+    private void getConfigurationByNameFromRedis(String name, PropMap config) {
+<span class="fc" id="L88">        createRedisClient();</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if(redisClient_ != null) {</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">            if(redisClient_.hexists(applicationName_, name)) {</span>
+                try {
+<span class="fc" id="L92">                    jsonParser_.fromStringToMap(redisClient_.hget(applicationName_, name));</span>
+<span class="nc" id="L93">                } catch(PropStoreException e) {</span>
+                    // Treat bad data as no data but log it.
+<span class="nc" id="L95">                    log_.warning(e.getMessage());</span>
+<span class="fc" id="L96">                }</span>
+            }
+        }
+<span class="fc" id="L99">        closeRedisClient();</span>
+<span class="fc" id="L100">    }</span>
+
+    private void getConfigurationByNameFromCustom(String name, PropMap config) {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if(customDir_ != null)</span>
+<span class="fc" id="L104">            getConfigurationByNameFromFile(customDir_ + &quot;/&quot; + name, config);</span>
+<span class="fc" id="L105">    }</span>
+
+    private void getConfigurationByNameFromUser(String name, PropMap config) {
+<span class="fc" id="L108">        getConfigurationByNameFromFile(userDir_ + &quot;/&quot; + name, config);</span>
+<span class="fc" id="L109">    }</span>
+
+    private void getConfigurationByNameFromSystem(String name, PropMap config) {
+<span class="fc" id="L112">        getConfigurationByNameFromFile(systemDir_ + &quot;/&quot; + name, config);</span>
+<span class="fc" id="L113">    }</span>
+
+    private void getConfigurationByNameFromFile(String prefix, PropMap config) {
+<span class="fc" id="L116">        File file = new File(prefix + &quot;.json&quot;);</span>
+<span class="fc" id="L117">        PropStore parser_ = jsonParser_;</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if(!file.canRead()) {</span>
+<span class="fc" id="L119">            file = new File(prefix + &quot;.yml&quot;);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            if(!file.canRead())</span>
+<span class="fc" id="L121">                return;</span>
+<span class="fc" id="L122">            parser_ = yamlParser_;</span>
+        }
+<span class="fc" id="L124">        try (InputStream stream = new FileInputStream(file)) {</span>
+<span class="fc" id="L125">            mergeProp(parser_.readMap(stream), config);</span>
+<span class="fc" id="L126">        } catch(IOException | PropStoreException e) {</span>
+<span class="fc" id="L127">            log_.warning(e.getMessage());</span>
+<span class="fc" id="L128">        }</span>
+<span class="fc" id="L129">    }</span>
+
+    private void mergeProp(PropMap newProps, PropMap target) { // On type mismatch newProps takes precedence.
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for(String key: newProps.keySet())</span>
+<span class="fc bfc" id="L133" title="All 6 branches covered.">            if(newProps.get(key) instanceof PropMap &amp;&amp; target.containsKey(key) &amp;&amp; target.get(key) instanceof PropMap)</span>
+<span class="fc" id="L134">                mergeProp(newProps.getMap(key), target.getMap(key));</span>
+            else
+<span class="fc" id="L136">                target.put(key, newProps.get(key)); // Arrays are not merged, only replaced.</span>
+<span class="fc" id="L137">    }</span>
+
+    private void closeRedisClient() {
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if(redisClient_ != null) {</span>
+<span class="fc" id="L141">            redisClient_.close();</span>
+<span class="fc" id="L142">            redisClient_ = null;</span>
+        }
+<span class="fc" id="L144">    }</span>
+
+    private void createRedisClient() {
+<span class="pc bpc" id="L147" title="2 of 4 branches missed.">        if(redisClient_ == null &amp;&amp; baseConfig_.getString(REDIS_SERVER_KEY) != null) {</span>
+<span class="fc" id="L148">            HostAndPort authority = new HostAndPort(baseConfig_.getString(REDIS_SERVER_KEY),</span>
+<span class="fc" id="L149">                    baseConfig_.getInteger(REDIS_PORT_KEY));</span>
+<span class="fc" id="L150">            redisClient_ = factory_.create(authority);</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">            if(redisClient_ != null) {</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">                if (baseConfig_.getStringOrDefault(REDIS_SECRET_KEY, null) != null)</span>
+<span class="fc" id="L153">                    redisClient_.auth(baseConfig_.getString(REDIS_SECRET_KEY));</span>
+<span class="fc" id="L154">                redisClient_.connect();</span>
+<span class="fc" id="L155">                redisClient_.select(baseConfig_.getIntegerOrDefault(REDIS_DB_NUMBER, 0));</span>
+            }
+        }
+<span class="fc" id="L158">    }</span>
+
+    private Jedis createInternalClient(HostAndPort authority) {
+        try {
+<span class="nc" id="L162">            return new Jedis(authority);</span>
+<span class="fc" id="L163">        } catch(JedisConnectionException e) {</span>
+<span class="fc" id="L164">            log_.warning(e.getMessage());</span>
+<span class="fc" id="L165">            return null;</span>
+        }
+    }
+
+    private final String applicationName_;
+    private final Logger log_;
+    private       String userDir_; // not marked final for UT.
+    private       String systemDir_; // not marked final for UT.
+    private       String customDir_; // not marked final for UT.
+    private final PropMap baseConfig_;
+    private final PropStore jsonParser_;
+    private final PropStore yamlParser_;
+    private       Jedis redisClient_;
+<span class="fc" id="L178">    private       JedisFactory factory_ = this::createInternalClient; // not marked final for UT.</span>
+
+<span class="fc" id="L180">    private static       String ETC_DIR = &quot;/etc&quot;; // not marked final for UT.</span>
+    private static final String CUSTOM_DIR_KEY = &quot;custom_dir&quot;;
+    private static final String REDIS_SERVER_KEY = &quot;redis_server&quot;;
+    private static final String REDIS_PORT_KEY = &quot;redis_port&quot;;
+    private static final String REDIS_SECRET_KEY = &quot;redis_secret&quot;;
+    private static final String REDIS_DB_NUMBER = &quot;redis_db&quot;;
+
+    @FunctionalInterface // Allows mocking of the Jedis object creation.
+    interface JedisFactory {
+        Jedis create(HostAndPort hp);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

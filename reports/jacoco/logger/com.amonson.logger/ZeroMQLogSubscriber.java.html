@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ZeroMQLogSubscriber.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">ZeroMQLogSubscriber.java</span></div><h1>ZeroMQLogSubscriber.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.logger;
+
+import com.amonson.prop_store.PropMap;
+import com.amonson.prop_store.PropStore;
+import com.amonson.prop_store.PropStoreFactory;
+import com.amonson.prop_store.PropStoreFactoryException;
+import org.zeromq.SocketType;
+import org.zeromq.ZMQException;
+import org.zeromq.ZMQ;
+
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
+/**
+ * Class to receive data from the ZeroMQPublishHandler class.
+ */
+public class ZeroMQLogSubscriber implements Runnable, Callable&lt;Void&gt; {
+    /**
+     * Construct a class to run a server for the ZMQPublishHandler.
+     *
+     * @param url The ZeroMQ URL to bind to. The address may be '*' to bind to all interfaces.
+     * @param messageCallback The callback that will receive all published log messages.
+     * @param topics The topics to listen on. If no topics are specified then all are listened to.
+     * @throws RuntimeException if the JSON parser cannot be created.
+     */
+<span class="fc" id="L30">    public ZeroMQLogSubscriber(String url, ReceivedLogMessageHandler messageCallback, String... topics) {</span>
+<span class="fc" id="L31">        url_ = url;</span>
+<span class="fc" id="L32">        callback_ = messageCallback;</span>
+<span class="fc" id="L33">        topics_ = topics;</span>
+        try {
+<span class="fc" id="L35">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="nc" id="L36">        } catch(PropStoreFactoryException e) {</span>
+<span class="nc" id="L37">            throw new RuntimeException(e);</span>
+<span class="fc" id="L38">        }</span>
+<span class="fc" id="L39">        ctx_ = ZMQ.context(1);</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Method implements the Runnable interface.
+     *
+     * @throws RuntimeException encapsulating the checked exception from call().
+     */
+    @Override
+    public void run() {
+        try {
+<span class="fc" id="L50">            call();</span>
+<span class="fc" id="L51">        } catch(Exception e) {</span>
+<span class="fc" id="L52">            throw new RuntimeException(e);</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * Start the subscriber as a server and listen for messages.
+     *
+     * @return null for the Void generic parameter.
+     * @throws Exception Required by the Callable functional interface.
+     */
+    @Override
+    public Void call() throws Exception {
+<span class="fc" id="L64">        internalRun();</span>
+<span class="fc" id="L65">        return null;</span>
+    }
+
+    /**
+     * Signal the server receive loop to stop.
+     */
+    public void signalStopServer() {
+<span class="pc bpc" id="L72" title="2 of 4 branches missed.">        if(thread_ != null &amp;&amp; !thread_.isInterrupted()) {</span>
+<span class="fc" id="L73">            thread_.interrupt();</span>
+<span class="pc" id="L74">            try { thread_.join(500); } catch(InterruptedException e) { /* Ignore */ }</span>
+        }
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Test if the server is running.
+     *
+     * @return true is the server is in the receiving loop, false otherwise.
+     */
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    public boolean isRunning() { return thread_ != null; }</span>
+
+    private void internalRun() throws Exception {
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(isRunning())</span>
+<span class="fc" id="L87">            throw new IOException(&quot;Server is already Running!&quot;);</span>
+<span class="fc" id="L88">        try (ZMQ.Socket subscriber = creator_.create()) {</span>
+<span class="fc" id="L89">            subscriber.bind(url_);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            if(topics_.length &gt; 0)</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">                for(String topic: topics_)</span>
+<span class="fc" id="L92">                    subscriber.subscribe(topic);</span>
+            else
+<span class="fc" id="L94">                subscriber.subscribe(&quot;&quot;); // subscribe to all topics.</span>
+<span class="fc" id="L95">            Thread.sleep(100); // Apparently there is a bug and this is required.</span>
+<span class="fc" id="L96">            thread_ = Thread.currentThread();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc" id="L98">                byte[] topic = subscriber.recv(0);</span>
+<span class="fc" id="L99">                byte[] message = subscriber.recv(0);</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">                if (callback_ != null) {</span>
+<span class="fc" id="L101">                    PropMap map = parser_.fromStringToMap(new String(message, ZMQ.CHARSET));</span>
+<span class="fc" id="L102">                    callback_.received(new String(topic, ZMQ.CHARSET),</span>
+<span class="fc" id="L103">                            LogRecordSerialization.deserializeLogRecord(map),</span>
+<span class="fc" id="L104">                            map.getStringOrDefault(&quot;hostname&quot;, null),</span>
+<span class="fc" id="L105">                            map.getIntegerOrDefault(&quot;pid&quot;, 0));</span>
+                }
+<span class="fc" id="L107">            }</span>
+<span class="nc" id="L108">        } catch(ZMQException e) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            if(e.getErrorCode() != 4)</span>
+<span class="nc" id="L110">                throw new IOException(e);</span>
+        } finally {
+<span class="fc" id="L112">            thread_ = null;</span>
+        }
+<span class="fc" id="L114">    }</span>
+
+    private ZMQ.Socket createSocket() {
+<span class="fc" id="L117">        return ctx_.socket(SocketType.SUB);</span>
+    }
+
+    private final PropStore parser_;
+    private final String url_;
+    private final String[] topics_;
+    private final ZMQ.Context ctx_;
+    private       Thread thread_;
+    private final ReceivedLogMessageHandler callback_;
+<span class="fc" id="L126">    private       SocketCreator creator_ = this::createSocket;</span>
+
+    @FunctionalInterface
+    interface SocketCreator {
+        ZMQ.Socket create();
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
