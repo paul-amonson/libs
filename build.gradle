@@ -1,3 +1,6 @@
+import java.nio.charset.StandardCharsets
+import java.time.Instant
+
 // Copyright (C) 2018-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -59,6 +62,60 @@ publishing {
 
 def exportedProjects = []
 subprojects.forEach(sub -> { exportedProjects.add(':' + sub.name) })
+
+build {
+    doFirst {
+        mkdir("${buildDir}")
+        mkdir("${buildDir}/docs")
+    }
+    doLast {
+        String year = Instant.now().toString().split('-')[0]
+        String title = "Reports for project ${project.name} version ${project.version}"
+        String headerLine = "<tr><th>Code Coverage</th><th>Test Results</th></tr>"
+        String docs = """<a href="javadoc/index.html">JavaDocs</a> for project ${project.name} version ${project.version}"""
+        String projectLines = ""
+        exportedProjects.forEach(p -> {
+            String p2 = ((String)p).replace(":", "")
+            if(new File("${buildDir}/tests/${p2}").exists())
+                projectLines += """<tr><td><a class="link" href="reports/jacoco/${p2}/index.html">${p2}</a></td><td><a class="link" href="reports/test/${p2}/index.html">${p2}</a></td></tr>"""
+        })
+        String html = """<!DOCTYPE html><html><head><title>${title}</title><link rel="stylesheet" href="style.css"></link></head><body><h1>${title}</h1><hr /><h2>${docs}</h2><table border=2>
+${headerLine}
+${projectLines}
+</table><br /><div>Copyright&copy;${year} Paul Amonson</div></body>"""
+        new File("${buildDir}/docs/index.html").text = html
+        new File("${buildDir}/docs/style.css").text = """
+    body {
+        margin: 18pt;
+        background-color: rgb(48,48,48) !important;
+        color: white;
+    }
+    table {
+        background-color: rgb(128,128,128);
+        padding: 3pt;
+    }
+    td {
+        color: black;
+        padding: 6pt;
+    }
+    th {
+        background-color: rgb(48,48,48);
+        color: rgb(192,192,0);
+        padding: 6pt;
+    }
+    a {
+        color: rgb(72,72,224);
+    }
+    a.link {
+        color: rgb(0,0,64);
+        text-decoration: none;
+    }
+    div {
+        indent: 36pt;
+    }
+"""
+    }
+}
 
 subprojects {
     apply plugin: 'java-library'
@@ -297,6 +354,18 @@ task allJavaDocs(type: Javadoc) {
     options.addBooleanOption('html5', true)
     source exportedProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
-    destinationDir = file("${buildDir}/javadoc")
+    destinationDir = file("${buildDir}/docs/javadoc")
+
+    doLast {
+    }
 }
 jar.finalizedBy('allJavaDocs')
+
+task myTest(type: Copy) {
+    doLast {
+        System.out.println("*** It got here!!!!")
+        from "${buildDir}/index.html"
+        into "${buildDir}/docs/reports"
+    }
+}
+jacocoTestReport.finalizedBy('myTest')
