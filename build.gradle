@@ -36,7 +36,6 @@ if(version == baseVersion)
 build.group = "_favorites"
 clean.group = "_favorites"
 test.group = "_favorites"
-javadoc.group = "_favorites"
 jar.group = "_favorites"
 
 publishing {
@@ -57,6 +56,9 @@ publishing {
         }
     }
 }
+
+def exportedProjects = []
+subprojects.forEach(sub -> { exportedProjects.add(':' + sub.name) })
 
 subprojects {
     apply plugin: 'java-library'
@@ -81,89 +83,6 @@ subprojects {
 
     clean {
         delete += "${projectDir}/out"
-    }
-
-    javadoc {
-        options.addBooleanOption('html5', true)
-        doLast {
-            copy {
-                from(javadoc.outputs)
-                into "${rootProject.buildDir}/docs/documentation/${project.name}"
-            }
-            copy {
-                from(file("${rootProject.projectDir}/html_src/stylesheet.css"))
-                into "${rootProject.buildDir}/docs/documentation"
-            }
-            new File((String)"${rootProject.buildDir}/docs/documentation").mkdirs()
-            def links=""
-            for(Object sub: rootProject.subprojects)
-                links += """    <li><b>Package: <a href="${sub.name}/index.html">${sub.name}</a></b></li>\n"""
-            new File((String)"${rootProject.buildDir}/docs/documentation/index.html").text = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>libs API Java Documentation</title>
-    <link rel="stylesheet" type="text/css" href="/stylesheet.css" title="Style">
-</head>
-<body style="background-color:#dee3e9;">
-<h1 style="text-indent:20px"><a>${rootProject.name}</a> API Java Documentation (${rootProject.version})</h1>
-<ul>
-${links}
-</ul>
-</body>
-</html>
-"""
-            new File((String)"${rootProject.buildDir}/docs/reports").mkdirs()
-            new File((String)"${rootProject.buildDir}/docs/reports/index.html").text = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>libs Reports for Last Build</title>
-    <link rel="stylesheet" type="text/css" href="/stylesheet.css" title="Style">
-</head>
-<body style="background-color:#dee3e9;">
-<h1>Build Reports for <a href="https://github.com/paul-amonson/libs">${rootProject.name}</a>
-Build: <i>${rootProject.version}</i></h1>
-<h2 style="text-indent:20px">Test Reports</h2>
-<ul>
-    <li>Tests: <a href="test/crypto/index.html">crypto</a></li>
-    <li>Tests: <a href="test/factory/index.html">factory</a></li>
-    <li>Tests: <a href="test/logger/index.html">logger</a></li>
-    <li>Tests: <a href="test/prop_store/index.html">prop_store</a></li>
-    <li>Tests: <a href="test/shutdown_hook/index.html">shutdown_hook</a></li>
-    <li>Tests: <a href="test/task_manager/index.html">task_manager</a></li>
-    <li>Tests: <a href="test/xdg/index.html">xdg</a></li>
-</ul>
-<h2 style="text-indent:20px">Jacoco Coverage Reports</h2>
-<ul>
-    <li>Coverage: <a href="jacoco/crypto/index.html">crypto</a></li>
-    <li>Coverage: <a href="jacoco/logger/index.html">logger</a></li>
-    <li>Coverage: <a href="jacoco/factory/index.html">factory</a></li>
-    <li>Coverage: <a href="jacoco/prop_store/index.html">prop_store</a></li>
-    <li>Coverage: <a href="jacoco/shutdown_hook/index.html">shutdown_hook</a></li>
-    <li>Coverage: <a href="jacoco/task_manager/index.html">task_manager</a></li>
-    <li>Coverage: <a href="jacoco/xdg/index.html">xdg</a></li>
-</ul>
-<h2 style="text-indent:20px">PMD Static Analysis Reports</h2>
-<ul>
-    <li>Analysis: <a href="pmd/crypto.html">crypto</a></li>
-    <li>Analysis: <a href="pmd/logger.html">logger</a></li>
-    <li>Analysis: <a href="pmd/factory.html">factory</a></li>
-    <li>Analysis: <a href="pmd/prop_store.html">prop_store</a></li>
-    <li>Analysis: <a href="pmd/shutdown_hook.html">shutdown_hook</a></li>
-    <li>Analysis: <a href="pmd/task_manager.html">task_manager</a></li>
-    <li>Analysis: <a href="pmd/xdg.html">xdg</a></li>
-</ul>
-</body>
-</html>
-"""
-        }
-    }
-
-    check {
-        finalizedBy(javadoc)
     }
 
     compileJava {
@@ -255,8 +174,6 @@ Build: <i>${rootProject.version}</i></h1>
         }
         finalizedBy(jacocoTestReport)
     }
-// The integration tests are failing in github actions.
-//    check.finalizedBy(integrationTest)
 }
 
 project(':prop_store') {
@@ -350,6 +267,14 @@ project(':config_location') {
     }
 }
 
+project(':redis') {
+    group = 'com.amonson'
+    dependencies {
+        implementation project(':logger')
+        implementation group: 'redis.clients', name: 'jedis', version: '3.2.0'
+    }
+}
+
 jar {
     dependsOn(subprojects.jar)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -359,11 +284,19 @@ jar {
         }.collect {
             zipTree(it)
         }
-        if(subproject.name != 'logger_server')
-            from zipTree(new File("${projectDir}/${subproject.name}/build/libs/${subproject.name}.jar"))
+        from zipTree(new File("${projectDir}/${subproject.name}/build/libs/${subproject.name}.jar"))
     }
 
     manifest {
         attributes('Implementation-Version': rootProject.version)
     }
 }
+
+task allJavaDocs(type: Javadoc) {
+    group = "_favorites"
+    options.addBooleanOption('html5', true)
+    source exportedProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/javadoc")
+}
+jar.finalizedBy('allJavaDocs')

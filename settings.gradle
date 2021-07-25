@@ -13,5 +13,6 @@ include 'factory'
 include 'task_manager'
 include 'config_location'
 include 'node_monitoring'
+include 'redis'
 
 rootProject.name = 'libs'
