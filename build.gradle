@@ -11,6 +11,7 @@ plugins {
     id 'jacoco'
     id 'groovy'
     id 'maven-publish'
+    id 'org.ajoberstar.git-publish' version '0.3.3'
 }
 
 def honorScanningRules = false
@@ -22,19 +23,23 @@ String gitVersionString() {
         ignoreExitValue = true
         standardOutput = stdout
         errorOutput = stderr
-        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "origin/master", "--tags"
+//        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "origin/master", "--tags"
+        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "--tags"
     }
     String localVersion = stdout.toString().trim()
     return (localVersion == null || localVersion.isEmpty())?'0.0.0':localVersion
 }
 
-System.out.printf("*** Building version: %s\n\n", gitVersionString())
-
 version = gitVersionString()
+
+System.out.printf("*** Building version: %s\n\n", version)
+
 def baseVersion = version.split("-")[0]
 def release = false
-if(version == baseVersion)
+if(version == baseVersion) {
     release = true
+    System.out.println("*** This is a release version!\n")
+}
 
 build.group = "_favorites"
 clean.group = "_favorites"
@@ -361,11 +366,18 @@ task allJavaDocs(type: Javadoc) {
 }
 jar.finalizedBy('allJavaDocs')
 
-task myTest(type: Copy) {
-    doLast {
-        System.out.println("*** It got here!!!!")
-        from "${buildDir}/index.html"
-        into "${buildDir}/docs/reports"
+gitPublish {
+    repoUri = 'git@github.com:paul-amonson/libs.git'
+    branch = 'gh-pages'
+    contents {
+        from "${buildDir}/docs"
+        into '/'
+    }
+    commitMessage = 'Publishing to github pages'
+}
+
+gitPublishPush {
+    onlyIf {
+        return release
     }
 }
-jacocoTestReport.finalizedBy('myTest')
