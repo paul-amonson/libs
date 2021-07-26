@@ -1,3 +1,6 @@
+import java.nio.charset.StandardCharsets
+import java.time.Instant
+
 // Copyright (C) 2018-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -8,6 +11,7 @@ plugins {
     id 'jacoco'
     id 'groovy'
     id 'maven-publish'
+    id 'org.ajoberstar.git-publish' version '0.3.3'
 }
 
 def honorScanningRules = false
@@ -25,18 +29,22 @@ String gitVersionString() {
     return (localVersion == null || localVersion.isEmpty())?'0.0.0':localVersion
 }
 
-System.out.printf("*** Building version: %s\n\n", gitVersionString())
-
 version = gitVersionString()
+
+System.out.printf("*** Building version: %s\n\n", version)
+
 def baseVersion = version.split("-")[0]
 def release = false
-if(version == baseVersion)
+if(version == baseVersion) {
     release = true
+    System.out.println("*** This is a release version!\n")
+}
 
 build.group = "_favorites"
 clean.group = "_favorites"
 test.group = "_favorites"
 jar.group = "_favorites"
+gitPublishPush.group = "_favorites"
 
 publishing {
     publications {
@@ -59,6 +67,76 @@ publishing {
 
 def exportedProjects = []
 subprojects.forEach(sub -> { exportedProjects.add(':' + sub.name) })
+
+build {
+    doFirst {
+        mkdir("${buildDir}")
+        mkdir("${buildDir}/docs")
+    }
+    doLast {
+        String year = Instant.now().toString().split('-')[0]
+        String title = "Reports for project ${project.name} version ${project.version}"
+        String headerLine = "<tr><th>Code Coverage</th><th>Test Results</th></tr>"
+        String docs = """<a href="javadoc/index.html">JavaDocs</a> for project ${project.name} version ${project.version}"""
+        String projectLines = ""
+        exportedProjects.forEach(p -> {
+            String p2 = ((String)p).replace(":", "")
+            if(new File("${buildDir}/tests/${p2}").exists())
+                projectLines += """<tr><td><a class="link" href="reports/jacoco/${p2}/index.html">${p2}</a></td><td><a class="link" href="reports/test/${p2}/index.html">${p2}</a></td></tr>"""
+        })
+        String html = """<!DOCTYPE html><html><head><title>${title}</title><link rel="stylesheet" href="style.css"></link></head><body><h1>${title}</h1><hr /><h2>${docs}</h2><table border=2>
+${headerLine}
+${projectLines}
+</table><br /><div>Copyright&copy;${year} Paul Amonson</div></body>"""
+        new File("${buildDir}/docs/index.html").text = html
+        new File("${buildDir}/docs/style.css").text = """
+    body {
+        margin: 18pt;
+        background-color: rgb(48,48,48) !important;
+        color: white;
+    }
+    table {
+        background-color: rgb(128,128,128);
+        padding: 3pt;
+    }
+    td {
+        color: black;
+        padding: 6pt;
+    }
+    th {
+        background-color: rgb(48,48,48);
+        color: rgb(192,192,0);
+        padding: 6pt;
+    }
+    a {
+        color: rgb(72,72,224);
+    }
+    a.link {
+        color: rgb(0,0,64);
+        text-decoration: none;
+    }
+    div {
+        indent: 36pt;
+    }
+"""
+    }
+}
+
+gitPublish {
+    repoUri = 'git@github.com:paul-amonson/libs.git'
+    branch = 'gh-pages'
+    contents {
+        from "${buildDir}/docs"
+        into '/'
+    }
+    commitMessage = 'Publishing to github pages'
+}
+
+gitPublishPush {
+    onlyIf {
+        return release
+    }
+}
 
 subprojects {
     apply plugin: 'java-library'
@@ -297,6 +375,6 @@ task allJavaDocs(type: Javadoc) {
     options.addBooleanOption('html5', true)
     source exportedProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
-    destinationDir = file("${buildDir}/javadoc")
+    destinationDir = file("${buildDir}/docs/javadoc")
 }
 jar.finalizedBy('allJavaDocs')
