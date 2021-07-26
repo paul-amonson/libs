@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultJsonFormatter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">DefaultJsonFormatter.java</span></div><h1>DefaultJsonFormatter.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.logger;
+
+import com.amonson.prop_store.PropMap;
+import com.amonson.prop_store.PropStore;
+import com.amonson.prop_store.PropStoreFactory;
+import com.amonson.prop_store.PropStoreFactoryException;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
+
+/**
+ * A simple default Json formatter with a eye on performance. A general JSON serializer was not used. Instead, a
+ * simple StringBuilder is used.
+ */
+public class DefaultJsonFormatter extends Formatter {
+    /**
+     * Default ctor that prefetches the hostname and PID for the process and stores them as fields.
+     *
+     * @throws RuntimeException if the JSON parser cannot be created or the hostname cannot be retrieved.
+     */
+<span class="fc" id="L30">    public DefaultJsonFormatter() {</span>
+        try {
+<span class="fc" id="L32">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="fc" id="L33">            String program = &quot;/usr/bin/hostname&quot;;</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">            if (System.getProperty(&quot;os.name&quot;).startsWith(&quot;Windows&quot;))</span>
+<span class="nc" id="L35">                program = &quot;/Windows/System32/HOSTNAME.EXE&quot;;</span>
+<span class="fc" id="L36">            ProcessBuilder pb = new ProcessBuilder(program);</span>
+<span class="fc" id="L37">            Process p = pb.start();</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (!p.waitFor(5, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L39">                p.destroyForcibly();</span>
+<span class="nc" id="L40">                throw new IOException(&quot;Failed to get hostname using: &quot; + program);</span>
+            }
+<span class="fc" id="L42">            hostName_ = new String(new BufferedInputStream(p.getInputStream()).readAllBytes(),</span>
+<span class="fc" id="L43">                    StandardCharsets.US_ASCII).trim();</span>
+<span class="nc" id="L44">        } catch(InterruptedException | IOException | PropStoreFactoryException e) {</span>
+<span class="nc" id="L45">            throw new RuntimeException(&quot;Failed to get the system hostname!&quot;, e);</span>
+<span class="fc" id="L46">        }</span>
+<span class="fc" id="L47">        pid_ = ProcessHandle.current().pid();</span>
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * Overridden format method used by the Handler to format the LogRecord as a String. In this case a JSON string.
+     *
+     * @param logRecord The LogRecord to format from the handler.
+     * @return The formatted string.
+     */
+    @Override
+    public String format(LogRecord logRecord) {
+<span class="fc" id="L58">        PropMap map = LogRecordSerialization.serializeLogRecord(logRecord);</span>
+<span class="fc" id="L59">        map.put(&quot;hostname&quot;, hostName_);</span>
+<span class="fc" id="L60">        map.put(&quot;pid&quot;, pid_);</span>
+<span class="fc" id="L61">        return parser_.toString(map);</span>
+    }
+
+    private final String hostName_;
+    private final long pid_;
+    private final PropStore parser_;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

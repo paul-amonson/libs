@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropList.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">prop_store</a> &gt; <a href="index.source.html" class="el_package">com.amonson.prop_store</a> &gt; <span class="el_source">PropList.java</span></div><h1>PropList.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018-2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.prop_store;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * Class to store a list of properties.
+ */
+@SuppressWarnings(&quot;serial&quot;)
+public class PropList extends ArrayList&lt;Object&gt; {
+    public PropList() {
+<span class="fc" id="L19">        super();</span>
+<span class="fc" id="L20">    }</span>
+
+    public PropList(Collection&lt;?&gt; list) {
+<span class="fc" id="L23">        super(list);</span>
+<span class="fc" id="L24">    }</span>
+
+    public String getString(int index) {
+<span class="fc" id="L27">        return get(index).toString();</span>
+    }
+
+    public PropMap getMap(int index) {
+<span class="fc" id="L31">        return (PropMap)get(index);</span>
+    }
+
+    public PropList getArray(int index) {
+<span class="fc" id="L35">        return (PropList)get(index);</span>
+    }
+
+    public Boolean getBoolean(int index) {
+<span class="fc" id="L39">        return (Boolean)get(index);</span>
+    }
+
+    public Short getShort(int index) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L44">        return ((BigDecimal)get(index)).shortValue();</span>
+    }
+
+    public Integer getInteger(int index) {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L49">        return ((BigDecimal)get(index)).intValue();</span>
+    }
+
+    public Long getLong(int index) {
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L54">        return ((BigDecimal)get(index)).longValue();</span>
+    }
+
+    public BigInteger getBigInteger(int index) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L59">        return ((BigDecimal)get(index)).toBigInteger();</span>
+    }
+
+    public Float getFloat(int index) {
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L64">        return ((BigDecimal)get(index)).floatValue();</span>
+    }
+
+    public Double getDouble(int index) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L69">        return ((BigDecimal)get(index)).doubleValue();</span>
+    }
+
+    public BigDecimal getBigDecimal(int index) {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
+<span class="fc" id="L74">        return (BigDecimal)get(index);</span>
+    }
+
+    public boolean isNull(int index) {
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        return get(index) == null;</span>
+    }
+    
+    @Override
+    public boolean add(Object value) {
+<span class="fc" id="L83">        PropMap.checkType(value);</span>
+<span class="fc" id="L84">        return super.add(PropMap.makeStoredValue(value));</span>
+    }
+    
+    @Override
+    public void add(int index, Object value) {
+<span class="fc" id="L89">        PropMap.checkType(value);</span>
+<span class="fc" id="L90">        super.add(index, PropMap.makeStoredValue(value));</span>
+<span class="fc" id="L91">    }</span>
+    
+    @Override
+    public boolean addAll(Collection&lt;?&gt; collection) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        for(Object item: collection)</span>
+<span class="fc" id="L96">            add(item);</span>
+<span class="fc" id="L97">        return true;</span>
+    }
+
+    @Override
+    public boolean addAll(int index, Collection&lt;?&gt; collection) {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for(Object item: collection)</span>
+<span class="fc" id="L103">            add(index++, item);</span>
+<span class="fc" id="L104">        return true;</span>
+    }
+    
+    @Override
+    public Object set(int index, Object value) {
+<span class="fc" id="L109">        PropMap.checkType(value);</span>
+<span class="fc" id="L110">        return super.set(index, PropMap.makeStoredValue(value));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
