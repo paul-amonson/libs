@@ -81,7 +81,7 @@ build {
         String projectLines = ""
         exportedProjects.forEach(p -> {
             String p2 = ((String)p).replace(":", "")
-            if(new File("${buildDir}/tests/${p2}").exists())
+            if(p2 != 'logger_server')
                 projectLines += """<tr><td><a class="link" href="reports/jacoco/${p2}/index.html">${p2}</a></td><td><a class="link" href="reports/test/${p2}/index.html">${p2}</a></td></tr>"""
         })
         String html = """<!DOCTYPE html><html><head><title>${title}</title><link rel="stylesheet" href="style.css"></link></head><body><h1>${title}</h1><hr /><h2>${docs}</h2><table border=2>
