@@ -165,9 +165,9 @@ public class NodeMonitoring {
 <span class="fc" id="L165">                }</span>
 <span class="fc bfc" id="L166" title="All 2 branches covered.">                for(Map.Entry&lt;String,Long&gt; entry: lastSeen_.entrySet()) {</span>
 <span class="fc" id="L167">                    long now = Instant.now().toEpochMilli();</span>
-<span class="pc bpc" id="L168" title="3 of 4 branches missed.">                    if(entry.getValue() &lt; (now - EXPIRED_MILLISECONDS) &amp;&amp; entry.getValue() != 0L) {</span>
-<span class="nc" id="L169">                        fireEvent(entry.getKey(), false);</span>
-<span class="nc" id="L170">                        lastSeen_.put(entry.getKey(), 0L);</span>
+<span class="pc bpc" id="L168" title="1 of 4 branches missed.">                    if(entry.getValue() &lt; (now - EXPIRED_MILLISECONDS) &amp;&amp; entry.getValue() != 0L) {</span>
+<span class="fc" id="L169">                        fireEvent(entry.getKey(), false);</span>
+<span class="fc" id="L170">                        lastSeen_.put(entry.getKey(), 0L);</span>
                     }
 <span class="fc" id="L172">                }</span>
             }
