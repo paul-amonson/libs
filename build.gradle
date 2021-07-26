@@ -23,8 +23,7 @@ String gitVersionString() {
         ignoreExitValue = true
         standardOutput = stdout
         errorOutput = stderr
-//        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "origin/master", "--tags"
-        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "--tags"
+        commandLine "git", "--git-dir=${rootProject.projectDir}/.git", "describe", "origin/master", "--tags"
     }
     String localVersion = stdout.toString().trim()
     return (localVersion == null || localVersion.isEmpty())?'0.0.0':localVersion
@@ -45,6 +44,7 @@ build.group = "_favorites"
 clean.group = "_favorites"
 test.group = "_favorites"
 jar.group = "_favorites"
+gitPublishPush.group = "_favorites"
 
 publishing {
     publications {
@@ -119,6 +119,22 @@ ${projectLines}
         indent: 36pt;
     }
 """
+    }
+}
+
+gitPublish {
+    repoUri = 'git@github.com:paul-amonson/libs.git'
+    branch = 'gh-pages'
+    contents {
+        from "${buildDir}/docs"
+        into '/'
+    }
+    commitMessage = 'Publishing to github pages'
+}
+
+gitPublishPush {
+    onlyIf {
+        return release
     }
 }
 
@@ -360,24 +376,5 @@ task allJavaDocs(type: Javadoc) {
     source exportedProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
-
-    doLast {
-    }
 }
 jar.finalizedBy('allJavaDocs')
-
-gitPublish {
-    repoUri = 'git@github.com:paul-amonson/libs.git'
-    branch = 'gh-pages'
-    contents {
-        from "${buildDir}/docs"
-        into '/'
-    }
-    commitMessage = 'Publishing to github pages'
-}
-
-gitPublishPush {
-    onlyIf {
-        return release
-    }
-}
