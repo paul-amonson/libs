@@ -18,7 +18,7 @@ class RedisUniqueIdSpec extends Specification {
         jedis_.multi() >> transaction_
         transaction_.incrBy(_ as String, _ as Long) >> response_
         transaction_.del(_ as String) >> Mock(Response)
-        response_.get() >>> [ 8192L, 8192L ]
+        response_.get() >>> [ 16384L, 16384L ]
 
         underTest_ = new RedisUniqueId(jedis_, 0, "testKey")
     }
@@ -36,14 +36,13 @@ class RedisUniqueIdSpec extends Specification {
     }
 
     def "Test ctor() with bad inputs"() {
-        when: new RedisUniqueId(client, db, name, size)
+        when: new RedisUniqueId(client, db, name)
         then: thrown(IllegalArgumentException)
         where:
-        client      | db | name      | size
-        null        | 0  | "testkey" | 1000
-        Mock(Jedis) | -1 | "testKey" | 1000
-        Mock(Jedis) | 0  | null      | 1000
-        Mock(Jedis) | 0  | ""        | 1000
-        Mock(Jedis) | 0  | "testKey" | 10
+        client      | db | name
+        null        | 0  | "testkey"
+        Mock(Jedis) | -1 | "testKey"
+        Mock(Jedis) | 0  | null
+        Mock(Jedis) | 0  | ""
     }
 }
