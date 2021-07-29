@@ -23,5 +23,9 @@ public enum DataAccessLayerStatus {
     /**
      * Query failed due to no connection.
      */
-    NO_CONNECTION
+    NO_CONNECTION,
+    /**
+     * Query procedure was malformed for failed.
+     */
+    PROCEDURE_FAILURE
 }

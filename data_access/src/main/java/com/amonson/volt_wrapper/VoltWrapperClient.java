@@ -8,7 +8,6 @@ import org.voltdb.client.*;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,14 +22,14 @@ import java.util.logging.Logger;
  *      port            - (Optional; def = "21212") Port for VoltDB servers.
  *      retry_delay     - (Optional; def = "2000") Delay between retries to a connection in milliseconds.
  */
-public class VoltWrapperClient extends ClientStatusListenerExt {
+class VoltWrapperClient extends ClientStatusListenerExt {
     /**
      * Constructs the object and internal client but does not connect.
      *
      * @param properties Properties to configure the internal client.
      * @param logger This is where logging messages go.
      */
-    public VoltWrapperClient(Properties properties, Logger logger) {
+    VoltWrapperClient(Properties properties, Logger logger) {
         assert properties != null && properties.containsKey(SERVERS);
         assert logger != null;
         log_ = logger;
@@ -110,7 +109,6 @@ public class VoltWrapperClient extends ClientStatusListenerExt {
      * @param callback {@link ProcedureCallback} that will be invoked with procedure results.
      * @param procedureName class name (not qualified by package) of the procedure to execute.
      * @param params vararg list of procedure's parameter values.
-     * @return <code>true</code> if the procedure was queued and <code>false</code> otherwise.
      * @throws NoConnectionsException if this {@link Client} instance is not connected to any servers.
      * @throws IOException if there is a Java network or connection problem.
      */

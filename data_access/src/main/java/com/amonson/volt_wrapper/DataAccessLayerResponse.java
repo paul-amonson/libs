@@ -29,8 +29,20 @@ public class DataAccessLayerResponse {
     public DataAccessLayerStatus getStatus() { return status_; }
 
     /**
-     * Get the results of the query.
-     *
+     * Get the results of the query. This mimics an array of results of rows. So usually it's an array of
+     * 0 or 1 "tables" containing an array of rows where each row is an object with named key (column name) and value.
+     * [ // Array of results (PropList)
+     *    [ // rows of specific result (PropList)
+     *       {"column_name": value, "column_name2": value, ...}, // PropMap
+     *       {"column_name": value, "column_name2": value, ...}, // PropMap
+     *       ...
+     *    ],
+     *    [ // rows of specific result (PropList)
+     *       {"column_name": value, "column_name2": value, ...}, // PropMap
+     *       {"column_name": value, "column_name2": value, ...}, // PropMap
+     *       ...
+     *    ]
+     * ]
      * @return The results of the query.
      */
     public PropList getResults() { return results_; }
