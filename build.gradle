@@ -337,6 +337,15 @@ project(':task_manager') {
     }
 }
 
+project(':volt_wrapper') {
+    group = 'com.amonson'
+    dependencies {
+        implementation project(':logger')
+        implementation project(':prop_store')
+        implementation group: 'org.voltdb', name: 'voltdbclient', version: '10.1.1'
+    }
+}
+
 project(':config_location') {
     group = 'com.amonson'
     dependencies {

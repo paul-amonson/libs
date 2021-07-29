@@ -14,5 +14,6 @@ include 'task_manager'
 include 'config_location'
 include 'node_monitoring'
 include 'redis'
+include 'volt_wrapper'
 
 rootProject.name = 'libs'
