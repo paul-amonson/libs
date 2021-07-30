@@ -31,7 +31,6 @@ public abstract class DataAccessLayer {
      * @param callback The callback for asynchronous completion of the query.
      * @param name Procedure name for the query.
      * @param params Parameters for the query.
-     * @return The DataAccessLayerResponse for the attempted query.
      */
     public abstract void query(DataAccessLayerCallback callback, String name, Object... params);
 
