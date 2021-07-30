@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package com.amonson.volt_wrapper;
+package com.amonson.data_access;
 
 import org.voltdb.client.*;
 
@@ -184,7 +184,7 @@ class VoltWrapperClient extends ClientStatusListenerExt {
     private final Logger              log_;
     private final Properties          properties_;
     private final Map<String,Boolean> connections_ = new ConcurrentHashMap<>();
-    private final Client              client_;
+    private       Client              client_;
     private final int                 port_;
     private       Thread              connectionThread_ = null;
 

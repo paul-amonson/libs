@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package com.amonson.volt_wrapper;
+package com.amonson.data_access;
 
 /**
  * Default description for class DataAccessLayerException
  */
+@SuppressWarnings("serial")
 public class DataAccessLayerException extends Exception {
 
     /**

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package com.amonson.volt_wrapper;
+package com.amonson.data_access;
 
 import com.amonson.prop_store.PropList;
 import com.amonson.prop_store.PropMap;
@@ -13,6 +13,7 @@ import org.voltdb.client.ProcCallException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -161,19 +162,15 @@ public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
         switch(type) {
             case STRING:
                 return table.getString(columnIndex);
-            case BIGINT:
             case DECIMAL:
                 return table.getDecimalAsBigDecimal(columnIndex);
+            case BIGINT:
             case SMALLINT:
             case INTEGER:
             case TINYINT:
                 return table.getLong(columnIndex);
-            case BOOLEAN:
-                return table.getLong(columnIndex) != 0L;
             case FLOAT:
                 return table.getDouble(columnIndex);
-            case NULL:
-                return null;
             case TIMESTAMP:
                 return table.getTimestampAsLong(columnIndex);
             default:
@@ -182,10 +179,7 @@ public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
         }
     }
 
-    private final VoltWrapperClient client_;
-    private final static List<Byte> connectionErrors_ = new ArrayList<>() {{
-        add(ClientResponse.SERVER_UNAVAILABLE);
-        add(ClientResponse.CONNECTION_LOST);
-        add(ClientResponse.CONNECTION_TIMEOUT);
-    }};
+    private VoltWrapperClient client_;
+    private final static List<Byte> connectionErrors_ = Arrays.asList(ClientResponse.SERVER_UNAVAILABLE,
+            ClientResponse.CONNECTION_LOST, ClientResponse.CONNECTION_TIMEOUT);
 }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-package com.amonson.volt_wrapper;
+package com.amonson.data_access;
 
 /**
  * Callback for asynchronous queries.
