@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Xdg.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xdg</a> &gt; <a href="index.source.html" class="el_package">com.amonson.xdg</a> &gt; <span class="el_source">Xdg.java</span></div><h1>Xdg.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018-2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.xdg;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.*;
+
+/**
+ * &lt;p&gt;Class used to open files based loosely on the XDG specification. The specification is located at
+ * &lt;a href=&quot;https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html&quot;&gt;
+ *     https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html&lt;/a&gt;. The following features of
+ * the specification are supported:&lt;/p&gt;
+ * &lt;ul&gt;
+ *     &lt;li&gt;Data home folder&lt;/li&gt;
+ *     &lt;li&gt;Data search path&lt;/li&gt;
+ *     &lt;li&gt;Configuration home folder&lt;/li&gt;
+ *     &lt;li&gt;Configuration search path&lt;/li&gt;
+ *     &lt;li&gt;Cache directory (temporary files that are not sensitive)&lt;/li&gt;
+ * &lt;/ul&gt;
+ * &lt;p&gt;
+ * The only feature not supported is the runtime directory (&lt;b&gt;XDG_RUNTIME_DIR&lt;/b&gt;) for temporary files that are user
+ * sensitive.&lt;/p&gt;
+ *
+ */
+public class Xdg {
+    /**
+     * Create a non-specific version of the Xdg class that will not use a application name as a subfolder.
+     */
+    public Xdg() {
+<span class="fc" id="L34">        this(null);</span>
+<span class="fc" id="L35">    }</span>
+
+    /**
+     * Create a specific version of the Xdg class that will use a application name as a subfolder.
+     *
+     * @param applicationName The name to use as an application subfolder to the base XDG specification defined folder.
+     */
+<span class="fc" id="L42">    public Xdg(String applicationName) {</span>
+<span class="fc bfc" id="L43" title="All 4 branches covered.">        if(applicationName != null &amp;&amp; !applicationName.trim().equals(&quot;&quot;))</span>
+<span class="fc" id="L44">            applicationName_ = applicationName.trim();</span>
+<span class="fc" id="L45">        initialize();</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Open a XDG data input stream if found in the XDG_DATA_DIRS path. The XDG_DATA_HOME is the first priority if
+     * specified.
+     *
+     * @param fileNameOnly The name to find in the data path (XDG_DATA_DIRS).
+     * @return The InputStream object if successful.
+     * @throws IOException When the file cannot be opened or is missing.
+     */
+    public InputStream openDataInputStream(String fileNameOnly) throws IOException {
+<span class="fc" id="L57">        File fullPath = findDataFile(fileNameOnly);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L59">            throw new FileNotFoundException(String.format(&quot;The data file %s was not found in the XDG_DATA_DIRS!&quot;,</span>
+                    fileNameOnly));
+<span class="fc" id="L61">        return new FileInputStream(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG data reader if found in the XDG_DATA_DIRS path. The XDG_DATA_HOME is the first priority if
+     * specified.
+     *
+     * @param fileNameOnly The name to find in the data path (XDG_DATA_DIRS).
+     * @return The Reader object if successful.
+     * @throws IOException When the file cannot be opened or is missing.
+     */
+    public Reader openDataReader(String fileNameOnly) throws IOException {
+<span class="fc" id="L73">        File fullPath = findDataFile(fileNameOnly);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L75">            throw new FileNotFoundException(String.format(&quot;The data file %s was not found in the XDG_DATA_DIRS!&quot;,</span>
+                    fileNameOnly));
+<span class="fc" id="L77">        return new FileReader(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG data output stream in the XDG_DATA_HOME path.
+     *
+     * @param fileNameOnly The name to open in the data path (XDG_DATA_HOME).
+     * @return The OutputStream object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public OutputStream openDataOutputStream(String fileNameOnly) throws IOException {
+<span class="fc" id="L88">        File fullPath = Paths.get(dataHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L89">        return new FileOutputStream(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG data writer in the XDG_DATA_HOME path.
+     *
+     * @param fileNameOnly The name to open in the data path (XDG_DATA_HOME).
+     * @return The Writer object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public Writer openDataWriter(String fileNameOnly) throws IOException {
+<span class="fc" id="L100">        File fullPath = Paths.get(dataHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L101">        return new FileWriter(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG config input stream if found in the XDG_CONFIG_DIRS path. The XDG_CONFIG_HOME is the first priority if
+     * specified.
+     *
+     * @param fileNameOnly The name to find in the config path (XDG_DATA_DIRS).
+     * @return The InputStream object if successful.
+     * @throws IOException When the file cannot be opened or is missing.
+     */
+    public InputStream openConfigInputStream(String fileNameOnly) throws IOException {
+<span class="fc" id="L113">        File fullPath = findConfigFile(fileNameOnly);</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L115">            throw new FileNotFoundException(String.format(&quot;The config file %s was not found in the XDG_CONFIG_DIRS!&quot;,</span>
+                    fileNameOnly));
+<span class="fc" id="L117">        return new FileInputStream(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG config reader if found in the XDG_CONFIG_DIRS path. The XDG_CONFIG_HOME is the first priority if
+     * specified.
+     *
+     * @param fileNameOnly The name to find in the config path (XDG_CONFIG_DIRS).
+     * @return The Reader object if successful.
+     * @throws IOException When the file cannot be opened or is missing.
+     */
+    public Reader openConfigReader(String fileNameOnly) throws IOException {
+<span class="fc" id="L129">        File fullPath = findConfigFile(fileNameOnly);</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L131">            throw new FileNotFoundException(String.format(&quot;The config file %s was not found in the XDG_CONFIG_DIRS!&quot;,</span>
+                    fileNameOnly));
+<span class="fc" id="L133">        return new FileReader(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG config output stream in the XDG_CONFIG_HOME path.
+     *
+     * @param fileNameOnly The name to open in the config path (XDG_CONFIG_HOME).
+     * @return The OutputStream object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public OutputStream openConfigOutputStream(String fileNameOnly) throws IOException {
+<span class="fc" id="L144">        File fullPath = Paths.get(configHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L145">        return new FileOutputStream(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG config writer in the XDG_CONFIG_HOME path.
+     *
+     * @param fileNameOnly The name to open in the config path (XDG_CONFIG_HOME).
+     * @return The Writer object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public Writer openConfigWriter(String fileNameOnly) throws IOException {
+<span class="fc" id="L156">        File fullPath = Paths.get(configHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L157">        return new FileWriter(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG cache input stream if found in the XDG_CACHE_HOME path.
+     *
+     * @param fileNameOnly The name to open in the cache home (XDG_CACHE_HOME).
+     * @return The InputStream object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public InputStream openCacheInputStream(String fileNameOnly) throws IOException {
+<span class="fc" id="L168">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L169">        return new FileInputStream(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG cache reader if found in the XDG_CACHE_HOME path.
+     *
+     * @param fileNameOnly The name to open in the cache home (XDG_CACHE_HOME).
+     * @return The Reader object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public Reader openCacheReader(String fileNameOnly) throws IOException {
+<span class="fc" id="L180">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L181">        return new FileReader(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG cache output stream in the XDG_CACHE_HOME path.
+     *
+     * @param fileNameOnly The name to open in the cache home (XDG_CACHE_HOME).
+     * @return The InputStream object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public OutputStream openCacheOutputStream(String fileNameOnly) throws IOException {
+<span class="fc" id="L192">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L193">        return new FileOutputStream(fullPath);</span>
+    }
+
+    /**
+     * Open a XDG cache writer in the XDG_CACHE_HOME path.
+     *
+     * @param fileNameOnly The name to open in the cache home (XDG_CACHE_HOME).
+     * @return The InputStream object if successful.
+     * @throws IOException When the file cannot be opened.
+     */
+    public Writer openCacheWriter(String fileNameOnly) throws IOException {
+<span class="fc" id="L204">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L205">        return new FileWriter(fullPath);</span>
+    }
+
+    /**
+     * Find the file in the data path (XDG_DATA_DIRS).
+     *
+     * @param fileNameOnly The name to find in the data path (XDG_DATA_DIRS).
+     * @return Either the File object if it exists, otherwise null is returned.
+     */
+    public File findDataFile(String fileNameOnly) {
+<span class="fc" id="L215">        return findFileInPath(fileNameOnly, dataDirs_);</span>
+    }
+
+    /**
+     * Find the file in the config path (XDG_CONFIG_DIRS).
+     *
+     * @param fileNameOnly The name to find in the config path (XDG_CONFIG_DIRS).
+     * @return Either the File object if it exists, otherwise null is returned.
+     */
+    public File findConfigFile(String fileNameOnly) {
+<span class="fc" id="L225">        return findFileInPath(fileNameOnly, configDirs_);</span>
+    }
+
+    /**
+     * Get the storage location for new or updated configuration files.
+     *
+     * @return The folder name.
+     */
+    public File getConfigHome() {
+<span class="fc" id="L234">        return new File(configHome_);</span>
+    }
+
+    /**
+     * Get the storage location for new or updated data files.
+     *
+     * @return The folder name.
+     */
+    public File getDataHome() {
+<span class="fc" id="L243">        return new File(dataHome_);</span>
+    }
+
+    /**
+     * Get the storage location for temporary data files.
+     *
+     * @return The folder name.
+     */
+<span class="fc" id="L251">    public File getCacheHome() { return new File(cacheHome_); }</span>
+
+    private File findFileInPath(String fileNameOnly, List&lt;String&gt; path) {
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        for(String parent: path) {</span>
+<span class="fc" id="L255">            File tryFile = Paths.get(parent, fileNameOnly).toFile();</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">            if(tryFile.exists())</span>
+<span class="fc" id="L257">                return tryFile;</span>
+<span class="fc" id="L258">        }</span>
+<span class="fc" id="L259">        return null;</span>
+    }
+
+    private void initialize() {
+<span class="fc" id="L263">        setDataHome();</span>
+<span class="fc" id="L264">        setConfigHome();</span>
+<span class="fc" id="L265">        setCacheHome();</span>
+<span class="fc" id="L266">        setDataDirs();</span>
+<span class="fc" id="L267">        setConfigDirs();</span>
+<span class="fc" id="L268">    }</span>
+
+    private void setDataDirs() {
+<span class="fc bfc" id="L271" title="All 2 branches covered.">        String candidate = (applicationName_ != null)?String.format(&quot;/usr/local/share/%s:/usr/share/%s&quot;,</span>
+<span class="fc" id="L272">                applicationName_, applicationName_):&quot;/usr/local/share:/usr/share&quot;;</span>
+<span class="fc" id="L273">        candidate = getPropertyOrDefault(&quot;xdg.data.dirs&quot;, candidate);</span>
+<span class="fc" id="L274">        candidate = getEnvironmentOrDefault(&quot;XDG_DATA_DIRS&quot;, candidate);</span>
+<span class="fc" id="L275">        candidate = String.format(&quot;%s:%s&quot;, dataHome_, candidate);</span>
+<span class="fc" id="L276">        dataDirs_ = Arrays.asList(candidate.split(&quot;:&quot;));</span>
+<span class="fc" id="L277">    }</span>
+
+    private void setConfigDirs() {
+<span class="fc bfc" id="L280" title="All 2 branches covered.">        String candidate = (applicationName_ != null)?String.format(&quot;/etc/xdg/%s:/etc/%s.d:/etc&quot;,</span>
+<span class="fc" id="L281">                applicationName_, applicationName_):&quot;/etc/xdg:/etc&quot;;</span>
+<span class="fc" id="L282">        candidate = getPropertyOrDefault(&quot;xdg.config.dirs&quot;, candidate);</span>
+<span class="fc" id="L283">        candidate = getEnvironmentOrDefault(&quot;XDG_CONFIG_DIRS&quot;, candidate);</span>
+<span class="fc" id="L284">        candidate = String.format(&quot;%s:%s&quot;, configHome_, candidate);</span>
+<span class="fc" id="L285">        configDirs_ = Arrays.asList(candidate.split(&quot;:&quot;));</span>
+<span class="fc" id="L286">    }</span>
+
+    private void setDataHome() {
+<span class="fc" id="L289">        String candidate = Paths.get(home_, &quot;.local&quot;, &quot;share&quot;).toString();</span>
+<span class="fc" id="L290">        candidate = addApplicationName(candidate);</span>
+<span class="fc" id="L291">        candidate = getPropertyOrDefault(&quot;xdg.data.home&quot;, candidate);</span>
+<span class="fc" id="L292">        candidate = getEnvironmentOrDefault(&quot;XDG_DATA_HOME&quot;, candidate);</span>
+<span class="fc" id="L293">        mkdirs(candidate);</span>
+<span class="fc" id="L294">        dataHome_ = candidate;</span>
+<span class="fc" id="L295">    }</span>
+
+    private void setConfigHome() {
+<span class="fc" id="L298">        String candidate = Paths.get(home_, &quot;.config&quot;).toString();</span>
+<span class="fc" id="L299">        candidate = addApplicationName(candidate);</span>
+<span class="fc" id="L300">        candidate = getPropertyOrDefault(&quot;xdg.config.home&quot;, candidate);</span>
+<span class="fc" id="L301">        candidate = getEnvironmentOrDefault(&quot;XDG_CONFIG_HOME&quot;, candidate);</span>
+<span class="fc" id="L302">        mkdirs(candidate);</span>
+<span class="fc" id="L303">        configHome_ = candidate;</span>
+<span class="fc" id="L304">    }</span>
+
+    private void setCacheHome() {
+<span class="fc" id="L307">        String candidate = Paths.get(home_, &quot;.cache&quot;).toString();</span>
+<span class="fc" id="L308">        candidate = addApplicationName(candidate);</span>
+<span class="fc" id="L309">        candidate = getPropertyOrDefault(&quot;xdg.cache.home&quot;, candidate);</span>
+<span class="fc" id="L310">        candidate = getEnvironmentOrDefault(&quot;XDG_CACHE_HOME&quot;, candidate);</span>
+<span class="fc" id="L311">        mkdirs(candidate);</span>
+<span class="fc" id="L312">        cacheHome_ = candidate;</span>
+<span class="fc" id="L313">    }</span>
+
+    private String addApplicationName(String path) {
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        if(applicationName_ != null)</span>
+<span class="fc" id="L317">            return Paths.get(path, applicationName_).toString();</span>
+<span class="fc" id="L318">        return path;</span>
+    }
+
+    private String getPropertyOrDefault(String propertyName, String defaultValue) {
+<span class="fc" id="L322">        String property = System.getProperty(propertyName);</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">        if(property == null) return defaultValue;</span>
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">        if(property.trim().equals(&quot;&quot;)) return defaultValue;</span>
+<span class="fc" id="L325">        return property.trim();</span>
+    }
+
+    private String getEnvironmentOrDefault(String envName, String defaultValue) {
+<span class="fc" id="L329">        String env = environment_.get(envName);</span>
+<span class="fc bfc" id="L330" title="All 2 branches covered.">        if(env == null) return defaultValue;</span>
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">        if(env.trim().equals(&quot;&quot;)) return defaultValue;</span>
+<span class="fc" id="L332">        return env.trim();</span>
+    }
+
+    private void mkdirs(String folder) {
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        if(!isValidFolder(folder)) {</span>
+<span class="fc" id="L337">            File dir = new File(folder);</span>
+<span class="fc" id="L338">            dir.mkdirs();</span>
+        }
+<span class="fc" id="L340">    }</span>
+
+    private boolean isValidFolder(String folder) {
+<span class="fc" id="L343">        return (new File(folder)).isDirectory();</span>
+    }
+
+<span class="fc" id="L346">    private String applicationName_ = null;</span>
+    private String dataHome_;
+    private String configHome_;
+<span class="fc" id="L349">    private List&lt;String&gt; dataDirs_ = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L350">    private List&lt;String&gt; configDirs_ = new ArrayList&lt;&gt;();</span>
+    private String cacheHome_;
+<span class="fc" id="L352">    static String home_ = System.getProperty(&quot;user.home&quot;);</span>
+<span class="fc" id="L353">    static Map&lt;String, String&gt; environment_ = new HashMap&lt;&gt;(System.getenv());</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

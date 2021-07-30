@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EncryptedFileOutputStream.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">crypto</a> &gt; <a href="index.source.html" class="el_package">com.amonson.crypto</a> &gt; <span class="el_source">EncryptedFileOutputStream.java</span></div><h1>EncryptedFileOutputStream.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018-2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.crypto;
+
+import javax.crypto.Cipher;
+import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+/**
+ * Class to open an encrypted file stream for write.
+ */
+public class EncryptedFileOutputStream extends OutputStream {
+    /**
+     * Open a file for write that is AES encrypted.
+     * @param filename File to open for writing.
+     * @param key Key object for crypto.
+     * @throws FileNotFoundException When an input file is not found.
+     * @throws InvalidAlgorithmParameterException When the AES/CBC is not supported.
+     * @throws NoSuchAlgorithmException When the AES algorithm is not supported.
+     * @throws InvalidKeyException When a bad key is used, usually the wrong bit length.
+     * @throws NoSuchPaddingException When the AES/CBC/PKCS5PADDING is not supported.
+     */
+    public EncryptedFileOutputStream(String filename, KeyData key) throws FileNotFoundException, NoSuchPaddingException,
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+<span class="fc" id="L33">        super();</span>
+<span class="fc" id="L34">        key_ = key;</span>
+<span class="fc" id="L35">        init(new File(filename));</span>
+<span class="fc" id="L36">    }</span>
+
+    /**
+     * Open a file for write that is AES encrypted.
+     * @param file File to open for writing.
+     * @param key Key object for crypto.
+     * @throws FileNotFoundException When an input file is not found.
+     * @throws InvalidAlgorithmParameterException When the AES/CBC is not supported.
+     * @throws NoSuchAlgorithmException When the AES algorithm is not supported.
+     * @throws InvalidKeyException When a bad key is used, usually the wrong bit length.
+     * @throws NoSuchPaddingException When the AES/CBC/PKCS5PADDING is not supported.
+     */
+    public EncryptedFileOutputStream(File file, KeyData key) throws FileNotFoundException, NoSuchPaddingException,
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException {
+<span class="fc" id="L50">        super();</span>
+<span class="fc" id="L51">        key_ = key;</span>
+<span class="fc" id="L52">        init(file);</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Write a byte to the stream.
+     * @param n The byte to write.
+     * @throws IOException When a stream cannot be written.
+     */
+    @Override
+    public void write(int n) throws IOException {
+<span class="fc" id="L62">        out_.write(n);</span>
+<span class="fc" id="L63">    }</span>
+
+    /**
+     * Write bytes to the stream.
+     * @param bytes The bytes to write.
+     * @throws IOException When a stream cannot be written.
+     */
+    @Override
+    public void write(byte[] bytes) throws IOException {
+<span class="fc" id="L72">        out_.write(bytes);</span>
+<span class="fc" id="L73">    }</span>
+
+    /**
+     * Write bytes to the stream.
+     * @param bytes The bytes to write.
+     * @param off offset in byte buffer.
+     * @param len length of bytes.
+     * @throws IOException When a stream cannot be written.
+     */
+    @Override
+    public void write(byte[] bytes, int off, int len) throws IOException {
+<span class="fc" id="L84">        out_.write(bytes, off, len);</span>
+<span class="fc" id="L85">    }</span>
+
+    /**
+     * Close the stream.
+     * @throws IOException When a stream cannot be closed.
+     */
+    @Override
+    public void close() throws IOException {
+<span class="fc" id="L93">        out_.close();</span>
+<span class="fc" id="L94">        super.close();</span>
+<span class="fc" id="L95">    }</span>
+
+    /**
+     * Flush bytes to disk.
+     * @throws IOException When a stream cannot be written.
+     */
+    @Override
+    public void flush() throws IOException {
+<span class="fc" id="L103">        out_.flush();</span>
+<span class="fc" id="L104">        super.flush();</span>
+<span class="fc" id="L105">    }</span>
+
+    private void init(File file) throws NoSuchPaddingException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException, InvalidKeyException, FileNotFoundException {
+<span class="fc" id="L109">        IvParameterSpec ivSpec = new IvParameterSpec(key_.IVAsBytes());</span>
+<span class="fc" id="L110">        SecretKeySpec keySpec = new SecretKeySpec(key_.keyAsBytes(), &quot;AES&quot;);</span>
+<span class="fc" id="L111">        Cipher cipher = Cipher.getInstance(&quot;AES/CBC/PKCS5PADDING&quot;);</span>
+<span class="fc" id="L112">        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);</span>
+<span class="fc" id="L113">        out_ = new CipherOutputStream(new FileOutputStream(file), cipher);</span>
+<span class="fc" id="L114">    }</span>
+
+    private final KeyData key_;
+    private CipherOutputStream out_;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

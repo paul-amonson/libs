@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisUniqueId.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">redis</a> &gt; <a href="index.source.html" class="el_package">com.amonson.redis</a> &gt; <span class="el_source">RedisUniqueId.java</span></div><h1>RedisUniqueId.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.redis;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Response;
+import redis.clients.jedis.Transaction;
+
+/**
+ * Class to retrieve a unique ID by name from a Redis server.
+ */
+public class RedisUniqueId {
+    /**
+     * Construct a object to get a unique ID from the specified name with a specified caching value.
+     *
+     * @param client The Jedis client object to use in this object for communications.
+     * @param db The Redis Server DB number (0-max of server).
+     * @param name The name of the unique ID to access on the redis server.
+     * @throws IllegalArgumentException When the input arguments are incorrect.
+     */
+<span class="fc" id="L23">    public RedisUniqueId(Jedis client, int db, String name) {</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if(client == null)</span>
+<span class="fc" id="L25">            throw new IllegalArgumentException(&quot;parameter 'client' cannot be null!&quot;);</span>
+<span class="fc bfc" id="L26" title="All 4 branches covered.">        if(name == null || name.isBlank())</span>
+<span class="fc" id="L27">            throw new IllegalArgumentException(&quot;parameter 'name' cannot be null or blank!&quot;);</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if(db &lt; 0)</span>
+<span class="fc" id="L29">            throw new IllegalArgumentException(&quot;parameter 'db' must be greater than or equal to 0!&quot;);</span>
+<span class="fc" id="L30">        client_ = client;</span>
+<span class="fc" id="L31">        db_ = db;</span>
+<span class="fc" id="L32">        name_ = &quot;uniqueId.&quot; + name;</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * Reset the redis unique named value to 0
+     */
+    public void reset() {
+<span class="fc" id="L39">        try (Transaction trans = client_.multi()) {</span>
+<span class="fc" id="L40">            trans.select(db_);</span>
+<span class="fc" id="L41">            trans.del(name_);</span>
+<span class="fc" id="L42">            trans.exec();</span>
+<span class="fc" id="L43">            current_ = 0L;</span>
+        }
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * Get the next unique ID.
+     *
+     * @return The ID from the server or the local cache.
+     */
+    public long getNext() {
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if((current_ % CACHE_SIZE) == 0) {</span>
+<span class="fc" id="L54">            try (Transaction trans = client_.multi()) {</span>
+<span class="fc" id="L55">                trans.select(db_);</span>
+<span class="fc" id="L56">                Response&lt;Long&gt; response = trans.incrBy(name_, CACHE_SIZE);</span>
+<span class="fc" id="L57">                trans.exec();</span>
+<span class="fc" id="L58">                current_ = response.get() - CACHE_SIZE;</span>
+            }
+        }
+<span class="fc" id="L61">        return current_++;</span>
+    }
+
+    private final Jedis client_;
+    private final String name_;
+    private final int db_;
+<span class="fc" id="L67">    private       long current_ = 0L;</span>
+
+    private static final int CACHE_SIZE = 16_384;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

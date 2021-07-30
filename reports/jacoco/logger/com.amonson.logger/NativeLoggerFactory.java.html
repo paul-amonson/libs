@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NativeLoggerFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logger</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger</a> &gt; <span class="el_source">NativeLoggerFactory.java</span></div><h1>NativeLoggerFactory.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.logger;
+
+import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * A simple factory wrapper for the built-in java logger (java.util.logging).
+ */
+public final class NativeLoggerFactory {
+    private NativeLoggerFactory() {} // Disable instance creation
+
+    /**
+     * Create a new logger, disabling the default parent, adding a default handler and a default formatter. This logger
+     * is NOT added to any LogManager if you desire to retrieve this logger in other parts of the codebase add this to
+     * a LogManager. The default handler used is the ConsoleHandler. The default formatter is the DefaultLineFormatter.
+     *
+     * @param name The name of the logger to create.
+     * @return The new constructed and configured logger.
+     */
+    public static Logger getNamedConfiguredLogger(String name) {
+<span class="fc" id="L26">        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter());</span>
+    }
+
+    /**
+     * Create a new logger, disabling the default parent, adding a default handler and a formatter. This logger is NOT
+     * added to any LogManager if you desire to retrieve this logger in other parts of the codebase add this to a
+     * LogManager. The default handler used is the ConsoleHandler.
+     *
+     * @param name The name of the logger to create.
+     * @param formatter The String formatter for the handler.
+     * @return The new constructed and configured logger.
+     */
+    public static Logger getNamedConfiguredLogger(String name, Formatter formatter) {
+<span class="fc" id="L39">        return getNamedConfiguredLogger(name, new ConsoleHandler(), formatter);</span>
+    }
+
+    /**
+     * Create a new logger, disabling the default parent, adding a handler and a default formatter. This logger is NOT
+     * added to any LogManager if you desire to retrieve this logger in other parts of the codebase add this to a
+     * LogManager. The default formatter is the DefaultLineFormatter.
+     *
+     * @param name The name of the logger to create.
+     * @param handler The Handler that &quot;publishes&quot; the logged message.
+     * @return The new constructed and configured logger.
+     */
+    public static Logger getNamedConfiguredLogger(String name, Handler handler) {
+<span class="fc" id="L52">        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter());</span>
+    }
+
+    /**
+     * Create a new logger, disabling the default parent, adding a handler and a formatter. This logger is NOT added
+     * to any LogManager if you desire to retrieve this logger in other parts of the codebase add this to a LogManager.
+     *
+     * @param name The name of the logger to create.
+     * @param handler The Handler that &quot;publishes&quot; the logged message.
+     * @param formatter The String formatter for the handler.
+     * @return The new constructed and configured logger.
+     */
+    public static Logger getNamedConfiguredLogger(String name, Handler handler, Formatter formatter) {
+<span class="fc" id="L65">        Logger logger = Logger.getLogger(name);</span>
+<span class="fc" id="L66">        logger.setUseParentHandlers(false);</span>
+<span class="fc" id="L67">        logger.addHandler(handler);</span>
+<span class="fc" id="L68">        logger.getHandlers()[0].setLevel(Level.FINEST);</span>
+<span class="fc" id="L69">        logger.getHandlers()[0].setFormatter(formatter);</span>
+<span class="fc" id="L70">        logger.setLevel(Level.FINEST);</span>
+<span class="fc" id="L71">        return logger;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
