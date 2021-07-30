@@ -25,7 +25,9 @@ public class TaskMonitorTest {
         Task task = Task.execute(TestApp.class, new String[] {pid_, "250", "Print me!"},
                 Task.Type.Default, null);
         monitor_.addTask(task);
-        Thread.sleep(500);
+        while(!task.isRunning()) Thread.sleep(10);
+        task.waitForCompletion();
+        Thread.sleep(100);
         assertNotNull(task_);
         monitor_.close();
         monitor_.close();

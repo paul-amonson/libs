@@ -36,6 +36,7 @@ public class RedisProofOfLifeVariable implements Runnable {
      * Construct an object with the Jedis client and specified name and period.
      *
      * @param client The Redis client object to use in this object for communications.
+     * @param db The Redis DB index to select.
      * @param name The name of the variable on the redis server.
      * @param period The period in milliseconds of the redis server variable update, the redis variable expires
      *              in twice this value. Cannot be less than 500 ms.

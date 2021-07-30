@@ -10,8 +10,12 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIfEnvironmentVariable(named = "OS", matches = "[Ww]indows.*", disabledReason = "Test skipped on Windows")
 public class XdgTest {
     private static String tmpFolder = Paths.get(File.separator, "tmp").toString();
 

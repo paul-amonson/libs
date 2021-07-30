@@ -42,7 +42,7 @@ public class KeyData {
      * IV/Key generation.
      */
     public KeyData() throws NoSuchAlgorithmException {
-        SecureRandom randomSecureRandom = SecureRandom.getInstance(RNG_ALGORITHM);
+        SecureRandom randomSecureRandom = SecureRandom.getInstance(getAlgorithm());
         byte[] iv = new byte[16];
         randomSecureRandom.nextBytes(iv);
         iv_ = Base64.getEncoder().encodeToString(iv);
@@ -141,5 +141,10 @@ public class KeyData {
     String key_;
 
     // Strong but may block on some OSes. Try "NativePRNGNonBlocking" if you have problems.
-    static String RNG_ALGORITHM = "NativePRNGBlocking";
+    private static String getAlgorithm() {
+        if(System.getProperty("os.name").matches(".*[wW]indows.*"))
+            return "Windows-PRNG";
+        else
+            return "NativePRNGBlocking";
+    }
 }

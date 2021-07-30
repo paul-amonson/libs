@@ -25,6 +25,8 @@ import java.util.*;
  * The only feature not supported is the runtime directory (<b>XDG_RUNTIME_DIR</b>) for temporary files that are user
  * sensitive.</p>
  *
+ * <b>NOTE:</b> This class only works on Linux based OS distributions.
+ *
  */
 public class Xdg {
     /**

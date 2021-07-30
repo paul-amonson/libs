@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class KeyDataTest {
     @BeforeEach
     public void setup() {
-        KeyData.RNG_ALGORITHM = "NativePRNGNonBlocking";
         byte[] zero = new byte[16];
         byte[] ones = new byte[16];
         for(int i = 0; i < 16; i++) {
@@ -36,16 +35,16 @@ public class KeyDataTest {
         KeyData data2 = new KeyData(keyObj);
         assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", data2.IV());
         assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", data2.key());
-        assertTrue(keyObj.equals(data2));
-        assertFalse(keyObj.equals("some_string"));
+        assertEquals(keyObj, data2);
+        assertNotEquals("some_string", keyObj);
         PropMap map = data2.toPropMap();
         assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", map.getString("A"));
         assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", map.getString("B"));
         KeyData.fromPropMap(map);
         data2.key_ = one;
-        assertFalse(keyObj.equals(data2));
+        assertNotEquals(keyObj, data2);
         data2.iv_ = one;
-        assertFalse(keyObj.equals(data2));
+        assertNotEquals(keyObj, data2);
     }
 
     @Test

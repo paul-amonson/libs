@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
  * <p>Configuration files can be in one of 2 formats, JSON or YAML. The files must end with either a ".json" or ".yml".</p>
  *
  * <p>Redis configuration if used must be found in /etc/<i>application_name</i>.{json|yml}.</p>
+ *
+ * <b>NOTE:</b> This class only works on Linux based OS distributions for filesystem config files but will work against Redis.
  */
 public class ConfigLoader {
     /**
