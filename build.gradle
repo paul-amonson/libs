@@ -1,10 +1,9 @@
-import java.nio.charset.StandardCharsets
-import java.time.Instant
-
 // Copyright (C) 2018-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
+
+import java.time.Instant
 
 plugins {
     id 'idea'
@@ -334,6 +333,16 @@ project(':task_manager') {
     group = 'com.amonson'
     dependencies {
         implementation project(':logger')
+    }
+}
+
+project(':data_access') {
+    group = 'com.amonson'
+    dependencies {
+        implementation project(':logger')
+        implementation project(':factory')
+        implementation project(':prop_store')
+        implementation group: 'org.voltdb', name: 'voltdbclient', version: '10.1.1'
     }
 }
 

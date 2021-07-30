@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2019 Paul Amonson
+// Copyright (C) 2018-2021 Paul Amonson
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -14,5 +14,6 @@ include 'task_manager'
 include 'config_location'
 include 'node_monitoring'
 include 'redis'
+include 'data_access'
 
 rootProject.name = 'libs'
