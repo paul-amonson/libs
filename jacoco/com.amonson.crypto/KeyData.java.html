@@ -143,9 +143,9 @@ public class KeyData {
     // Strong but may block on some OSes. Try &quot;NativePRNGNonBlocking&quot; if you have problems.
     private static String getAlgorithm() {
 <span class="pc bpc" id="L145" title="1 of 2 branches missed.">        if(System.getProperty(&quot;os.name&quot;).matches(&quot;.*[wW]indows.*&quot;))</span>
-<span class="fc" id="L146">            return &quot;Windows-PRNG&quot;;</span>
+<span class="nc" id="L146">            return &quot;Windows-PRNG&quot;;</span>
         else
-<span class="nc" id="L148">            return &quot;NativePRNGBlocking&quot;;</span>
+<span class="fc" id="L148">            return &quot;NativePRNGBlocking&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

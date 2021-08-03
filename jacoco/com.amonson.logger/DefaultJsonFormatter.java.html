@@ -32,7 +32,7 @@ public class DefaultJsonFormatter extends Formatter {
 <span class="fc" id="L32">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
 <span class="fc" id="L33">            String program = &quot;/usr/bin/hostname&quot;;</span>
 <span class="pc bpc" id="L34" title="1 of 2 branches missed.">            if (System.getProperty(&quot;os.name&quot;).startsWith(&quot;Windows&quot;))</span>
-<span class="fc" id="L35">                program = &quot;/Windows/System32/HOSTNAME.EXE&quot;;</span>
+<span class="nc" id="L35">                program = &quot;/Windows/System32/HOSTNAME.EXE&quot;;</span>
 <span class="fc" id="L36">            ProcessBuilder pb = new ProcessBuilder(program);</span>
 <span class="fc" id="L37">            Process p = pb.start();</span>
 <span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (!p.waitFor(5, TimeUnit.SECONDS)) {</span>

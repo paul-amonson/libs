@@ -216,7 +216,7 @@ public class NodeMonitoring {
 <span class="fc" id="L216">    }</span>
 
     private void stopThread(Thread thread) {
-<span class="pc bpc" id="L219" title="3 of 6 branches missed.">        if(thread != null &amp;&amp; thread.isAlive() &amp;&amp; !thread.isInterrupted()) {</span>
+<span class="pc bpc" id="L219" title="2 of 6 branches missed.">        if(thread != null &amp;&amp; thread.isAlive() &amp;&amp; !thread.isInterrupted()) {</span>
 <span class="fc" id="L220">            thread.interrupt();</span>
             try {
 <span class="fc" id="L222">                thread.join();</span>
