@@ -3,17 +3,4 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-
-include 'prop_store'
-include 'crypto'
-include 'logger'
-include 'logger_server'
-include 'xdg'
-include 'factory'
-include 'task_manager'
-include 'config_location'
-include 'node_monitoring'
-include 'redis'
-include 'data_access'
-
 rootProject.name = 'libs'

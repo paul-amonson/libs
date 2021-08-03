@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-import java.time.Instant
-
 plugins {
     id 'idea'
     id 'jacoco'
@@ -64,63 +62,6 @@ publishing {
     }
 }
 
-def exportedProjects = []
-subprojects.forEach(sub -> { exportedProjects.add(':' + sub.name) })
-
-build {
-    doFirst {
-        mkdir("${buildDir}")
-        mkdir("${buildDir}/docs")
-    }
-    doLast {
-        String year = Instant.now().toString().split('-')[0]
-        String title = "Reports for project ${project.name} version ${project.version}"
-        String headerLine = "<tr><th>Code Coverage</th><th>Test Results</th></tr>"
-        String docs = """<a href="javadoc/index.html">JavaDocs</a> for project ${project.name} version ${project.version}"""
-        String projectLines = ""
-        exportedProjects.forEach(p -> {
-            String p2 = ((String)p).replace(":", "")
-            if(p2 != 'logger_server')
-                projectLines += """<tr><td><a class="link" href="reports/jacoco/${p2}/index.html">${p2}</a></td><td><a class="link" href="reports/test/${p2}/index.html">${p2}</a></td></tr>"""
-        })
-        String html = """<!DOCTYPE html><html><head><title>${title}</title><link rel="stylesheet" href="style.css"></link></head><body><h1>${title}</h1><hr /><h2>${docs}</h2><table border=2>
-${headerLine}
-${projectLines}
-</table><br /><div>Copyright&copy;${year} Paul Amonson</div></body>"""
-        new File("${buildDir}/docs/index.html").text = html
-        new File("${buildDir}/docs/style.css").text = """
-    body {
-        margin: 18pt;
-        background-color: rgb(48,48,48) !important;
-        color: white;
-    }
-    table {
-        background-color: rgb(128,128,128);
-        padding: 3pt;
-    }
-    td {
-        color: black;
-        padding: 6pt;
-    }
-    th {
-        background-color: rgb(48,48,48);
-        color: rgb(192,192,0);
-        padding: 6pt;
-    }
-    a {
-        color: rgb(72,72,224);
-    }
-    a.link {
-        color: rgb(0,0,64);
-        text-decoration: none;
-    }
-    div {
-        indent: 36pt;
-    }
-"""
-    }
-}
-
 gitPublish {
     repoUri = 'git@github.com:paul-amonson/libs.git'
     branch = 'gh-pages'
@@ -137,253 +78,123 @@ gitPublishPush {
     }
 }
 
-subprojects {
-    apply plugin: 'java-library'
-    apply plugin: 'jacoco'
-    apply plugin: 'groovy'
+apply plugin: 'java-library'
+apply plugin: 'jacoco'
+apply plugin: 'groovy'
 
-    targetCompatibility = 11
-    sourceCompatibility = 11
+targetCompatibility = 11
+sourceCompatibility = 11
 
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-        testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
-
-        testImplementation 'org.codehaus.groovy:groovy:3.0.7'
-        testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
-    }
-
-    clean {
-        delete += "${projectDir}/out"
-    }
-
-    compileJava {
-        options.compilerArgs << '-Werror'
-        options.compilerArgs << '-Xlint:all,-processing,-path'
-        options.compilerArgs << '-XDignore.symbol.file=true'
-        options.fork = true
-        options.forkOptions.executable = 'javac'
-    }
-
-    test {
-        useJUnitPlatform()
-        reports {
-            html.outputLocation = file("${rootProject.buildDir}/docs/reports/test/${project.name}")
-            junitXml.outputLocation = file("${rootProject.buildDir}/tests/${project.name}")
-        }
-        finalizedBy(jacocoTestReport)
-    }
-
-    jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from {
-            configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-        }
-    }
-
-    jacocoTestReport {
-        group = "Reporting"
-        reports {
-            xml.required = true
-            xml.outputLocation = file("${rootProject.buildDir}/jacoco/${project.name}.xml")
-            html.required = true
-            html.outputLocation = file("${rootProject.buildDir}/docs/reports/jacoco/${project.name}")
-        }
-        finalizedBy(jacocoTestCoverageVerification)
-    }
-
-    jacocoTestCoverageVerification {
-        violationRules {
-            rule {
-                element = 'PACKAGE'
-                enabled = honorScanningRules
-                limit {
-                    counter = 'METHOD'
-                    minimum = 0.90
-                }
-            }
-            rule {
-                element = 'PACKAGE'
-                enabled = honorScanningRules
-                limit {
-                    counter = 'BRANCH'
-                    minimum = 0.70
-                }
-            }
-        }
-    }
-    configurations {
-        integrationImplementation.extendsFrom testImplementation
-        integrationRuntime.extendsFrom testRuntime
-    }
-
-    sourceSets {
-        integration {
-            groovy.srcDir "$projectDir/src/integration/groovy"
-            resources.srcDir "$projectDir/src/integration/resources"
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-        }
-    }
-
-    task integrationTest(type: Test) {
-        group = '_favorites'
-        useJUnitPlatform()
-        testClassesDirs = sourceSets.integration.output.classesDirs
-        classpath = sourceSets.integration.runtimeClasspath
-
-        testLogging {
-            outputs.upToDateWhen {false}
-            showCauses = true
-            showExceptions = true
-            showStackTraces = true
-            showStandardStreams = true
-            exceptionFormat = 'full'
-        }
-        reports {
-            html.outputLocation = file("${rootProject.buildDir}/docs/reports/test/${project.name}")
-            junitXml.outputLocation = file("${rootProject.buildDir}/tests/${project.name}")
-        }
-        finalizedBy(jacocoTestReport)
-    }
+repositories {
+    mavenCentral()
 }
 
-project(':prop_store') {
-    group = 'com.amonson'
-    dependencies {
-        implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '4.0.0'
-        implementation group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
-    }
+dependencies {
+    implementation group: 'com.github.cliftonlabs', name: 'json-simple', version: '4.0.0'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.21+'
+    implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    implementation group: 'org.voltdb', name: 'voltdbclient', version: '10.1.1'
+    implementation group: 'redis.clients', name: 'jedis', version: '3.2.0'
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
+    testImplementation 'org.codehaus.groovy:groovy:3.0.8'
+    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
 }
 
-project(':logger') {
-    group = 'com.amonson'
-    dependencies {
-        implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
-        implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
-        implementation project(':prop_store')
-
-        testImplementation project(':prop_store')
-    }
+clean {
+    delete += "${projectDir}/out"
 }
 
-project(':node_monitoring') {
-    group = 'com.amonson'
-    dependencies {
-        implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
-    }
+compileJava {
+    options.compilerArgs << '-Werror'
+    options.compilerArgs << '-Xlint:all,-processing,-path'
+    options.compilerArgs << '-XDignore.symbol.file=true'
+    options.fork = true
+    options.forkOptions.executable = 'javac'
 }
 
-project(':logger_server') {
-    apply plugin: 'application'
-
-    group = 'com.amonson'
-    dependencies {
-        implementation group: 'org.zeromq', name: 'jeromq', version: '0.5.1'
-        implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
-        implementation project(':prop_store')
-        implementation project(':logger')
-
-        testImplementation project(':prop_store')
+test {
+    useJUnitPlatform()
+    reports {
+        html.outputLocation = file("${buildDir}/docs/test")
+        junitXml.outputLocation = file("${buildDir}/tests")
     }
-
-    project.mainClassName = "com.amonson.logger_server.LogServerApp"
-
-    jar {
-        doFirst {
-        }
-        manifest {
-            attributes('Main-Class': project.mainClassName, 'Implementation-Version': rootProject.version)
-        }
-
-        doLast {
-            copy {
-                from "${buildDir}/libs/${project.name}.jar"
-                rename "${project.name}.jar", "${project.name}-${rootProject.version}.jar"
-                into "${rootProject.buildDir}/libs"
-            }
-        }
-    }
-}
-
-project(':xdg') {
-    group = 'com.amonson'
-}
-
-project(':crypto') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':prop_store')
-    }
-}
-
-project(':factory') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':logger')
-    }
-}
-
-project(':task_manager') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':logger')
-    }
-}
-
-project(':data_access') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':logger')
-        implementation project(':factory')
-        implementation project(':prop_store')
-        implementation group: 'org.voltdb', name: 'voltdbclient', version: '10.1.1'
-    }
-}
-
-project(':config_location') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':prop_store')
-        implementation group: 'redis.clients', name: 'jedis', version: '3.6.1'
-    }
-}
-
-project(':redis') {
-    group = 'com.amonson'
-    dependencies {
-        implementation project(':logger')
-        implementation group: 'redis.clients', name: 'jedis', version: '3.2.0'
-    }
+    finalizedBy(jacocoTestReport)
 }
 
 jar {
-    dependsOn(subprojects.jar)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    subprojects.each { subproject ->
-        from subproject.configurations.runtimeClasspath.findAll {
-            it.name.endsWith('jar')
-        }.collect {
-            zipTree(it)
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+}
+jar.finalizedBy(javadoc)
+
+jacocoTestReport {
+    group = "Reporting"
+    reports {
+        xml.required = true
+        xml.outputLocation = file("${buildDir}/jacoco/jacoco.xml")
+        html.required = true
+        html.outputLocation = file("${buildDir}/docs/jacoco")
+    }
+    finalizedBy(jacocoTestCoverageVerification)
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'PACKAGE'
+            enabled = honorScanningRules
+            limit {
+                counter = 'METHOD'
+                minimum = 0.90
+            }
         }
-        from zipTree(new File("${projectDir}/${subproject.name}/build/libs/${subproject.name}.jar"))
-    }
-
-    manifest {
-        attributes('Implementation-Version': rootProject.version)
+        rule {
+            element = 'PACKAGE'
+            enabled = honorScanningRules
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.70
+            }
+        }
     }
 }
 
-task allJavaDocs(type: Javadoc) {
-    group = "_favorites"
-    options.addBooleanOption('html5', true)
-    source exportedProjects.collect { project(it).sourceSets.main.allJava }
-    classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
-    destinationDir = file("${buildDir}/docs/javadoc")
+configurations {
+    integrationImplementation.extendsFrom testImplementation
+    integrationRuntime.extendsFrom testRuntime
 }
-jar.finalizedBy('allJavaDocs')
+
+sourceSets {
+    integration {
+        groovy.srcDir "${projectDir}/src/integration/groovy"
+        resources.srcDir "${projectDir}/src/integration/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+task integrationTest(type: Test, dependsOn: jar) {
+    group = '_favorites'
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+
+    testLogging {
+        outputs.upToDateWhen {false}
+        showCauses = true
+        showExceptions = true
+        showStackTraces = true
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+    reports {
+        html.outputLocation = file("${buildDir}/docs/component_tests")
+        junitXml.outputLocation = file("${buildDir}/tests")
+    }
+}
