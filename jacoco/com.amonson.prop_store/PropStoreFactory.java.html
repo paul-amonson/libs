@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropStoreFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.prop_store</a> &gt; <span class="el_source">PropStoreFactory.java</span></div><h1>PropStoreFactory.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018-2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.prop_store;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+
+/**
+ * Static class to register and create PropStore derived implementations for property serialization.
+ */
+public final class PropStoreFactory {
+    private PropStoreFactory() {}
+
+    /**
+     * Retrieve an instance of the named implementation.
+     *
+     * @param name The name of the implementation to create.
+     * @return THe new instance of the PropStore derived class.
+     * @throws PropStoreFactoryException is thrown when the instance cannot be created or the name is not registered.
+     */
+    public static PropStore getStore(String name) throws PropStoreFactoryException {
+<span class="fc" id="L25">        return getStore(name, null);</span>
+    }
+
+    /**
+     * Retrieve an instance of the named implementation with implementaion specific arguments..
+     *
+     * @param name The name of the implementation to create.
+     * @param args The arguments in a map for the implementation, null is allowed.
+     * @return THe new instance of the PropStore derived class.
+     * @throws PropStoreFactoryException is thrown when the instance cannot be created or the name is not registered.
+     */
+    public static PropStore getStore(String name, Properties args) throws PropStoreFactoryException {
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if(name == null)</span>
+<span class="fc" id="L38">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be null!&quot;);</span>
+<span class="fc" id="L39">        name = name.toLowerCase().trim();</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if(name.trim().equals(&quot;&quot;))</span>
+<span class="fc" id="L41">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be empty!&quot;);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if(!supportedImplementations_.containsKey(name))</span>
+<span class="fc" id="L43">            throw new PropStoreFactoryException(String.format(&quot;Implementation '%s' is not supported!&quot;, name));</span>
+        try {
+<span class="fc" id="L45">            return supportedImplementations_.get(name).getConstructor(Properties.class).newInstance(args);</span>
+<span class="nc" id="L46">        } catch(NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {</span>
+<span class="nc" id="L47">            throw new PropStoreFactoryException(&quot;Failed to construct PropStore; is the ctor&quot;, e); // This cannot happen!</span>
+        }
+    }
+
+    /**
+     * Used to add user parsers/generators derived from PropStore.
+     *
+     * @param name The name of the parser to use. Cannot already exist in registry. Cannot be null.
+     * @param classObject The class implementation derived from PropStore. Cannot be null.
+     * @return True if the implementation was added to the registry. False if the 'name' already exists.
+     * @throws PropStoreFactoryException When the implementation cannot be added because of a missing ctor. The ctor
+     * for a PropStore derived class should take a java.util.Properties object.
+     */
+    public static boolean registerNewStore(String name, Class&lt;? extends PropStore&gt; classObject)
+            throws PropStoreFactoryException {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if(name == null)</span>
+<span class="fc" id="L63">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be null!&quot;);</span>
+<span class="fc" id="L64">        name = name.toLowerCase().trim();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if(name.equals(&quot;&quot;))</span>
+<span class="fc" id="L66">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be empty!&quot;);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if(classObject == null) throw new IllegalArgumentException(&quot;The 'classObject' argument cannot be null!&quot;);</span>
+        try {
+<span class="fc" id="L69">            classObject.getConstructor(Properties.class).newInstance(new Properties());</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            return supportedImplementations_.putIfAbsent(name, classObject) == null;</span>
+<span class="fc" id="L71">        } catch(NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {</span>
+<span class="fc" id="L72">            throw new PropStoreFactoryException(&quot;PropStore implementation doesn't appear to have a valid ctor!&quot;, e);</span>
+        }
+    }
+
+    /**
+     * Gets the list of implementations supported.
+     *
+     * @return The collection of names supported by the factory.
+     */
+    public static Collection&lt;String&gt; getNames() {
+<span class="fc" id="L82">        return supportedImplementations_.keySet();</span>
+    }
+
+    /**
+     * Setup supplied internal implementations.
+     */
+<span class="fc" id="L88">    static Map&lt;String, Class&lt;? extends PropStore&gt;&gt; supportedImplementations_ =</span>
+<span class="fc" id="L89">            new HashMap&lt;&gt;() {{</span>
+<span class="fc" id="L90">        put(&quot;json&quot;, JsonStore.class);</span>
+<span class="fc" id="L91">        put(&quot;yaml&quot;, YamlStore.class);</span>
+<span class="fc" id="L92">    }};</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

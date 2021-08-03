@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataAccessLayerResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.data_access</a> &gt; <span class="el_source">DataAccessLayerResponse.java</span></div><h1>DataAccessLayerResponse.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.data_access;
+
+import com.amonson.prop_store.PropList;
+
+/**
+ * Response for a query in a generic DataAccessLayer implementation.
+ */
+public class DataAccessLayerResponse {
+    /**
+     * Created in this package only.
+     *
+     * @param status The status of the query.
+     * @param results The results of a successful query or null if unsuccessful.
+     */
+<span class="fc" id="L19">    DataAccessLayerResponse(DataAccessLayerStatus status, PropList results) {</span>
+<span class="fc" id="L20">        status_ = status;</span>
+<span class="fc" id="L21">        results_ = results;</span>
+<span class="fc" id="L22">    }</span>
+
+    /**
+     * Get the status of the query.
+     *
+     * @return The status of the query.
+     */
+<span class="fc" id="L29">    public DataAccessLayerStatus getStatus() { return status_; }</span>
+
+    /**
+     * Get the results of the query. This mimics an array of results of rows. So usually it's an array of
+     * 0 or 1 &quot;tables&quot; containing an array of rows where each row is an object with named key (column name) and value.
+     * [ // Array of results (PropList)
+     *    [ // rows of specific result (PropList)
+     *       {&quot;column_name&quot;: value, &quot;column_name2&quot;: value, ...}, // PropMap
+     *       {&quot;column_name&quot;: value, &quot;column_name2&quot;: value, ...}, // PropMap
+     *       ...
+     *    ],
+     *    [ // rows of specific result (PropList)
+     *       {&quot;column_name&quot;: value, &quot;column_name2&quot;: value, ...}, // PropMap
+     *       {&quot;column_name&quot;: value, &quot;column_name2&quot;: value, ...}, // PropMap
+     *       ...
+     *    ]
+     * ]
+     * @return The results of the query.
+     */
+<span class="fc" id="L48">    public PropList getResults() { return results_; }</span>
+
+    private final DataAccessLayerStatus status_;
+    private final PropList results_;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

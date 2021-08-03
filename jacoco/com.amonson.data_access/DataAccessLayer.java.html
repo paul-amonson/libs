@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataAccessLayer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.data_access</a> &gt; <span class="el_source">DataAccessLayer.java</span></div><h1>DataAccessLayer.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.data_access;
+
+import java.util.Properties;
+import java.util.logging.Logger;
+
+/**
+ * Interface for DataAccess, agnostic to implementation.
+ */
+public abstract class DataAccessLayer {
+<span class="fc" id="L14">    protected DataAccessLayer(Properties configurationProperties, Logger logger) {</span>
+<span class="fc" id="L15">        log_ = logger;</span>
+<span class="fc" id="L16">        configurationProperties_ = configurationProperties;</span>
+<span class="fc" id="L17">    }</span>
+
+    /**
+     * Perform a synchronous query of the DataAccessLayer implementation.
+     *
+     * @param name Procedure name for the query.
+     * @param params Parameters for the query.
+     * @return The DataAccessLayerResponse for the attempted query.
+     */
+    public abstract DataAccessLayerResponse query(String name, Object... params);
+
+    /**
+     * Perform a asynchronous query of the DataAccessLayer implementation.
+     *
+     * @param callback The callback for asynchronous completion of the query.
+     * @param name Procedure name for the query.
+     * @param params Parameters for the query.
+     */
+    public abstract void query(DataAccessLayerCallback callback, String name, Object... params);
+
+    /**
+     * Perform a synchronous query of the DataAccessLayer implementation expecting a single long response.
+     *
+     * @param name Procedure name for the query.
+     * @param params Parameters for the query.
+     * @return The DataAccessLayerResponse for the attempted query.
+     * @throws DataAccessLayerException on any all underlying implementation call errors.
+     */
+    public abstract long queryForLong(String name, Object... params) throws DataAccessLayerException;
+
+    /**
+     * Connect the object to the data source(s).
+     */
+    public abstract void connect();
+
+    /**
+     * Disconnect the object from the data source(s).
+     */
+    public abstract void disconnect();
+
+    /**
+     * Does the object have a connection?
+     *
+     * @return true if at least one connection is present; false otherwise.
+     */
+    public abstract boolean isConnected();
+
+    protected final Logger log_;
+    protected final Properties configurationProperties_;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

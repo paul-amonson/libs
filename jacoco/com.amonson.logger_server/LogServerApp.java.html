@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LogServerApp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.logger_server</a> &gt; <span class="el_source">LogServerApp.java</span></div><h1>LogServerApp.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.logger_server;
+
+import com.amonson.logger.*;
+import com.amonson.prop_store.PropMap;
+import com.amonson.prop_store.PropStore;
+import com.amonson.prop_store.PropStoreFactory;
+import com.amonson.prop_store.PropStoreFactoryException;
+import org.apache.commons.cli.*;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.*;
+
+/**
+ * Application for a basic LogRecord Server (ZeroMQ SUB). It will dump to files based on the ZeroMQ topic names.
+ */
+public class LogServerApp implements Runnable {
+    public static void main(String[] args) {
+        try {
+<span class="nc" id="L25">            new LogServerApp(args).run();</span>
+<span class="nc" id="L26">        } catch(PropStoreFactoryException e) {</span>
+<span class="nc" id="L27">            System.err.println(&quot;ERROR: Failed to create the JSON parser!&quot;);</span>
+<span class="nc" id="L28">            System.exit(2);</span>
+<span class="nc" id="L29">        } catch(ParseException | NumberFormatException e) {</span>
+<span class="nc" id="L30">            System.err.printf(&quot;ERROR: %s\n&quot;, e.getMessage());</span>
+<span class="nc" id="L31">            System.exit(1);</span>
+<span class="nc" id="L32">        } catch(IOException e) {</span>
+<span class="nc" id="L33">            System.err.println(&quot;ERROR: Failed to retrieve the resources!&quot;);</span>
+<span class="nc" id="L34">            System.exit(3);</span>
+<span class="nc" id="L35">        } catch(IllegalArgumentException e) {</span>
+<span class="nc" id="L36">            System.exit(0);</span>
+<span class="nc" id="L37">        }</span>
+<span class="nc" id="L38">        System.exit(0);</span>
+<span class="nc" id="L39">    }</span>
+
+    @Override
+    public void run() {
+<span class="nc" id="L43">        System.out.println(&quot;Starting logging server at &quot; + url_);</span>
+<span class="nc" id="L44">        new ZeroMQLogSubscriber(url_, this::incomingMessage).run();</span>
+<span class="nc" id="L45">    }</span>
+
+<span class="nc" id="L47">    LogServerApp(String[] args) throws PropStoreFactoryException, ParseException, IOException {</span>
+<span class="nc" id="L48">        parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="nc" id="L49">        Options options = getOptions();</span>
+<span class="nc" id="L50">        DefaultParser parser = new DefaultParser();</span>
+<span class="nc" id="L51">        CommandLine cli = parseAndCapture(args, options, parser);</span>
+<span class="nc" id="L52">        String version = getClass().getPackage().getImplementationVersion();</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if(cli.hasOption('h')) {</span>
+<span class="nc" id="L54">            HelpFormatter format = new HelpFormatter();</span>
+<span class="nc" id="L55">            format.printHelp(String.format(&quot;java -jar logger_server-%s.jar [OPTIONS]&quot;, version), options);</span>
+<span class="nc" id="L56">            throw new IllegalArgumentException();</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        } else if(cli.hasOption('V')) {</span>
+<span class="nc" id="L58">            System.out.printf(&quot;Version: %s\n&quot;, version);</span>
+<span class="nc" id="L59">            throw new IllegalArgumentException();</span>
+        }
+<span class="nc" id="L61">    }</span>
+
+    private CommandLine parseAndCapture(String[] args, Options options, DefaultParser parser) throws ParseException {
+<span class="nc" id="L64">        CommandLine cli = parser.parse(options, args);</span>
+<span class="nc" id="L65">        count_ = Integer.parseInt(cli.getOptionValue('c', &quot;10&quot;));</span>
+<span class="nc" id="L66">        limit_ = Integer.parseInt(cli.getOptionValue('l', &quot;1024&quot;)) * 1_024; // Kb to b.</span>
+<span class="nc" id="L67">        url_ = String.format(&quot;tcp://*:%s&quot;, cli.getOptionValue('p', &quot;64001&quot;));</span>
+<span class="nc" id="L68">        folder_ = cli.getOptionValue('f', &quot;/tmp&quot;);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if(folder_.endsWith(&quot;/&quot;))</span>
+<span class="nc" id="L70">            folder_ = folder_.substring(0, folder_.length() - 1);</span>
+<span class="nc" id="L71">        return cli;</span>
+    }
+
+    private Options getOptions() {
+<span class="nc" id="L75">        Options options = new Options();</span>
+<span class="nc" id="L76">        Option option = new Option(&quot;c&quot;, &quot;count&quot;, true, &quot;How many maximum log files to keep at one time.&quot;);</span>
+<span class="nc" id="L77">        option.setType(Integer.class);</span>
+<span class="nc" id="L78">        options.addOption(option);</span>
+<span class="nc" id="L79">        option = new Option(&quot;l&quot;, &quot;limit&quot;, true, &quot;How many kilobytes a single file to limit size.&quot;);</span>
+<span class="nc" id="L80">        option.setType(Integer.class);</span>
+<span class="nc" id="L81">        options.addOption(option);</span>
+<span class="nc" id="L82">        option = new Option(&quot;p&quot;, &quot;port&quot;, true, &quot;Port to listen on for incoming messages log.&quot;);</span>
+<span class="nc" id="L83">        option.setType(Integer.class);</span>
+<span class="nc" id="L84">        options.addOption(option);</span>
+<span class="nc" id="L85">        option = new Option(&quot;f&quot;, &quot;folder&quot;, true, &quot;Folder where all log files are stored.&quot;);</span>
+<span class="nc" id="L86">        option.setType(String.class);</span>
+<span class="nc" id="L87">        options.addOption(option);</span>
+<span class="nc" id="L88">        option = new Option(&quot;h&quot;, &quot;help&quot;, false, &quot;Help request.&quot;);</span>
+<span class="nc" id="L89">        options.addOption(option);</span>
+<span class="nc" id="L90">        option = new Option(&quot;V&quot;, &quot;version&quot;, false, &quot;Version request.&quot;);</span>
+<span class="nc" id="L91">        options.addOption(option);</span>
+<span class="nc" id="L92">        return options;</span>
+    }
+
+    private void incomingMessage(String topic, LogRecord logRecord, String hostname, int pid) {
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if(!loggers_.containsKey(topic))</span>
+<span class="nc" id="L97">            createLogger(topic);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if(loggers_.containsKey(topic)) {</span>
+<span class="nc" id="L99">            PropMap map = LogRecordSerialization.serializeLogRecord(logRecord);</span>
+<span class="nc" id="L100">            map.put(&quot;hostname&quot;, hostname);</span>
+<span class="nc" id="L101">            map.put(&quot;pid&quot;, pid);</span>
+<span class="nc" id="L102">            loggers_.get(topic).log(Level.FINEST, parser_.toString(map));</span>
+        }
+<span class="nc" id="L104">    }</span>
+
+    private void createLogger(String topic) {
+        try {
+<span class="nc" id="L108">            String pattern = String.format(&quot;%s/%s-%%g.log&quot;, folder_, topic);</span>
+<span class="nc" id="L109">            Handler handler = new FileHandler(pattern, limit_, count_, true);</span>
+<span class="nc" id="L110">            Formatter formatter = new PassThruFormatter();</span>
+<span class="nc" id="L111">            Logger logger = NativeLoggerFactory.getNamedConfiguredLogger(topic, handler, formatter);</span>
+<span class="nc" id="L112">            loggers_.put(topic, logger);</span>
+<span class="nc" id="L113">        } catch(IOException e) { /* No logger for filename so these messages will be ignored. */ }</span>
+<span class="nc" id="L114">    }</span>
+
+    private int count_;
+    private int limit_;
+    private String url_;
+    private String folder_;
+    private final PropStore parser_;
+<span class="nc" id="L121">    Map&lt;String, Logger&gt; loggers_ = new HashMap&lt;&gt;();</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

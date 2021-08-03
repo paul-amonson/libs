@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControlledShutdown.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.task_manager</a> &gt; <span class="el_source">ControlledShutdown.java</span></div><h1>ControlledShutdown.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.task_manager;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * Control a threaded or non-threaded application's shutdown process. This is used to guarantee and orderly shutdown
+ * with proper cleanup.
+ */
+public final class ControlledShutdown {
+    /**
+     * Called near the beginning of main() to setup a shutdown hook.
+     */
+<span class="fc" id="L17">    public static void startApplication() { startApplication(null); }</span>
+
+    /**
+     * Called near the beginning of main() to setup a shutdown hook.
+     *
+     * @param callback If not null this functional interface is called during the shutdown hook to help debug issues.
+     * @throws IllegalApplicationState when called with a state other than 'NotStarted'.
+     */
+    public static void startApplication(DebugMessageCallback callback) {
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if(state_ != InternalState.NotStarted)</span>
+<span class="fc" id="L27">            throw new IllegalApplicationState(String.format(&quot;The '%s.startApplication' method must be called first!&quot;,</span>
+<span class="fc" id="L28">                    ControlledShutdown.class.getSimpleName()));</span>
+<span class="fc" id="L29">        callback_ = callback;</span>
+<span class="fc" id="L30">        shutdownThread_ = new Thread(ControlledShutdown::shuttingDown);</span>
+<span class="fc" id="L31">        Runtime.getRuntime().addShutdownHook(shutdownThread_);</span>
+<span class="fc" id="L32">        state_ = InternalState.Started;</span>
+<span class="fc" id="L33">        callCallback(&quot;ControlShutdown.startApplication called!&quot;);</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * Called near the end of main to signal that all application cleanup was done, child processes or threads
+     * and stopped, and the process can end.
+     *
+     * @throws IllegalApplicationState when called with a state other than 'ShuttingDown'.
+     */
+    public static void endApplication() {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(state_ != InternalState.ShuttingDown)</span>
+<span class="fc" id="L44">            throw new IllegalApplicationState(String.format(&quot;The '%s.endApplication' method must be called after &quot; +</span>
+<span class="fc" id="L45">                            &quot;the application shutdown hook is called!&quot;, ControlledShutdown.class.getSimpleName()));</span>
+<span class="fc" id="L46">        waitForExit_.set(true);</span>
+<span class="fc" id="L47">        state_ = InternalState.ShutDown;</span>
+<span class="fc" id="L48">        callCallback(&quot;ControlShutdown.endApplication called!&quot;);</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * This returns true if the shutdown hook was called. This is used on worker threads to determine if the
+     * application needs to be shutdown and therefore the worker thread needs to end.
+     *
+     * @return true when shutting down (shutdown hook is called), false otherwise.
+     */
+    public static boolean isShuttingDown() {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        return state_ == InternalState.ShuttingDown;</span>
+    }
+
+    /**
+     * This will block until the shutdown hook is called. This is used when the application is a long running service
+     * and there is a need to block on the main thread while work is done on a separate worker thread.
+     */
+    public static void waitForShutdown() {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        while(!isShuttingDown()) {</span>
+<span class="fc" id="L67">            try { Thread.sleep(1_000L); } // One second</span>
+<span class="pc" id="L68">            catch (InterruptedException e) { /* Ignore this interrupt. */ }</span>
+        }
+<span class="fc" id="L70">    }</span>
+
+    /**
+     * Call this method if you wish to shutdown the application from a different thread of for a any reason.
+     *
+     * @throws IllegalApplicationState when called with a state other than 'Started'.
+     */
+    public static void manualShutdown() {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if(state_ != InternalState.Started)</span>
+<span class="nc" id="L79">            throw new IllegalApplicationState(&quot;Cannot call 'manualShutdown' with a state other than 'Started'&quot;);</span>
+<span class="nc" id="L80">        Runtime.getRuntime().removeShutdownHook(shutdownThread_);</span>
+<span class="nc" id="L81">        shutdownThread_.start();</span>
+<span class="nc" id="L82">    }</span>
+    /**
+     * Callback interface for debug messages. This avoids the &quot;specific logger&quot; problem.
+     */
+    @FunctionalInterface
+    public interface DebugMessageCallback {
+        void debugMessage(String message);
+    }
+
+    private static void callCallback(String msg) {
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if(callback_ != null)</span>
+<span class="nc" id="L93">            callback_.debugMessage(msg);</span>
+<span class="fc" id="L94">    }</span>
+
+    private static void shuttingDown() {
+<span class="fc" id="L97">        signalShutdown_.set(true);</span>
+<span class="fc" id="L98">        state_ = InternalState.ShuttingDown;</span>
+<span class="fc" id="L99">        callCallback(&quot;Shutdown hook called for ControlShutdown!&quot;);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        while(!waitForExit_.get()) {</span>
+<span class="fc" id="L101">            try { Thread.sleep(1_000L); } // One second</span>
+<span class="pc" id="L102">            catch (InterruptedException e) { /* Ignore this interrupt. */ }</span>
+        }
+<span class="fc" id="L104">        callCallback(&quot;Shutdown hook exiting!&quot;);</span>
+<span class="fc" id="L105">    }</span>
+    private ControlledShutdown() {} // static class
+
+<span class="fc" id="L108">    private enum InternalState {</span>
+<span class="fc" id="L109">        NotStarted,</span>
+<span class="fc" id="L110">        Started,</span>
+<span class="fc" id="L111">        ShuttingDown,</span>
+<span class="fc" id="L112">        ShutDown</span>
+    }
+
+    /**
+     * Unchecked exception for calling startApplication or endApplication in the wrong order with the wrong
+     * prerequisite states.
+     */
+    @SuppressWarnings(&quot;serial&quot;)
+    public static class IllegalApplicationState extends RuntimeException {
+<span class="fc" id="L121">        public IllegalApplicationState(String msg) { super(msg); }</span>
+    }
+
+    private       static Thread shutdownThread_;
+<span class="fc" id="L125">    private       static InternalState state_ = InternalState.NotStarted;</span>
+    private       static DebugMessageCallback callback_;
+<span class="fc" id="L127">    private final static AtomicBoolean signalShutdown_ = new AtomicBoolean(false);</span>
+<span class="fc" id="L128">    private final static AtomicBoolean waitForExit_ = new AtomicBoolean(false);</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.prop_store</a> &gt; <span class="el_source">PropStore.java</span></div><h1>PropStore.java</h1><pre class="source lang-java linenums">// Copyright (C) 2018-2019 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+package com.amonson.prop_store;
+
+import java.io.*;
+import java.util.Properties;
+
+/**
+ * Class representing a Store of properies (maps/lists nested or flat). Any stream, reader/writer, or files can be
+ * used.
+ */
+public abstract class PropStore {
+    /**
+     * Default constructor that takes a amp of configuration values for the property store (not used in the is base
+     * abstract class).
+     *
+     * @param config The properties of configuration parameters that may or may not be used by the derived classes.
+     *              This may be null.
+     */
+<span class="fc" id="L23">    public PropStore(Properties config) {</span>
+<span class="fc" id="L24">    }</span>
+
+    /**
+     * Convert the PropMap to the text Store format.
+     *
+     * @param map The map to Store.
+     *
+     * @return The String version of the PropMap.
+     */
+    public abstract String toString(PropMap map);
+
+    /**
+     * Convert the PropList to the text Store format.
+     *
+     * @param list The list to Store.
+     * @return The String version of the PropList.
+     */
+    public abstract String toString(PropList list);
+
+    /**
+     * Convert a String representation of the properties to a PropMap.
+     *
+     * @param storeText The String representation of the properties.
+     * @return The parsed PropMap.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public abstract PropMap fromStringToMap(String storeText) throws PropStoreException;
+
+    /**
+     * Convert a String representation of the properties to a PropList.
+     *
+     * @param storeText The String representation of the properties.
+     * @return The parsed PropList.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public abstract PropList fromStringToList(String storeText) throws PropStoreException;
+
+    /**
+     * Read the text representation from the filename.
+     *
+     * @param filename The filename to read from.
+     * @return The parsed property map.
+     * @throws IOException if the filename cannot be found or cannot be read.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropMap readMap(String filename) throws IOException, PropStoreException {
+<span class="fc" id="L70">        return readMap(new File(filename));</span>
+    }
+
+    /**
+     * Read the text representation from the filename.
+     *
+     * @param file The file to to read from.
+     * @return The parsed property map.
+     * @throws IOException if the filename cannot be found or cannot be read.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropMap readMap(File file) throws IOException, PropStoreException {
+<span class="fc" id="L82">        try (InputStream stream = new FileInputStream(file)) {</span>
+<span class="fc" id="L83">            return readMap(stream);</span>
+        }
+    }
+
+    /**
+     * Read the text representation from the InputStream object.
+     *
+     * @param stream The stream to read from.
+     * @return The parsed property map.
+     * @throws IOException if cannot be read from the stream.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropMap readMap(InputStream stream) throws IOException, PropStoreException {
+<span class="fc" id="L96">        try (Reader reader = new InputStreamReader(stream)) {</span>
+<span class="fc" id="L97">            return readMap(reader);</span>
+        }
+    }
+
+    /**
+     * Read the text representation from the Reader object.
+     *
+     * @param reader The reader to read from.
+     * @return The parsed property map.
+     * @throws IOException if cannot be read from the reader.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropMap readMap(Reader reader) throws IOException, PropStoreException {
+<span class="fc" id="L110">        String storeText = readStoreText(reader);</span>
+<span class="fc" id="L111">        return fromStringToMap(storeText);</span>
+    }
+
+    /**
+     * Read the text representation from the filename.
+     *
+     * @param filename The filename to read from.
+     * @return The parsed property list.
+     * @throws IOException if the filename cannot be found or cannot be read.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropList readList(String filename) throws IOException, PropStoreException {
+<span class="fc" id="L123">        return readList(new File(filename));</span>
+    }
+
+    /**
+     * Read the text representation from the filename.
+     *
+     * @param file The file to to read from.
+     * @return The parsed property list.
+     * @throws IOException if the file cannot be found or cannot be read.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropList readList(File file) throws IOException, PropStoreException {
+<span class="fc" id="L135">        try (InputStream stream = new FileInputStream(file)) {</span>
+<span class="fc" id="L136">            return readList(stream);</span>
+        }
+    }
+
+    /**
+     * Read the text representation from the InputStream object.
+     *
+     * @param stream The stream to read from.
+     * @return The parsed property list.
+     * @throws IOException if cannot be read from the stream.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropList readList(InputStream stream) throws IOException, PropStoreException {
+<span class="fc" id="L149">        try (Reader reader = new InputStreamReader(stream)) {</span>
+<span class="fc" id="L150">            return readList(reader);</span>
+        }
+    }
+
+    /**
+     * Read the text representation from the Reader object.
+     *
+     * @param reader The reader to read from.
+     * @return The parsed property list.
+     * @throws IOException if cannot be read from the reader.
+     * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
+     */
+    public final PropList readList(Reader reader) throws IOException, PropStoreException {
+<span class="fc" id="L163">        String storeText = readStoreText(reader);</span>
+<span class="fc" id="L164">        return fromStringToList(storeText);</span>
+    }
+
+    /**
+     * Write the PropMap to the filename as text.
+     *
+     * @param filename The filename to write to.
+     * @param map The PropMap to write to the filename.
+     * @throws IOException if cannot be written to the filename.
+     */
+    public final void writeTo(String filename, PropMap map) throws IOException {
+<span class="fc" id="L175">        writeTo(new File(filename), map);</span>
+<span class="fc" id="L176">    }</span>
+
+    /**
+     * Write the PropMap to the filename as text.
+     *
+     * @param file The file to write to.
+     * @param map The PropMap to write to the file.
+     * @throws IOException if cannot be written to the file.
+     */
+    public final void writeTo(File file, PropMap map) throws IOException {
+<span class="fc" id="L186">        try (OutputStream stream = new FileOutputStream(file)) {</span>
+<span class="fc" id="L187">            writeTo(stream, map);</span>
+        }
+<span class="fc" id="L189">    }</span>
+
+    /**
+     * Write the PropMap to the filename as text.
+     *
+     * @param stream The stream to write to.
+     * @param map The PropMap to write to the stream.
+     * @throws IOException if cannot be written to the stream.
+     */
+    public final void writeTo(OutputStream stream, PropMap map) throws IOException {
+<span class="fc" id="L199">        try (Writer writer = new OutputStreamWriter(stream)) {</span>
+<span class="fc" id="L200">            writeTo(writer, map);</span>
+        }
+<span class="fc" id="L202">    }</span>
+
+    /**
+     * Write the PropMap to the filename as text.
+     *
+     * @param writer The writer to write to.
+     * @param map The PropMap to write to the writer.
+     * @throws IOException if cannot be written to the writer.
+     */
+    public final void writeTo(Writer writer, PropMap map) throws IOException {
+<span class="fc" id="L212">        String storeText = toString(map);</span>
+<span class="fc" id="L213">        writer.write(storeText);</span>
+<span class="fc" id="L214">    }</span>
+
+    /**
+     * Write the PropMap to the filename as text.
+     *
+     * @param filename The filename to write to.
+     * @param list The PropMap to write to the filename.
+     * @throws IOException if cannot be written to the filename.
+     */
+    public final void writeTo(String filename, PropList list) throws IOException {
+<span class="fc" id="L224">        writeTo(new File(filename), list);</span>
+<span class="fc" id="L225">    }</span>
+
+    /**
+     * Write the PropMap to the file as text.
+     *
+     * @param file The file to write to.
+     * @param list The PropMap to write to the file.
+     * @throws IOException if cannot be written to the file.
+     */
+    public final void writeTo(File file, PropList list) throws IOException {
+<span class="fc" id="L235">        try (OutputStream stream = new FileOutputStream(file)) {</span>
+<span class="fc" id="L236">            writeTo(stream, list);</span>
+        }
+<span class="fc" id="L238">    }</span>
+
+    /**
+     * Write the PropMap to the stream as text.
+     *
+     * @param stream The stream to write to.
+     * @param list The PropMap to write to the stream.
+     * @throws IOException if cannot be written to the stream.
+     */
+    public final void writeTo(OutputStream stream, PropList list) throws IOException {
+<span class="fc" id="L248">        try (Writer writer = new OutputStreamWriter(stream)) {</span>
+<span class="fc" id="L249">            writeTo(writer, list);</span>
+        }
+<span class="fc" id="L251">    }</span>
+
+    /**
+     * Write the PropMap to the writer as text.
+     *
+     * @param writer The stream to write to.
+     * @param list The PropMap to write to the writer.
+     * @throws IOException if cannot be written to the writer.
+     */
+    public final void writeTo(Writer writer, PropList list) throws IOException {
+<span class="fc" id="L261">        String storeText = toString(list);</span>
+<span class="fc" id="L262">        writer.write(storeText);</span>
+<span class="fc" id="L263">    }</span>
+
+    private String readStoreText(Reader reader) throws IOException {
+<span class="fc" id="L266">        try (BufferedReader buffered = new BufferedReader(reader)) {</span>
+<span class="fc" id="L267">            StringBuilder builder = new StringBuilder();</span>
+<span class="fc" id="L268">            String line = null;</span>
+<span class="fc" id="L269">            String newline = System.getProperty(&quot;line.separator&quot;);</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">            while((line = buffered.readLine()) != null)</span>
+<span class="fc" id="L271">                builder.append(line).append(newline);</span>
+<span class="fc" id="L272">            return builder.toString();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
