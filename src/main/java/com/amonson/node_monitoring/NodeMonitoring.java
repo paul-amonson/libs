@@ -8,13 +8,10 @@ import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQException;
 
-import java.net.*;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 /**
  * Class to participate in a cluster as a mesh where all nodes are monitored to be active or missing by every
@@ -22,22 +19,35 @@ import java.util.regex.Pattern;
  */
 public class NodeMonitoring {
     /**
-     * ctor to create a new monitoring class. This will consume 4 threads, but they are mostly light weight.
+     * ctor to create a new monitoring class. This will consume 4 threads, but they are mostly lightweight.
      *
-     * @param ips The array of IPs or hostnames in this cluster. It must be the complete list.
+     * @param myHostname This nodes hostname (must be network resolvable)
+     * @param allHostnames The array of hostnames in this cluster. It must be the complete list.
      * @param eventCallback Called when the online/offline state of a remote node changes.
      * @param logger The logger used to log warnings, errors, or debug information.
      * @throws IllegalArgumentException if the networking cannot correctly navigate the local NICs.
      */
-    public NodeMonitoring(String[] ips, NodeEventHandler eventCallback, Logger logger) {
-        for(String ip: ips)
-            lastSeen_.put(ip, 0L);
+    public NodeMonitoring(String myHostname, String[] allHostnames, NodeEventHandler eventCallback, Logger logger) {
+        this(myHostname, Arrays.asList(allHostnames), eventCallback, logger);
+    }
+
+    /**
+     * ctor to create a new monitoring class. This will consume 4 threads, but they are mostly lightweight.
+     *
+     * @param myHostname This nodes hostname (must be network resolvable)
+     * @param allHostnames The collection of hostnames in this cluster. It must be the complete list.
+     * @param eventCallback Called when the online/offline state of a remote node changes.
+     * @param logger The logger used to log warnings, errors, or debug information.
+     * @throws IllegalArgumentException if the networking cannot correctly navigate the local NICs.
+     */
+    public NodeMonitoring(String myHostname, Collection<String> allHostnames, NodeEventHandler eventCallback,
+                          Logger logger) {
+        myHostname_ = myHostname;
+        for(String host: allHostnames)
+            lastSeen_.put(host, 0L);
         events_ = eventCallback;
         log_ = logger;
         handlers_.put(ALIVE, this::processHeartbeat);
-
-        if (getNetworkEnvironment())
-            throw new IllegalArgumentException("Failed to include this node in the list of all nodes!");
     }
 
     /**
@@ -159,7 +169,7 @@ public class NodeMonitoring {
         monitoringThread_ = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(HEARTBEAT_SECONDS * 500L);
+                    Thread.sleep(HEARTBEAT_MILLISECONDS / 2L);
                 } catch(InterruptedException e) {
                     break; // Exit if interrupt happens here!
                 }
@@ -179,9 +189,9 @@ public class NodeMonitoring {
         heartbeatThread_ = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
                 log_.fine("*** DEBUG: PING...");
-                sendQueue_.add(new TopicMessage(ALIVE, myIP_));
+                sendQueue_.add(new TopicMessage(ALIVE, myHostname_));
                 try {
-                    Thread.sleep(HEARTBEAT_SECONDS * 1_000L);
+                    Thread.sleep(HEARTBEAT_MILLISECONDS);
                 } catch(Exception e) {
                     break; // Exit if interrupt happens here!
                 }
@@ -194,8 +204,8 @@ public class NodeMonitoring {
         sendThread_ = new Thread(() -> {
             ZMQ.Context ctx = ZMQ.context(1);
             ZMQ.Socket publisher = creator_.create(ctx, SocketType.PUB);
-            for(String ip: lastSeen_.keySet())
-                publisher.connect(String.format("tcp://%s:%d", ip, port_));
+            for(String host: lastSeen_.keySet())
+                publisher.connect(String.format("tcp://%s:%d", host, port_));
 
             while(!Thread.currentThread().isInterrupted()) {
                 if(sendQueue_.size() > 0) {
@@ -228,7 +238,7 @@ public class NodeMonitoring {
         subscriberThread_ = new Thread(() -> {
             ZMQ.Context ctx = ZMQ.context(1);
             ZMQ.Socket subscriber = creator_.create(ctx, SocketType.SUB);
-            subscriber.bind(String.format("tcp://%s:%d", myIP_, port_));
+            subscriber.bind(String.format("tcp://%s:%d", myHostname_, port_));
             subscriber.subscribe("");
             try {
                 Thread.sleep(100); // For a race condition inside JeroMQ...
@@ -280,51 +290,6 @@ public class NodeMonitoring {
             log_.fine("### Dropped Message from unknown IP: " + msg);
     }
 
-    private boolean getNetworkEnvironment() {
-        lastSeen_ = replaceHostsWithIPs(lastSeen_);
-        try {
-            Enumeration<NetworkInterface> enumer = NetworkInterface.getNetworkInterfaces();
-            while(enumer.hasMoreElements())
-                findMyAddress(enumer.nextElement());
-        } catch(SocketException e) {
-            log_.severe("ERROR: Failed to iterate NIC interfaces on this system!");
-            return true;
-        }
-        if(myIP_ == null) {
-            log_.severe("ERROR: Failed to find this systems IP which must also be in the passed IP list!");
-            return true;
-        }
-        lastSeen_.remove(myIP_);
-        return false;
-    }
-
-    private void findMyAddress(NetworkInterface nic) {
-        for(InterfaceAddress address: nic.getInterfaceAddresses()) {
-            InetAddress addr = address.getAddress();
-            if(!addr.isLoopbackAddress() && addr.getAddress().length == 4) {
-                String ip = addr.getHostAddress();
-                if(lastSeen_.containsKey(ip))
-                    myIP_ = ip;
-            }
-        }
-    }
-
-    private Map<String,Long> replaceHostsWithIPs(Map<String, Long> input) {
-        Map<String, Long> output = new ConcurrentHashMap<>();
-        for(String host: input.keySet()) {
-            if(Pattern.compile("^[0-9]+[0-9]+[0-9]+[0-9]+$").matcher(host).matches())
-                output.put(host, 0L);
-            else {
-                try {
-                    output.put(InetAddress.getByName(host).getHostAddress(), 0L);
-                } catch(UnknownHostException e) {
-                    log_.warning(String.format("WARNING: Dropping '%s' as a unknown host!", host));
-                }
-            }
-        }
-        return output;
-    }
-
     private ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) { return ctx.socket(type); }
 
     private final Logger log_;
@@ -332,7 +297,7 @@ public class NodeMonitoring {
     private final Map<String, MessageHandler> handlers_ = new HashMap<>();
     private final Queue<TopicMessage> sendQueue_ = new ConcurrentLinkedQueue<>();
     private final NodeEventHandler events_;
-    private       String myIP_ = null;
+    private       String myHostname_ = null;
     private       Map<String,Long> lastSeen_ = new HashMap<>();
     private       SocketCreator creator_ = this::createSocket; // To make UT easier....
     private       Thread sendThread_ = null;
@@ -340,8 +305,8 @@ public class NodeMonitoring {
     private       Thread monitoringThread_ = null;
     private       Thread subscriberThread_ = null;
 
-    private static final long HEARTBEAT_SECONDS = 1L;
-    private static final long EXPIRED_MILLISECONDS = (HEARTBEAT_SECONDS * 1_000L * 5L) / 2L;
+    private static       long HEARTBEAT_MILLISECONDS = 1000L;
+    private static final long EXPIRED_MILLISECONDS = (HEARTBEAT_MILLISECONDS * 5L) / 2L;
     private static final String ALIVE = "alive";
 
     @FunctionalInterface

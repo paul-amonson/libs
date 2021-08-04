@@ -14,24 +14,18 @@ class NodeMonitoringSpec extends Specification {
     def subSocket = Mock(ZMQ.Socket)
     def pubSocket = Mock(ZMQ.Socket)
 
-    def myIP_
+    def myHostname_
     def underTest_
     def message_
     def state_
+    void setupSpec() {
+        NodeMonitoring.HEARTBEAT_MILLISECONDS = 10L
+    }
     void setup() {
-        Enumeration e = NetworkInterface.getNetworkInterfaces()
-        while (e.hasMoreElements()) {
-            NetworkInterface n = (NetworkInterface) e.nextElement()
-            Enumeration ee = n.getInetAddresses()
-            while (ee.hasMoreElements()) {
-                InetAddress i = (InetAddress) ee.nextElement()
-                if(i.getAddress().length == 4 && !i.isLoopbackAddress())
-                    myIP_ = i.getHostAddress()
-            }
-        }
-        underTest_ = new NodeMonitoring(new String[] {myIP_, "192.168.0.2", "192.168.0.3"}, this::eventCallback, Mock(Logger))
+        myHostname_ = "node1"
+        underTest_ = new NodeMonitoring(myHostname_, new String[] {myHostname_, "node2", "node3"}, this::eventCallback, Mock(Logger))
         underTest_.creator_ = this::createSocket
-        subSocket.recvStr(_ as Integer) >>> ["alive", "192.168.0.2", "alive", "192.168.0.3"]
+        subSocket.recvStr(_ as Integer) >>> ["alive", "node2", "alive", "node3"]
     }
 
     ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) {
@@ -51,21 +45,21 @@ class NodeMonitoringSpec extends Specification {
 
     def "Test startMonitoring"() {
         underTest_.startMonitoring()
-        Thread.sleep(2_700L)
+        Thread.sleep(27L)
         def running = underTest_.isRunning()
         underTest_.stopMonitoring()
-        expect: message_ == "192.168.0.3"
+        expect: message_ == "node3"
         and:    running == true
     }
 
     def "Test startMonitoring 2"() {
         underTest_.waitForMonitoring()
         underTest_.startMonitoring()
-        Thread.sleep(2_700L)
+        Thread.sleep(27L)
         def running = underTest_.isRunning()
         underTest_.stopMonitoring()
         underTest_.waitForMonitoring()
-        expect: message_ == "192.168.0.3"
+        expect: message_ == "node3"
         and:    running == true
     }
 
@@ -98,25 +92,25 @@ class NodeMonitoringSpec extends Specification {
 
     def "Test sendMessage"() {
         underTest_.startMonitoring()
-        Thread.sleep(500L)
-        underTest_.sendMessage("myTopic", "192.168.0.10")
-        underTest_.sendMessage("myTopic", "192.168.0.2")
+        Thread.sleep(5L)
+        underTest_.sendMessage("myTopic", "node10")
+        underTest_.sendMessage("myTopic", "node2")
         underTest_.stopMonitoring()
         expect: true
     }
 
     def "Test sendMessage negative"() {
         underTest_.startMonitoring()
-        Thread.sleep(500L)
-        underTest_.sendMessage("myTopic", "192.168.0.10")
-        underTest_.sendMessage("myTopic", "192.168.0.2")
+        Thread.sleep(5L)
+        underTest_.sendMessage("myTopic", "node10")
+        underTest_.sendMessage("myTopic", "node2")
         underTest_.stopMonitoring()
         when: underTest_.sendMessage(TOPIC, MESSAGE)
         then: thrown(IllegalArgumentException)
         where:
         TOPIC   | MESSAGE
-        null    | "192.168.0.2"
-        "alive" | "192.168.0.2"
+        null    | "node2"
+        "alive" | "node2"
         "topic" | null
     }
 
