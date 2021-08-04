@@ -19,7 +19,7 @@ class NodeMonitoringSpec extends Specification {
     def message_
     def state_
     void setupSpec() {
-        NodeMonitoring.HEARTBEAT_MILLISECONDS = 10L
+        NodeMonitoring.HEARTBEAT_MILLISECONDS = 30L
     }
     void setup() {
         myHostname_ = "node1"
@@ -45,7 +45,7 @@ class NodeMonitoringSpec extends Specification {
 
     def "Test startMonitoring"() {
         underTest_.startMonitoring()
-        Thread.sleep(27L)
+        Thread.sleep(85L)
         def running = underTest_.isRunning()
         underTest_.stopMonitoring()
         expect: message_ == "node3"
@@ -55,7 +55,7 @@ class NodeMonitoringSpec extends Specification {
     def "Test startMonitoring 2"() {
         underTest_.waitForMonitoring()
         underTest_.startMonitoring()
-        Thread.sleep(27L)
+        Thread.sleep(85L)
         def running = underTest_.isRunning()
         underTest_.stopMonitoring()
         underTest_.waitForMonitoring()
@@ -92,7 +92,7 @@ class NodeMonitoringSpec extends Specification {
 
     def "Test sendMessage"() {
         underTest_.startMonitoring()
-        Thread.sleep(5L)
+        Thread.sleep(15L)
         underTest_.sendMessage("myTopic", "node10")
         underTest_.sendMessage("myTopic", "node2")
         underTest_.stopMonitoring()
@@ -101,7 +101,7 @@ class NodeMonitoringSpec extends Specification {
 
     def "Test sendMessage negative"() {
         underTest_.startMonitoring()
-        Thread.sleep(5L)
+        Thread.sleep(15L)
         underTest_.sendMessage("myTopic", "node10")
         underTest_.sendMessage("myTopic", "node2")
         underTest_.stopMonitoring()
