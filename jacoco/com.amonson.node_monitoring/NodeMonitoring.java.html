@@ -44,11 +44,12 @@ public class NodeMonitoring {
 <span class="fc" id="L44">                          Logger logger) {</span>
 <span class="fc" id="L45">        myHostname_ = myHostname;</span>
 <span class="fc bfc" id="L46" title="All 2 branches covered.">        for(String host: allHostnames)</span>
-<span class="fc" id="L47">            lastSeen_.put(host, 0L);</span>
-<span class="fc" id="L48">        events_ = eventCallback;</span>
-<span class="fc" id="L49">        log_ = logger;</span>
-<span class="fc" id="L50">        handlers_.put(ALIVE, this::processHeartbeat);</span>
-<span class="fc" id="L51">    }</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            if(!host.equals(myHostname_))</span>
+<span class="fc" id="L48">                lastSeen_.put(host, 0L);</span>
+<span class="fc" id="L49">        events_ = eventCallback;</span>
+<span class="fc" id="L50">        log_ = logger;</span>
+<span class="fc" id="L51">        handlers_.put(ALIVE, this::processHeartbeat);</span>
+<span class="fc" id="L52">    }</span>
 
     /**
      * The functional interface for registered incoming messages.
@@ -65,13 +66,13 @@ public class NodeMonitoring {
      * @throws IllegalArgumentException is topic is null or 'alive'. Also thrown when the handler is null.
      */
     public MessageHandler addHandler(String topic, MessageHandler handler) {
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        if(topic == null)</span>
-<span class="fc" id="L69">            throw new IllegalArgumentException(&quot;The topic cannot be 'null!&quot;);</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">        if(handler == null)</span>
-<span class="fc" id="L71">            throw new IllegalArgumentException(&quot;The handler cannot be 'null!&quot;);</span>
-<span class="fc bfc" id="L72" title="All 2 branches covered.">        if(topic.equals(ALIVE))</span>
-<span class="fc" id="L73">            throw new IllegalArgumentException(&quot;The topic 'alive' is reserved for heartbeat functionality!&quot;);</span>
-<span class="fc" id="L74">        return handlers_.putIfAbsent(topic, handler);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if(topic == null)</span>
+<span class="fc" id="L70">            throw new IllegalArgumentException(&quot;The topic cannot be 'null!&quot;);</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if(handler == null)</span>
+<span class="fc" id="L72">            throw new IllegalArgumentException(&quot;The handler cannot be 'null!&quot;);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if(topic.equals(ALIVE))</span>
+<span class="fc" id="L74">            throw new IllegalArgumentException(&quot;The topic 'alive' is reserved for heartbeat functionality!&quot;);</span>
+<span class="fc" id="L75">        return handlers_.putIfAbsent(topic, handler);</span>
     }
 
     /**
@@ -82,39 +83,39 @@ public class NodeMonitoring {
      * @throws IllegalArgumentException is topic is null or 'alive'.
      */
     public MessageHandler removeHandler(String topic) {
-<span class="fc bfc" id="L85" title="All 2 branches covered.">        if(topic == null)</span>
-<span class="fc" id="L86">            throw new IllegalArgumentException(&quot;The topic cannot be 'null!&quot;);</span>
-<span class="fc bfc" id="L87" title="All 2 branches covered.">        if(topic.equals(ALIVE))</span>
-<span class="fc" id="L88">            throw new IllegalArgumentException(&quot;The topic 'alive' is reserved for heartbeat functionality!&quot;);</span>
-<span class="fc" id="L89">        return handlers_.remove(topic);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if(topic == null)</span>
+<span class="fc" id="L87">            throw new IllegalArgumentException(&quot;The topic cannot be 'null!&quot;);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if(topic.equals(ALIVE))</span>
+<span class="fc" id="L89">            throw new IllegalArgumentException(&quot;The topic 'alive' is reserved for heartbeat functionality!&quot;);</span>
+<span class="fc" id="L90">        return handlers_.remove(topic);</span>
     }
 
     /**
      * If not running this will start the monitoring threads. This can only be called once per instance.
      */
     public void startMonitoring() {
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if(subscriberThread_ == null) {</span>
-<span class="fc" id="L97">            startSendThread();</span>
-<span class="fc" id="L98">            startHeartbeat();</span>
-<span class="fc" id="L99">            startMonitoringInternal();</span>
-<span class="fc" id="L100">            startSubscriber();</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if(subscriberThread_ == null) {</span>
+<span class="fc" id="L98">            startSendThread();</span>
+<span class="fc" id="L99">            startHeartbeat();</span>
+<span class="fc" id="L100">            startMonitoringInternal();</span>
+<span class="fc" id="L101">            startSubscriber();</span>
             try {
-<span class="fc" id="L102">                Thread.sleep(100);</span>
-<span class="pc" id="L103">            } catch(InterruptedException e) { /* Ignored */ }</span>
+<span class="fc" id="L103">                Thread.sleep(100);</span>
+<span class="pc" id="L104">            } catch(InterruptedException e) { /* Ignored */ }</span>
         }
-<span class="fc" id="L105">    }</span>
+<span class="fc" id="L106">    }</span>
 
     /**
      * If running this will stop the monitoring threads.
      */
     public void stopMonitoring() {
-<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if(subscriberThread_ != null) {</span>
-<span class="fc" id="L112">            stopThread(subscriberThread_);</span>
-<span class="fc" id="L113">            stopThread(monitoringThread_);</span>
-<span class="fc" id="L114">            stopThread(heartbeatThread_);</span>
-<span class="fc" id="L115">            stopThread(sendThread_);</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">        if(subscriberThread_ != null) {</span>
+<span class="fc" id="L113">            stopThread(subscriberThread_);</span>
+<span class="fc" id="L114">            stopThread(monitoringThread_);</span>
+<span class="fc" id="L115">            stopThread(heartbeatThread_);</span>
+<span class="fc" id="L116">            stopThread(sendThread_);</span>
         }
-<span class="fc" id="L117">    }</span>
+<span class="fc" id="L118">    }</span>
 
     /**
      * Send a message to all other nodes in this participating in the monitoring cluster.
@@ -124,14 +125,14 @@ public class NodeMonitoring {
      * @throws IllegalArgumentException is topic is null or 'alive'. Also thrown when the message is null.
      */
     public void sendMessage(String topic, String message) {
-<span class="fc bfc" id="L127" title="All 2 branches covered.">        if(topic == null)</span>
-<span class="fc" id="L128">            throw new IllegalArgumentException(&quot;The topic cannot be 'null!&quot;);</span>
-<span class="fc bfc" id="L129" title="All 2 branches covered.">        if(message == null)</span>
-<span class="fc" id="L130">            throw new IllegalArgumentException(&quot;The message cannot be 'null!&quot;);</span>
-<span class="fc bfc" id="L131" title="All 2 branches covered.">        if(topic.equals(ALIVE))</span>
-<span class="fc" id="L132">            throw new IllegalArgumentException(&quot;The topic 'alive' is reserved for heartbeat functionality!&quot;);</span>
-<span class="fc" id="L133">        sendQueue_.add(new TopicMessage(topic, message));</span>
-<span class="fc" id="L134">    }</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if(topic == null)</span>
+<span class="fc" id="L129">            throw new IllegalArgumentException(&quot;The topic cannot be 'null!&quot;);</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if(message == null)</span>
+<span class="fc" id="L131">            throw new IllegalArgumentException(&quot;The message cannot be 'null!&quot;);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if(topic.equals(ALIVE))</span>
+<span class="fc" id="L133">            throw new IllegalArgumentException(&quot;The topic 'alive' is reserved for heartbeat functionality!&quot;);</span>
+<span class="fc" id="L134">        sendQueue_.add(new TopicMessage(topic, message));</span>
+<span class="fc" id="L135">    }</span>
 
     /**
      * Test if the monitoring is running.
@@ -139,7 +140,7 @@ public class NodeMonitoring {
      * @return true when the monitoring is running, false otherwise.
      */
     public boolean isRunning() {
-<span class="fc bfc" id="L142" title="All 4 branches covered.">        return subscriberThread_ != null &amp;&amp; subscriberThread_.isAlive();</span>
+<span class="fc bfc" id="L143" title="All 4 branches covered.">        return subscriberThread_ != null &amp;&amp; subscriberThread_.isAlive();</span>
     }
 
     /**
@@ -148,9 +149,9 @@ public class NodeMonitoring {
      * @throws InterruptedException If interrupted while waiting.
      */
     public void waitForMonitoring() throws InterruptedException {
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">        if(isRunning())</span>
-<span class="nc" id="L152">            subscriberThread_.join();</span>
-<span class="fc" id="L153">    }</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if(isRunning())</span>
+<span class="nc" id="L153">            subscriberThread_.join();</span>
+<span class="fc" id="L154">    }</span>
 
     /**
      * Functional interface for online/offline events for remote nodes.
@@ -161,162 +162,162 @@ public class NodeMonitoring {
     }
 
     private void fireEvent(String ip, boolean present) {
-<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if(events_ != null)</span>
-<span class="fc" id="L165">            events_.event(ip, present);</span>
-<span class="fc" id="L166">    }</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if(events_ != null)</span>
+<span class="fc" id="L166">            events_.event(ip, present);</span>
+<span class="fc" id="L167">    }</span>
 
     private void startMonitoringInternal() {
-<span class="fc" id="L169">        monitoringThread_ = new Thread(() -&gt; {</span>
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc" id="L170">        monitoringThread_ = new Thread(() -&gt; {</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">            while(!Thread.currentThread().isInterrupted()) {</span>
                 try {
-<span class="fc" id="L172">                    Thread.sleep(HEARTBEAT_MILLISECONDS / 2L);</span>
-<span class="fc" id="L173">                } catch(InterruptedException e) {</span>
-<span class="fc" id="L174">                    break; // Exit if interrupt happens here!</span>
-<span class="fc" id="L175">                }</span>
-<span class="fc bfc" id="L176" title="All 2 branches covered.">                for(Map.Entry&lt;String,Long&gt; entry: lastSeen_.entrySet()) {</span>
-<span class="fc" id="L177">                    long now = Instant.now().toEpochMilli();</span>
-<span class="pc bpc" id="L178" title="1 of 4 branches missed.">                    if(entry.getValue() &lt; (now - EXPIRED_MILLISECONDS) &amp;&amp; entry.getValue() != 0L) {</span>
-<span class="nc" id="L179">                        fireEvent(entry.getKey(), false);</span>
-<span class="nc" id="L180">                        lastSeen_.put(entry.getKey(), 0L);</span>
+<span class="fc" id="L173">                    Thread.sleep(HEARTBEAT_MILLISECONDS / 2L);</span>
+<span class="fc" id="L174">                } catch(InterruptedException e) {</span>
+<span class="fc" id="L175">                    break; // Exit if interrupt happens here!</span>
+<span class="fc" id="L176">                }</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">                for(Map.Entry&lt;String,Long&gt; entry: lastSeen_.entrySet()) {</span>
+<span class="fc" id="L178">                    long now = Instant.now().toEpochMilli();</span>
+<span class="pc bpc" id="L179" title="1 of 4 branches missed.">                    if(entry.getValue() &lt; (now - EXPIRED_MILLISECONDS) &amp;&amp; entry.getValue() != 0L) {</span>
+<span class="nc" id="L180">                        fireEvent(entry.getKey(), false);</span>
+<span class="nc" id="L181">                        lastSeen_.put(entry.getKey(), 0L);</span>
                     }
-<span class="fc" id="L182">                }</span>
+<span class="fc" id="L183">                }</span>
             }
-<span class="fc" id="L184">        });</span>
-<span class="fc" id="L185">        monitoringThread_.start();</span>
-<span class="fc" id="L186">    }</span>
+<span class="fc" id="L185">        });</span>
+<span class="fc" id="L186">        monitoringThread_.start();</span>
+<span class="fc" id="L187">    }</span>
 
     private void startHeartbeat() {
-<span class="fc" id="L189">        heartbeatThread_ = new Thread(() -&gt; {</span>
-<span class="pc bpc" id="L190" title="1 of 2 branches missed.">            while(!Thread.currentThread().isInterrupted()) {</span>
-<span class="fc" id="L191">                log_.fine(&quot;*** DEBUG: PING...&quot;);</span>
-<span class="fc" id="L192">                sendQueue_.add(new TopicMessage(ALIVE, myHostname_));</span>
+<span class="fc" id="L190">        heartbeatThread_ = new Thread(() -&gt; {</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc" id="L192">                log_.fine(&quot;*** DEBUG: PING...&quot;);</span>
+<span class="fc" id="L193">                sendQueue_.add(new TopicMessage(ALIVE, myHostname_));</span>
                 try {
-<span class="fc" id="L194">                    Thread.sleep(HEARTBEAT_MILLISECONDS);</span>
-<span class="fc" id="L195">                } catch(Exception e) {</span>
-<span class="fc" id="L196">                    break; // Exit if interrupt happens here!</span>
-<span class="fc" id="L197">                }</span>
+<span class="fc" id="L195">                    Thread.sleep(HEARTBEAT_MILLISECONDS);</span>
+<span class="fc" id="L196">                } catch(Exception e) {</span>
+<span class="fc" id="L197">                    break; // Exit if interrupt happens here!</span>
+<span class="fc" id="L198">                }</span>
             }
-<span class="fc" id="L199">        });</span>
-<span class="fc" id="L200">        heartbeatThread_.start();</span>
-<span class="fc" id="L201">    }</span>
+<span class="fc" id="L200">        });</span>
+<span class="fc" id="L201">        heartbeatThread_.start();</span>
+<span class="fc" id="L202">    }</span>
 
     private void startSendThread() {
-<span class="fc" id="L204">        sendThread_ = new Thread(() -&gt; {</span>
-<span class="fc" id="L205">            ZMQ.Context ctx = ZMQ.context(1);</span>
-<span class="fc" id="L206">            ZMQ.Socket publisher = creator_.create(ctx, SocketType.PUB);</span>
-<span class="fc bfc" id="L207" title="All 2 branches covered.">            for(String host: lastSeen_.keySet())</span>
-<span class="fc" id="L208">                publisher.connect(String.format(&quot;tcp://%s:%d&quot;, host, port_));</span>
+<span class="fc" id="L205">        sendThread_ = new Thread(() -&gt; {</span>
+<span class="fc" id="L206">            ZMQ.Context ctx = ZMQ.context(1);</span>
+<span class="fc" id="L207">            ZMQ.Socket publisher = creator_.create(ctx, SocketType.PUB);</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">            for(String host: lastSeen_.keySet())</span>
+<span class="fc" id="L209">                publisher.connect(String.format(&quot;tcp://%s:%d&quot;, host, port_));</span>
 
-<span class="fc bfc" id="L210" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
-<span class="fc bfc" id="L211" title="All 2 branches covered.">                if(sendQueue_.size() &gt; 0) {</span>
-<span class="fc" id="L212">                    TopicMessage msg = sendQueue_.poll();</span>
-<span class="fc" id="L213">                    publisher.sendMore(msg.topic());</span>
-<span class="fc" id="L214">                    publisher.send(msg.message());</span>
-<span class="fc" id="L215">                    log_.fine(msg.toString() + &quot;; OK&quot;);</span>
-<span class="fc" id="L216">                }</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">                if(sendQueue_.size() &gt; 0) {</span>
+<span class="fc" id="L213">                    TopicMessage msg = sendQueue_.poll();</span>
+<span class="fc" id="L214">                    publisher.sendMore(msg.topic());</span>
+<span class="fc" id="L215">                    publisher.send(msg.message());</span>
+<span class="fc" id="L216">                    log_.fine(msg.toString() + &quot;; OK&quot;);</span>
+<span class="fc" id="L217">                }</span>
             }
             try {
-<span class="fc" id="L219">                publisher.close();</span>
-<span class="pc" id="L220">            } catch(Exception e) { /* Ignore because this is expected on exit. */}</span>
+<span class="fc" id="L220">                publisher.close();</span>
+<span class="pc" id="L221">            } catch(Exception e) { /* Ignore because this is expected on exit. */}</span>
             try {
-<span class="fc" id="L222">                ctx.close();</span>
-<span class="pc" id="L223">            } catch(Exception e) { /* Ignore because this is expected on exit. */ }</span>
-<span class="fc" id="L224">        });</span>
-<span class="fc" id="L225">        sendThread_.start();</span>
-<span class="fc" id="L226">    }</span>
+<span class="fc" id="L223">                ctx.close();</span>
+<span class="pc" id="L224">            } catch(Exception e) { /* Ignore because this is expected on exit. */ }</span>
+<span class="fc" id="L225">        });</span>
+<span class="fc" id="L226">        sendThread_.start();</span>
+<span class="fc" id="L227">    }</span>
 
     private void stopThread(Thread thread) {
-<span class="pc bpc" id="L229" title="3 of 6 branches missed.">        if(thread != null &amp;&amp; thread.isAlive() &amp;&amp; !thread.isInterrupted()) {</span>
-<span class="fc" id="L230">            thread.interrupt();</span>
+<span class="pc bpc" id="L230" title="3 of 6 branches missed.">        if(thread != null &amp;&amp; thread.isAlive() &amp;&amp; !thread.isInterrupted()) {</span>
+<span class="fc" id="L231">            thread.interrupt();</span>
             try {
-<span class="fc" id="L232">                thread.join();</span>
-<span class="pc" id="L233">            } catch(Exception e) { /* Ignore and hope the thread is stopped. */ }</span>
+<span class="fc" id="L233">                thread.join();</span>
+<span class="pc" id="L234">            } catch(Exception e) { /* Ignore and hope the thread is stopped. */ }</span>
         }
-<span class="fc" id="L235">    }</span>
+<span class="fc" id="L236">    }</span>
 
     private void startSubscriber() {
-<span class="fc" id="L238">        subscriberThread_ = new Thread(() -&gt; {</span>
-<span class="fc" id="L239">            ZMQ.Context ctx = ZMQ.context(1);</span>
-<span class="fc" id="L240">            ZMQ.Socket subscriber = creator_.create(ctx, SocketType.SUB);</span>
-<span class="fc" id="L241">            subscriber.bind(String.format(&quot;tcp://%s:%d&quot;, myHostname_, port_));</span>
-<span class="fc" id="L242">            subscriber.subscribe(&quot;&quot;);</span>
+<span class="fc" id="L239">        subscriberThread_ = new Thread(() -&gt; {</span>
+<span class="fc" id="L240">            ZMQ.Context ctx = ZMQ.context(1);</span>
+<span class="fc" id="L241">            ZMQ.Socket subscriber = creator_.create(ctx, SocketType.SUB);</span>
+<span class="fc" id="L242">            subscriber.bind(String.format(&quot;tcp://%s:%d&quot;, myHostname_, port_));</span>
+<span class="fc" id="L243">            subscriber.subscribe(&quot;&quot;);</span>
             try {
-<span class="fc" id="L244">                Thread.sleep(100); // For a race condition inside JeroMQ...</span>
-<span class="pc" id="L245">            } catch(InterruptedException e) { /* Ignored, but hope it works! */ }</span>
+<span class="fc" id="L245">                Thread.sleep(100); // For a race condition inside JeroMQ...</span>
+<span class="pc" id="L246">            } catch(InterruptedException e) { /* Ignored, but hope it works! */ }</span>
 
-<span class="fc bfc" id="L247" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc bfc" id="L248" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
                 try {
-<span class="fc" id="L249">                    String topic = subscriber.recvStr(0);</span>
-<span class="pc bpc" id="L250" title="1 of 2 branches missed.">                    if (topic != null) {</span>
-<span class="fc" id="L251">                        String msg = subscriber.recvStr(0);</span>
-<span class="fc" id="L252">                        processMessage(topic, msg);</span>
-<span class="fc" id="L253">                    } else {</span>
-<span class="nc" id="L254">                        log_.warning(&quot;Received a 'null' topic!&quot;);</span>
+<span class="fc" id="L250">                    String topic = subscriber.recvStr(0);</span>
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">                    if (topic != null) {</span>
+<span class="fc" id="L252">                        String msg = subscriber.recvStr(0);</span>
+<span class="fc" id="L253">                        processMessage(topic, msg);</span>
+<span class="fc" id="L254">                    } else {</span>
+<span class="nc" id="L255">                        log_.warning(&quot;Received a 'null' topic!&quot;);</span>
                     }
-<span class="nc" id="L256">                } catch(ZMQException e) {</span>
-<span class="nc" id="L257">                    ZMQ.Error err = ZMQ.Error.findByCode(e.getErrorCode());</span>
-<span class="nc bnc" id="L258" title="All 4 branches missed.">                    if(err == ZMQ.Error.EINTR || err == ZMQ.Error.ETERM)</span>
-<span class="nc" id="L259">                        break;</span>
-<span class="nc" id="L260">                    log_.warning(String.format(&quot;%s: %s&quot;, e.getMessage(), err));</span>
-<span class="nc" id="L261">                } catch(Exception e) {</span>
-<span class="nc" id="L262">                    log_.warning(e.getMessage());</span>
-<span class="pc" id="L263">                }</span>
+<span class="nc" id="L257">                } catch(ZMQException e) {</span>
+<span class="nc" id="L258">                    ZMQ.Error err = ZMQ.Error.findByCode(e.getErrorCode());</span>
+<span class="nc bnc" id="L259" title="All 4 branches missed.">                    if(err == ZMQ.Error.EINTR || err == ZMQ.Error.ETERM)</span>
+<span class="nc" id="L260">                        break;</span>
+<span class="nc" id="L261">                    log_.warning(String.format(&quot;%s: %s&quot;, e.getMessage(), err));</span>
+<span class="nc" id="L262">                } catch(Exception e) {</span>
+<span class="nc" id="L263">                    log_.warning(e.getMessage());</span>
+<span class="pc" id="L264">                }</span>
             }
             try {
-<span class="fc" id="L266">                subscriber.close();</span>
-<span class="pc" id="L267">            } catch(Exception e) { /* Ignore because this is expected on exit. */ }</span>
+<span class="fc" id="L267">                subscriber.close();</span>
+<span class="pc" id="L268">            } catch(Exception e) { /* Ignore because this is expected on exit. */ }</span>
             try {
-<span class="fc" id="L269">                ctx.close();</span>
-<span class="pc" id="L270">            } catch(Exception e) { /* Ignore because this is expected on exit. */ }</span>
-<span class="fc" id="L271">        });</span>
-<span class="fc" id="L272">        subscriberThread_.start();</span>
-<span class="fc" id="L273">    }</span>
+<span class="fc" id="L270">                ctx.close();</span>
+<span class="pc" id="L271">            } catch(Exception e) { /* Ignore because this is expected on exit. */ }</span>
+<span class="fc" id="L272">        });</span>
+<span class="fc" id="L273">        subscriberThread_.start();</span>
+<span class="fc" id="L274">    }</span>
 
     private void processMessage(String topic, String msg) {
-<span class="pc bpc" id="L276" title="1 of 4 branches missed.">        if(handlers_.containsKey(topic) &amp;&amp; handlers_.get(topic) != null)</span>
-<span class="fc" id="L277">            handlers_.get(topic).handleMessage(msg);</span>
+<span class="pc bpc" id="L277" title="1 of 4 branches missed.">        if(handlers_.containsKey(topic) &amp;&amp; handlers_.get(topic) != null)</span>
+<span class="fc" id="L278">            handlers_.get(topic).handleMessage(msg);</span>
         else
-<span class="fc" id="L279">            log_.warning(&quot;### Dropped Message from topic: &quot; + topic);</span>
-<span class="fc" id="L280">    }</span>
+<span class="fc" id="L280">            log_.warning(&quot;### Dropped Message from topic: &quot; + topic);</span>
+<span class="fc" id="L281">    }</span>
 
     void processHeartbeat(String msg) {
-<span class="pc bpc" id="L283" title="1 of 2 branches missed.">        if(lastSeen_.containsKey(msg)) {</span>
-<span class="fc" id="L284">            long now = Instant.now().toEpochMilli();</span>
-<span class="fc" id="L285">            long last = lastSeen_.get(msg);</span>
-<span class="pc bpc" id="L286" title="3 of 4 branches missed.">            if(last &lt; (now - EXPIRED_MILLISECONDS) || last == 0L)</span>
-<span class="fc" id="L287">                fireEvent(msg, true);</span>
-<span class="fc" id="L288">            lastSeen_.put(msg, now);</span>
-<span class="fc" id="L289">        } else</span>
-<span class="nc" id="L290">            log_.fine(&quot;### Dropped Message from unknown IP: &quot; + msg);</span>
-<span class="fc" id="L291">    }</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">        if(lastSeen_.containsKey(msg)) {</span>
+<span class="fc" id="L285">            long now = Instant.now().toEpochMilli();</span>
+<span class="fc" id="L286">            long last = lastSeen_.get(msg);</span>
+<span class="pc bpc" id="L287" title="3 of 4 branches missed.">            if(last &lt; (now - EXPIRED_MILLISECONDS) || last == 0L)</span>
+<span class="fc" id="L288">                fireEvent(msg, true);</span>
+<span class="fc" id="L289">            lastSeen_.put(msg, now);</span>
+<span class="fc" id="L290">        } else</span>
+<span class="nc" id="L291">            log_.fine(&quot;### Dropped Message from unknown host: &quot; + msg);</span>
+<span class="fc" id="L292">    }</span>
 
-<span class="fc" id="L293">    private ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) { return ctx.socket(type); }</span>
+<span class="fc" id="L294">    private ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) { return ctx.socket(type); }</span>
 
     private final Logger log_;
-<span class="fc" id="L296">    private final int port_ = 23456;</span>
-<span class="fc" id="L297">    private final Map&lt;String, MessageHandler&gt; handlers_ = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L298">    private final Queue&lt;TopicMessage&gt; sendQueue_ = new ConcurrentLinkedQueue&lt;&gt;();</span>
+<span class="fc" id="L297">    private final int port_ = 23456;</span>
+<span class="fc" id="L298">    private final Map&lt;String, MessageHandler&gt; handlers_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L299">    private final Queue&lt;TopicMessage&gt; sendQueue_ = new ConcurrentLinkedQueue&lt;&gt;();</span>
     private final NodeEventHandler events_;
-<span class="fc" id="L300">    private       String myHostname_ = null;</span>
-<span class="fc" id="L301">    private       Map&lt;String,Long&gt; lastSeen_ = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L302">    private       SocketCreator creator_ = this::createSocket; // To make UT easier....</span>
-<span class="fc" id="L303">    private       Thread sendThread_ = null;</span>
-<span class="fc" id="L304">    private       Thread heartbeatThread_ = null;</span>
-<span class="fc" id="L305">    private       Thread monitoringThread_ = null;</span>
-<span class="fc" id="L306">    private       Thread subscriberThread_ = null;</span>
+<span class="fc" id="L301">    private       String myHostname_ = null;</span>
+<span class="fc" id="L302">    private       Map&lt;String,Long&gt; lastSeen_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L303">    private       SocketCreator creator_ = this::createSocket; // To make UT easier....</span>
+<span class="fc" id="L304">    private       Thread sendThread_ = null;</span>
+<span class="fc" id="L305">    private       Thread heartbeatThread_ = null;</span>
+<span class="fc" id="L306">    private       Thread monitoringThread_ = null;</span>
+<span class="fc" id="L307">    private       Thread subscriberThread_ = null;</span>
 
-<span class="fc" id="L308">    private static       long HEARTBEAT_MILLISECONDS = 1000L;</span>
-<span class="fc" id="L309">    private static final long EXPIRED_MILLISECONDS = (HEARTBEAT_MILLISECONDS * 5L) / 2L;</span>
+<span class="fc" id="L309">    private static       long HEARTBEAT_MILLISECONDS = 1000L;</span>
+<span class="fc" id="L310">    private static final long EXPIRED_MILLISECONDS = (HEARTBEAT_MILLISECONDS * 5L) / 2L;</span>
     private static final String ALIVE = &quot;alive&quot;;
 
     @FunctionalInterface
     interface SocketCreator { ZMQ.Socket create(ZMQ.Context ctx, SocketType type); }
 
     private static class TopicMessage {
-<span class="fc" id="L316">        TopicMessage(String topic, String message) { topic_ = topic; message_ = message; }</span>
+<span class="fc" id="L317">        TopicMessage(String topic, String message) { topic_ = topic; message_ = message; }</span>
 
-<span class="fc" id="L318">        String topic() { return topic_; }</span>
-<span class="fc" id="L319">        String message() { return message_; }</span>
+<span class="fc" id="L319">        String topic() { return topic_; }</span>
+<span class="fc" id="L320">        String message() { return message_; }</span>
 
         private final String topic_;
         private final String message_;
