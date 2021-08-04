@@ -44,7 +44,8 @@ public class NodeMonitoring {
                           Logger logger) {
         myHostname_ = myHostname;
         for(String host: allHostnames)
-            lastSeen_.put(host, 0L);
+            if(!host.equals(myHostname_))
+                lastSeen_.put(host, 0L);
         events_ = eventCallback;
         log_ = logger;
         handlers_.put(ALIVE, this::processHeartbeat);
@@ -287,7 +288,7 @@ public class NodeMonitoring {
                 fireEvent(msg, true);
             lastSeen_.put(msg, now);
         } else
-            log_.fine("### Dropped Message from unknown IP: " + msg);
+            log_.fine("### Dropped Message from unknown host: " + msg);
     }
 
     private ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) { return ctx.socket(type); }
