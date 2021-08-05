@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClusterServiceMonitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.node_monitoring</a> &gt; <span class="el_source">ClusterServiceMonitor.java</span></div><h1>ClusterServiceMonitor.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.node_monitoring;
+
+import java.time.Instant;
+import java.util.*;
+import java.util.logging.Logger;
+
+/**
+ * Class to create a service node in a cluster. Each node has 1 of 2 roles, primary or secondary.
+ */
+public class ClusterServiceMonitor {
+    /**
+     * Construct the monitoring object that participates in a cluster.
+     *
+     * @param myHostname This nodes hostname.
+     * @param clusterNodes All the hostnames in the cluster of services.
+     * @param callback Callback that receives either a primary or secondary state. Only one primary can exist
+     *                in the cluster at a time.
+     * @param logger Th native Java Logger to log messages.
+     */
+    public ClusterServiceMonitor(String myHostname, String[] clusterNodes, RoleChange callback, Logger logger) {
+<span class="fc" id="L25">        this(myHostname, Arrays.asList(clusterNodes), callback, logger);</span>
+<span class="fc" id="L26">    }</span>
+
+    /**
+     * Construct the monitoring object that participates in a cluster.
+     *
+     * @param myHostname This nodes hostname.
+     * @param clusterNodes All the hostnames in the cluster of services.
+     * @param callback Callback that receives either a primary or secondary state. Only one primary can exist
+     *                in the cluster at a time.
+     * @param logger Th native Java Logger to log messages.
+     */
+<span class="fc" id="L37">    public ClusterServiceMonitor(String myHostname, List&lt;String&gt; clusterNodes, RoleChange callback, Logger logger) {</span>
+<span class="fc" id="L38">        me_ = myHostname;</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        for(String node: clusterNodes)</span>
+<span class="fc" id="L40">            nodes_.put(node, 0);</span>
+<span class="fc" id="L41">        nodes_.put(me_, rng_.nextInt(Integer.MAX_VALUE));</span>
+<span class="fc" id="L42">        primary_ = me_;</span>
+<span class="fc" id="L43">        callback_ = callback;</span>
+<span class="fc" id="L44">        log_ = logger;</span>
+<span class="fc" id="L45">        monitoring_ = new NodeMonitoring(me_, nodes_.keySet(), this::callback, log_);</span>
+<span class="fc" id="L46">        evaluatePrimary(true);</span>
+<span class="fc" id="L47">    }</span>
+
+    /**
+     * Set the port for communication. This will be bound to in the process. Must be called before starting the cluster.
+     *
+     * @param port Must be &amp;gt;1024 and &amp;lt;65536.
+     */
+    public void setPort(int port) {
+<span class="fc" id="L55">        monitoring_.setPort(port);</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Join the cluster.
+     *
+     * @param blocking If set to true this method will block, if false the process will run in the background.
+     */
+    public void startMonitoring(boolean blocking) {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if(!monitoring_.isRunning()) {</span>
+<span class="fc" id="L65">            monitoring_.addHandler(&quot;ANNOUNCE&quot;, this::announceCallback);</span>
+<span class="fc" id="L66">            monitoring_.startMonitoring();</span>
+<span class="fc" id="L67">            announce();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">            if (blocking) {</span>
+                try {
+<span class="fc" id="L70">                    monitoring_.waitForMonitoring();</span>
+<span class="nc" id="L71">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L72">                    log_.fine(&quot;An expected interrupt occured in the monitoring. Monitoring halted.&quot;);</span>
+<span class="fc" id="L73">                }</span>
+            }
+        }
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Leave the cluster.
+     */
+    public void stopMonitoring() {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if(monitoring_.isRunning())</span>
+<span class="fc" id="L83">            monitoring_.stopMonitoring();</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * Test if the node in the cluster.
+     *
+     * @return true if the process is part of the cluster; false if it's not.
+     */
+    public boolean isRunning() {
+<span class="fc" id="L92">        return monitoring_.isRunning();</span>
+    }
+
+    /**
+     * Get the current role manually.
+     *
+     * @return This processes current role.
+     */
+    public Role getRole() {
+<span class="fc" id="L101">        return role_;</span>
+    }
+
+    /**
+     * Enum for the 2 possible roles.
+     */
+<span class="fc" id="L107">    public enum Role { Primary, Secondary }</span>
+
+    /**
+     * Defined callback for the Role changes as the cluster changes.
+     */
+    @FunctionalInterface public interface RoleChange {
+        /**
+         * Called when the Role for this node changes.
+         *
+         * @param role The new Role.
+         */
+        void stateChanged(Role role);
+    }
+
+    synchronized private void announce() {
+<span class="fc" id="L122">        monitoring_.sendMessage(&quot;ANNOUNCE&quot;, me_ + &quot;:&quot; + nodes_.get(me_));</span>
+<span class="fc" id="L123">    }</span>
+
+    private void callback(String node, boolean newState) {
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if(newState)</span>
+<span class="fc" id="L127">            announce();</span>
+        else {
+<span class="fc" id="L129">            nodes_.put(node, 0);</span>
+<span class="fc" id="L130">            evaluatePrimary(false);</span>
+        }
+<span class="fc" id="L132">    }</span>
+
+    private void announceCallback(String message) {
+<span class="fc" id="L135">        String[] parts = message.split(&quot;:&quot;);</span>
+<span class="fc" id="L136">        int rank = Integer.parseInt(parts[1]);</span>
+<span class="fc" id="L137">        nodes_.put(parts[0], rank);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if(rank == nodes_.get(me_)) {</span>
+<span class="fc" id="L139">            nodes_.put(me_, rng_.nextInt(Integer.MAX_VALUE));</span>
+<span class="fc" id="L140">            announce();</span>
+        }
+<span class="fc" id="L142">        evaluatePrimary(false);</span>
+<span class="fc" id="L143">    }</span>
+
+    private void evaluatePrimary(boolean initial) {
+<span class="fc" id="L146">        String candidate = me_;</span>
+<span class="fc" id="L147">        int candidateRank = nodes_.get(me_);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        for(Map.Entry&lt;String,Integer&gt; entry: nodes_.entrySet())</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">            if(entry.getValue() &gt; candidateRank) {</span>
+<span class="fc" id="L150">                candidateRank = entry.getValue();</span>
+<span class="fc" id="L151">                candidate = entry.getKey();</span>
+            }
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if(initial)</span>
+<span class="fc" id="L154">            callCallback(Role.Primary);</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        else if(!primary_.equals(candidate)) {</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">            if(primary_.equals(me_))</span>
+<span class="fc" id="L157">                callCallback(Role.Secondary);</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            if(candidate.equals(me_))</span>
+<span class="fc" id="L159">                callCallback(Role.Primary);</span>
+<span class="fc" id="L160">            primary_ = candidate;</span>
+        }
+<span class="fc" id="L162">    }</span>
+
+    private void callCallback(Role role) {
+<span class="fc" id="L165">        role_ = role;</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">        if(callback_ != null)</span>
+<span class="fc" id="L167">            callback_.stateChanged(role);</span>
+<span class="fc" id="L168">    }</span>
+
+<span class="fc" id="L170">    private final Map&lt;String, Integer&gt; nodes_ = new HashMap&lt;&gt;();</span>
+    private final String me_;
+    private final Logger log_;
+<span class="fc" id="L173">    private final Random rng_ = new Random(Instant.now().toEpochMilli());</span>
+    private final RoleChange callback_;
+    private       NodeMonitoring monitoring_;
+    private       String primary_;
+    private       Role role_;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
