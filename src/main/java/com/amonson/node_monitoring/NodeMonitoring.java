@@ -91,6 +91,15 @@ public class NodeMonitoring {
     }
 
     /**
+     * Set the port for this node monitoring object. Must be set before calling startMonitoring.
+     *
+     * @param port The port to bind to and listen on.
+     */
+    public void setPort(int port) {
+        port_ = port;
+    }
+
+    /**
      * If not running this will start the monitoring threads. This can only be called once per instance.
      */
     public void startMonitoring() {
@@ -294,10 +303,10 @@ public class NodeMonitoring {
     private ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) { return ctx.socket(type); }
 
     private final Logger log_;
-    private final int port_ = 23456;
     private final Map<String, MessageHandler> handlers_ = new HashMap<>();
     private final Queue<TopicMessage> sendQueue_ = new ConcurrentLinkedQueue<>();
     private final NodeEventHandler events_;
+    private       int port_ = 23456;
     private       String myHostname_ = null;
     private       Map<String,Long> lastSeen_ = new HashMap<>();
     private       SocketCreator creator_ = this::createSocket; // To make UT easier....

@@ -26,6 +26,7 @@ class NodeMonitoringSpec extends Specification {
         underTest_ = new NodeMonitoring(myHostname_, new String[] {myHostname_, "node2", "node3"}, this::eventCallback, Mock(Logger))
         underTest_.creator_ = this::createSocket
         subSocket.recvStr(_ as Integer) >>> ["alive", "node2", "alive", "node3"]
+        underTest_.setPort(10000)
     }
 
     ZMQ.Socket createSocket(ZMQ.Context ctx, SocketType type) {
