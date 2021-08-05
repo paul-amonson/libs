@@ -49,7 +49,7 @@ public class ClusterServiceMonitor {
     /**
      * Set the port for communication. This will be bound to in the process. Must be called before starting the cluster.
      *
-     * @param port Must be >1024 and <65536.
+     * @param port Must be &gt;1024 and &lt;65536.
      */
     public void setPort(int port) {
         monitoring_.setPort(port);
