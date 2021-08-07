@@ -32,8 +32,11 @@ public class ClusterServiceMonitor {
      */
     public ClusterServiceMonitor(String myHostname, List<String> clusterNodes, Logger logger) {
         me_ = myHostname;
-        for(String node: clusterNodes)
+        for(String node: clusterNodes) {
+            otherNodes_.add(node);
             nodes_.put(node, 0);
+        }
+        otherNodes_.remove(me_);
         nodes_.put(me_, rng_.nextInt(Integer.MAX_VALUE));
         primary_ = me_;
         log_ = logger;
@@ -169,6 +172,24 @@ public class ClusterServiceMonitor {
     }
 
     /**
+     * Get this node's hostname.
+     *
+     * @return My hostname.
+     */
+    public String getMyHostname() {
+        return me_;
+    }
+
+    /**
+     * Get the collection of nodes except this node.
+     *
+     * @return The list of other nodes.
+     */
+    public Collection<String> getOtherNodeNames() {
+        return otherNodes_;
+    }
+
+    /**
      * Enum for the 2 possible roles.
      */
     public enum Role { Primary, Secondary }
@@ -272,6 +293,7 @@ public class ClusterServiceMonitor {
     }
 
     private final Map<String, Integer> nodes_ = new HashMap<>();
+    private final List<String> otherNodes_ = new ArrayList<>();
     private final String me_;
     private final Logger log_;
     private final Random rng_ = new Random(Instant.now().toEpochMilli());

@@ -61,7 +61,7 @@ publishing {
         }
     }
 }
-
+publish.group = "_favorites"
 gitPublish {
     repoUri = 'git@github.com:paul-amonson/libs.git'
     branch = 'gh-pages'

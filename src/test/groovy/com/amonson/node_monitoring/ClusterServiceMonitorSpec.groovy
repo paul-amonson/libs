@@ -158,4 +158,10 @@ class ClusterServiceMonitorSpec extends Specification implements ClusterServiceM
         underTest_.messageCallback("me|other|message")
         expect: from_ == null
     }
+
+    def "Test get nodes"() {
+        expect: underTest_.getOtherNodeNames().size() == 1
+        and:    underTest_.getOtherNodeNames().get(0) == "other"
+        and:    underTest_.getMyHostname() == "me"
+    }
 }
