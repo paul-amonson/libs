@@ -130,6 +130,9 @@ jar {
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
+    manifest {
+        attributes("Implementation-Title": project.name, "Implementation-Version": project.version)
+    }
 }
 jar.finalizedBy(javadoc)
 
