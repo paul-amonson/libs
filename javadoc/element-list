@@ -3,7 +3,6 @@ com.amonson.crypto
 com.amonson.data_access
 com.amonson.factory
 com.amonson.logger
-com.amonson.logger_server
 com.amonson.node_monitoring
 com.amonson.prop_store
 com.amonson.redis
