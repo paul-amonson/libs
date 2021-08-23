@@ -69,7 +69,7 @@ public class NodeMonitoringFactory {
      *                    must be network resolvable. This may be null denoting a cluster of only this node.
      * @param port The base port used for node to node communication. The next numeric port (port+1) is used
      *             for another process using the NodeMonitoringClient on the same node to communicate with the server.
-     *             Privileged ports are not allowed (ports &tl; 1024) .
+     *             Privileged ports are not allowed (ports &lt; 1024) .
      * @param logger The logger used for logging in this class.
      * @return The newly created instance of the {@link NodeMonitoringClient} to talk to the {@link NodeMonitoring}
      * cluster but only on a node with the server running.
