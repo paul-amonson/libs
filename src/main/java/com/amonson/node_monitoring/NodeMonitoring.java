@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * Implementations of this interface must have a constructor with the following signature:
  *
  *      &lt;class_name&gt;(String myHostname,
- *                         List<String> allHostnames,
+ *                         List&lt;String&gt; allHostnames,
  *                         int port,
  *                         NodeStateChangeHandler nodeStateChangeHandler,
  *                         Logger logger,
