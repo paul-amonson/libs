@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NodeMonitoringZeroMQ.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.node_monitoring</a> &gt; <span class="el_source">NodeMonitoringZeroMQ.java</span></div><h1>NodeMonitoringZeroMQ.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.node_monitoring;
+
+import org.zeromq.*;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.*;
+import java.util.logging.Logger;
+
+/**
+ * This is a JeroMQ based (a specific Java implementation of ZeroMQ) implementation of the
+ * {@link NodeMonitoring} interface.
+ *
+ * Specific implementation for this JeroMQ-based implementation are:
+ *
+ *      ZeroMQThreads      - (def. 1) This is the number of internal threads used by ZeroMQ for I/O. 1-4 is typical.
+ */
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">class NodeMonitoringZeroMQ implements NodeMonitoring {</span>
+    @Override
+    public void sendMessage(Message message) {
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        if(zeroMQThreadId_ != Long.MIN_VALUE) {</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">            if(message.targetsContains(&quot;*&quot;)) {</span>
+<span class="fc" id="L27">                message.replaceTargets(lastSeen_.keySet());</span>
+<span class="fc" id="L28">                message.addTargets(me_);</span>
+            }
+<span class="fc" id="L30">            ZMsg msg = convertMessage(message);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">            boolean useRelay = Thread.currentThread().getId() != zeroMQThreadId_;</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">            if(useRelay)</span>
+<span class="fc" id="L33">                msg.addFirst(RELAY);</span>
+<span class="fc" id="L34">            ZMQ.Socket socket = publish_;</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            if(useRelay) {</span>
+<span class="fc" id="L36">                log_.fine(&quot;Sending inproc message across threads first: &quot; + message);</span>
+<span class="fc" id="L37">                socket = nonZeroMQThreads_.getOrDefault(Thread.currentThread().getId(), null);</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">                if (socket == null) {</span>
+<span class="fc" id="L39">                    socket = CTX.socket(SocketType.PUSH);</span>
+<span class="fc" id="L40">                    socket.connect(INPROC_URL);</span>
+<span class="fc" id="L41">                    nonZeroMQThreads_.put(Thread.currentThread().getId(), socket);</span>
+                }
+            } else
+<span class="fc" id="L44">                log_.fine(&quot;Sending message directly to cluster network: &quot; + message);</span>
+<span class="fc" id="L45">            msg.send(socket);</span>
+        }
+<span class="fc" id="L47">    }</span>
+
+    @Override
+    public void start(boolean blocking) {
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if(zeroMQThreadId_ == Long.MIN_VALUE) {</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            log_.fine(String.format(&quot;Starting %s listening on 'tcp://*:%d'...&quot;, blocking?&quot;blocking&quot;:&quot;non-blocking&quot;,</span>
+<span class="fc" id="L53">                    port_));</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            if(blocking)</span>
+<span class="fc" id="L55">                startBlocking();</span>
+            else
+<span class="fc" id="L57">                new Thread(this::startBlocking).start();</span>
+        }
+<span class="fc" id="L59">    }</span>
+
+    @Override
+    public void stop() {
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if(zeroMQThreadId_ != Long.MIN_VALUE) {</span>
+<span class="fc" id="L64">            log_.fine(&quot;Stopping listening.&quot;);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (zeroMQThreadId_ != Thread.currentThread().getId())</span>
+<span class="fc" id="L66">                sendMessage(new Message(STOP, me_, me_));</span>
+            else
+<span class="fc" id="L68">                Thread.currentThread().interrupt();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if(zeroMQThread_ != null) {</span>
+                try {
+<span class="nc" id="L71">                    zeroMQThread_.join(60_000L);</span>
+<span class="fc" id="L72">                } catch(InterruptedException e) {</span>
+                    /* Ignore and assume thread finished. */
+                } finally {
+<span class="fc" id="L75">                    zeroMQThread_ = null;</span>
+                }
+            }
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            for(Map.Entry&lt;Long,ZMQ.Socket&gt; entry: nonZeroMQThreads_.entrySet())</span>
+<span class="fc" id="L79">                entry.getValue().close();</span>
+<span class="fc" id="L80">            nonZeroMQThreads_.clear();</span>
+        }
+<span class="fc" id="L82">    }</span>
+
+    @Override
+    public void waitForExitWhenOnThread() {
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if(zeroMQThread_ != null) {</span>
+            try {
+<span class="nc" id="L88">                zeroMQThread_.join();</span>
+<span class="nc" id="L89">            } catch(InterruptedException e) { /* */ }</span>
+        }
+<span class="nc" id="L91">    }</span>
+
+    @Override
+    public boolean isRunning() {
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        return zeroMQThreadId_ != Long.MIN_VALUE;</span>
+    }
+
+    @Override
+    public MessageHandler addOrReplaceMessageHandler(String topic, MessageHandler handler) {
+<span class="pc bpc" id="L100" title="1 of 4 branches missed.">        assert topic != null:&quot;The 'topic' may not be null!&quot;;</span>
+<span class="pc bpc" id="L101" title="1 of 4 branches missed.">        assert handler != null:&quot;The 'handler' may not be null!&quot;;</span>
+<span class="fc" id="L102">        synchronized (messageHandlers_) {</span>
+<span class="fc" id="L103">            return messageHandlers_.put(topic, handler);</span>
+        }
+    }
+
+    @Override
+    public void addMessageHandler(String topic, MessageHandler handler) {
+<span class="pc bpc" id="L109" title="1 of 4 branches missed.">        assert topic != null:&quot;The 'topic' may not be null!&quot;;</span>
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">        assert handler != null:&quot;The 'handler' may not be null!&quot;;</span>
+<span class="fc" id="L111">        synchronized (messageHandlers_) {</span>
+<span class="fc" id="L112">            messageHandlers_.putIfAbsent(topic, handler);</span>
+<span class="fc" id="L113">        }</span>
+<span class="fc" id="L114">    }</span>
+
+    @Override
+    public MessageHandler removeMessageHandler(String topic) {
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">        assert topic != null:&quot;The 'topic' may not be null!&quot;;</span>
+<span class="fc" id="L119">        synchronized (messageHandlers_) {</span>
+<span class="fc" id="L120">            return messageHandlers_.remove(topic);</span>
+        }
+    }
+
+    @Override
+    public boolean addNodeStateChangeHandler(NodeStateChangeHandler newHandler) {
+<span class="fc" id="L126">        synchronized (nodeStateChangeHandler_) {</span>
+<span class="fc" id="L127">            return nodeStateChangeHandler_.add(newHandler);</span>
+        }
+    }
+
+    @Override
+    public boolean removeNodeStateChangeHandler(NodeStateChangeHandler newHandler) {
+<span class="fc" id="L133">        synchronized (nodeStateChangeHandler_) {</span>
+<span class="fc" id="L134">            return nodeStateChangeHandler_.remove(newHandler);</span>
+        }
+    }
+
+    @Override
+    public String getMyHostname() {
+<span class="nc" id="L140">        return me_;</span>
+    }
+
+    @Override
+    public Logger getLogger() {
+<span class="nc" id="L145">        return log_;</span>
+    }
+
+    NodeMonitoringZeroMQ(String myHostname, List&lt;String&gt; allHostnames, int port,
+<span class="fc" id="L149">                         NodeStateChangeHandler nodeStateChangeHandler, Logger logger, Properties config) {</span>
+<span class="pc bpc" id="L150" title="1 of 4 branches missed.">        if(myHostname == null || myHostname.isBlank())</span>
+<span class="fc" id="L151">            throw new IllegalArgumentException(&quot;The 'myHostname' must not be null or empty!&quot;);</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if(port &lt; 1024)</span>
+<span class="fc" id="L153">            throw new IllegalArgumentException(&quot;Cannot be a privileged port!&quot;);</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        if(port &gt; 65534)</span>
+<span class="fc" id="L155">            throw new IllegalArgumentException(&quot;The 'port' cannot be greater than 65534 because both the 'port' &quot; +</span>
+                    &quot;and 'port+1' are used!&quot;);
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if(logger == null)</span>
+<span class="fc" id="L158">            throw new IllegalArgumentException(&quot;The 'logger' cannot be null!&quot;);</span>
+<span class="fc" id="L159">        me_ = myHostname;</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        for(String hostname: allHostnames)</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">            if (!myHostname.equals(hostname))</span>
+<span class="fc" id="L162">                lastSeen_.put(hostname, new Pair&lt;&gt;(0L, RemoteNodeState.MISSING));</span>
+<span class="fc" id="L163">        port_ = port;</span>
+<span class="fc" id="L164">        log_ = logger;</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if(nodeStateChangeHandler != null)</span>
+<span class="fc" id="L166">            addNodeStateChangeHandler(nodeStateChangeHandler);</span>
+<span class="fc" id="L167">        configure(config);</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if(CTX == null)</span>
+<span class="fc" id="L169">            CTX = ZMQ.context(zeroMQThreadCount_);</span>
+<span class="fc" id="L170">        loop_ = new ZLoop(CTX);</span>
+<span class="fc" id="L171">    }</span>
+
+    private void configure(Properties config) {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if(config != null) {</span>
+<span class="fc" id="L175">            expireDeltaMilliseconds_ = Long.parseLong(config.getProperty(&quot;NodeExpirationTime&quot;,</span>
+<span class="fc" id="L176">                    Long.toString(expireDeltaMilliseconds_)));</span>
+<span class="fc" id="L177">            checkPeriodMilliseconds_ = Long.parseLong(config.getProperty(&quot;NodeAlivePeriod&quot;,</span>
+<span class="fc" id="L178">                    Long.toString(checkPeriodMilliseconds_)));</span>
+<span class="fc" id="L179">            zeroMQThreadCount_ = Integer.parseInt(config.getProperty(&quot;ZeroMQThreads&quot;,</span>
+<span class="fc" id="L180">                    Integer.toString(zeroMQThreadCount_)));</span>
+<span class="fc" id="L181">            threadPoolCount_ = Integer.parseInt(config.getProperty(&quot;ThreadsPoolCount&quot;,</span>
+<span class="fc" id="L182">                    Integer.toString(threadPoolCount_)));</span>
+        }
+<span class="fc" id="L184">    }</span>
+
+    private void startBlocking() {
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if(zeroMQThreadId_ == Long.MIN_VALUE) {</span>
+<span class="fc" id="L188">            zeroMQThreadId_ = Thread.currentThread().getId();</span>
+<span class="fc" id="L189">            startPool();</span>
+<span class="fc" id="L190">            reportAllMissing();</span>
+<span class="fc" id="L191">            String bindUrl = String.format(&quot;tcp://*:%d&quot;, port_);</span>
+<span class="fc" id="L192">            String connectUrl = String.format(&quot;tcp://%%s:%d&quot;, port_);</span>
+<span class="fc" id="L193">            ZMQ.Socket subExternal = CTX.socket(SocketType.SUB);</span>
+<span class="fc" id="L194">            subExternal.subscribe(&quot;&quot;);</span>
+<span class="fc" id="L195">            subExternal.bind(bindUrl);</span>
+<span class="fc" id="L196">            ZMQ.Socket pullLocalhost = CTX.socket(SocketType.PULL);</span>
+<span class="fc" id="L197">            pullLocalhost.bind(String.format(&quot;tcp://localhost:%d&quot;, port_ + 1));</span>
+<span class="fc" id="L198">            ZMQ.Socket inproc = CTX.socket(SocketType.PULL);</span>
+<span class="fc" id="L199">            inproc.bind(INPROC_URL);</span>
+<span class="fc" id="L200">            publish_ = CTX.socket(SocketType.PUB);</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            for (String hostname : lastSeen_.keySet())</span>
+<span class="fc" id="L202">                publish_.connect(String.format(connectUrl, hostname));</span>
+<span class="fc" id="L203">            loop_.addPoller(new ZMQ.PollItem(pullLocalhost, ZMQ.Poller.POLLIN), this::localhostIncomingRequest, null);</span>
+<span class="fc" id="L204">            loop_.addPoller(new ZMQ.PollItem(subExternal, ZMQ.Poller.POLLIN), this::fromExternalCluster, null);</span>
+<span class="fc" id="L205">            loop_.addPoller(new ZMQ.PollItem(inproc, ZMQ.Poller.POLLIN), this::fromOtherThreadInProcess, null);</span>
+<span class="fc" id="L206">            loop_.addTimer((int) checkPeriodMilliseconds_, 0, this::timerTick, null);</span>
+
+            // Block this thread here...
+<span class="fc" id="L209">            loop_.start();</span>
+
+<span class="fc" id="L211">            inproc.close();</span>
+<span class="fc" id="L212">            publish_.close();</span>
+<span class="fc" id="L213">            pullLocalhost.close();</span>
+<span class="fc" id="L214">            subExternal.close();</span>
+<span class="fc" id="L215">            stopPool();</span>
+<span class="fc" id="L216">            zeroMQThreadId_ = Long.MIN_VALUE;</span>
+        }
+<span class="fc" id="L218">    }</span>
+
+    private void reportAllMissing() {
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        for(Map.Entry&lt;String,Pair&lt;Long,RemoteNodeState&gt;&gt; entry: lastSeen_.entrySet())</span>
+<span class="fc" id="L222">            callNodeStateChangeHandlerOnThread(entry.getKey(), entry.getValue().second, entry.getValue().first);</span>
+<span class="fc" id="L223">    }</span>
+
+    // Incoming handler for tcp://localhost PULL incoming messages.
+    private int localhostIncomingRequest(ZLoop zLoop, ZMQ.PollItem pollItem, Object o) {
+<span class="fc" id="L227">        ZMsg msg = indirectCall_.call(pollItem.getSocket(), true);</span>
+<span class="fc" id="L228">        Message message = new Message(msg.removeFirst().getString(StandardCharsets.UTF_8),</span>
+<span class="fc" id="L229">                msg.removeFirst().getString(StandardCharsets.UTF_8),</span>
+<span class="fc" id="L230">                msg.removeFirst().getString(StandardCharsets.UTF_8), parseFrames(msg));</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if(message.targetsContains(me_))</span>
+<span class="nc" id="L232">            callMessageHandlerOnThread(message);</span>
+<span class="fc" id="L233">        sendMessage(message);</span>
+<span class="fc" id="L234">        return 0;</span>
+    }
+
+    private String[] parseFrames(ZMsg msg) {
+<span class="fc" id="L238">        String[] frames = new String[msg.size()];</span>
+<span class="fc" id="L239">        int i = 0;</span>
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">        for(ZFrame frame: msg)</span>
+<span class="nc" id="L241">            frames[i++] = frame.getString(StandardCharsets.UTF_8);</span>
+<span class="fc" id="L242">        return frames;</span>
+    }
+
+    private int timerTick(ZLoop zLoop, ZMQ.PollItem pollItem, Object o) {
+<span class="fc" id="L246">        sendAlive();</span>
+<span class="fc" id="L247">        checkForMissingNodes();</span>
+<span class="fc" id="L248">        return 0;</span>
+    }
+
+    // Incoming handler for tcp://* SUB incoming messages.
+    private int fromExternalCluster(ZLoop loop, ZMQ.PollItem item, Object arg) {
+<span class="fc" id="L253">        ZMsg recvMsg = indirectCall_.call(item.getSocket(), true);</span>
+<span class="fc" id="L254">        String topic = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);</span>
+<span class="fc" id="L255">        String sender = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">        if(topic.equals(ALIVE)) {</span>
+<span class="fc" id="L257">            log_.finest(String.format(&quot;Received ALIVE message from '%s'!&quot;, sender));</span>
+<span class="fc" id="L258">            long previous = lastSeen_.get(sender).first;</span>
+<span class="fc" id="L259">            lastSeen_.get(sender).first = Instant.now().toEpochMilli();</span>
+<span class="pc bpc" id="L260" title="2 of 4 branches missed.">            if(previous == 0L &amp;&amp; nodeStateChangeHandler_ != null) {</span>
+<span class="fc" id="L261">                lastSeen_.get(sender).second = RemoteNodeState.ACTIVE;</span>
+<span class="fc" id="L262">                callNodeStateChangeHandlerOnThread(sender, lastSeen_.get(sender).second, lastSeen_.get(sender).first);</span>
+            }
+<span class="fc" id="L264">            return 0;</span>
+        }
+<span class="fc" id="L266">        Message message = new Message(topic, sender, recvMsg.removeFirst().getString(StandardCharsets.UTF_8));</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">        if(message.targetsContains(me_)) {</span>
+<span class="nc" id="L268">            MessageHandler handler = messageHandlers_.getOrDefault(topic, null);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            if(handler != null) {</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">                for(ZFrame frame: recvMsg)</span>
+<span class="nc" id="L271">                    message.addMessageParts(frame.getString(StandardCharsets.UTF_8));</span>
+<span class="nc" id="L272">                callMessageHandlerOnThread(message);</span>
+            }
+        }
+<span class="fc" id="L275">        return 0;</span>
+    }
+
+    // Incoming handler for inproc:// PULL incoming messages.
+    private int fromOtherThreadInProcess(ZLoop loop, ZMQ.PollItem item, Object arg) {
+<span class="fc" id="L280">        ZMsg recvMsg = indirectCall_.call(item.getSocket(), true);</span>
+<span class="fc" id="L281">        String topic = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);</span>
+<span class="pc bpc" id="L282" title="1 of 2 branches missed.">        if(topic.equals(STOP))</span>
+<span class="nc" id="L283">            Thread.currentThread().interrupt();</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">        else if(topic.equals(RELAY))</span>
+<span class="nc" id="L285">            recvMsg.send(publish_);</span>
+<span class="fc" id="L286">        return 0;</span>
+    }
+
+    private void sendAlive() {
+<span class="fc" id="L290">        ZMsg msg = new ZMsg();</span>
+<span class="fc" id="L291">        msg.add(ALIVE);</span>
+<span class="fc" id="L292">        msg.add(me_);</span>
+<span class="fc" id="L293">        msg.send(publish_);</span>
+<span class="fc" id="L294">    }</span>
+
+    private void checkForMissingNodes() {
+<span class="fc" id="L297">        long now = Instant.now().toEpochMilli();</span>
+<span class="fc" id="L298">        final List&lt;String&gt; missingList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        for(Map.Entry&lt;String, Pair&lt;Long,RemoteNodeState&gt;&gt; entry: lastSeen_.entrySet())</span>
+<span class="pc bpc" id="L300" title="3 of 4 branches missed.">            if(entry.getValue().first &gt; 0L &amp;&amp; (now - entry.getValue().first) &gt; expireDeltaMilliseconds_)</span>
+<span class="nc" id="L301">                missingList.add(entry.getKey());</span>
+<span class="pc bpc" id="L302" title="2 of 4 branches missed.">        if(nodeStateChangeHandler_.size() &gt; 0 &amp;&amp; missingList.size() &gt; 0)</span>
+<span class="nc bnc" id="L303" title="All 2 branches missed.">            for (String node : missingList) {</span>
+<span class="nc" id="L304">                lastSeen_.get(node).first = 0L;</span>
+<span class="nc" id="L305">                lastSeen_.get(node).second = RemoteNodeState.MISSING;</span>
+<span class="nc" id="L306">                callNodeStateChangeHandlerOnThread(node, lastSeen_.get(node).second, lastSeen_.get(node).first);</span>
+<span class="nc" id="L307">            }</span>
+<span class="fc" id="L308">    }</span>
+
+    // Start the threads for the thread pool for callback tasks.
+    private void startPool() {
+<span class="fc" id="L312">        push_ = CTX.socket(SocketType.PUSH);</span>
+<span class="fc" id="L313">        push_.bind(&quot;inproc://thread_pool&quot;);</span>
+        // Pause for slow bind...
+<span class="pc" id="L315">        try { Thread.sleep(100); } catch(InterruptedException e) { /* Ignore */ }</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        for(int i = 0; i &lt; threadPoolCount_; i++) {</span>
+<span class="fc" id="L317">            Thread t = new Thread(this::pullLoop);</span>
+<span class="fc" id="L318">            t.start();</span>
+<span class="fc" id="L319">            threadPool_.add(t);</span>
+        }
+<span class="fc" id="L321">    }</span>
+
+    // Stop the threads for the thread pool for callback tasks.
+    private void stopPool() {
+<span class="fc bfc" id="L325" title="All 2 branches covered.">        for(Thread t: threadPool_) {</span>
+<span class="fc" id="L326">            t.interrupt();</span>
+            try {
+<span class="fc" id="L328">                t.join();</span>
+<span class="pc" id="L329">            } catch(InterruptedException e) { /* Ignore */ }</span>
+<span class="fc" id="L330">        }</span>
+<span class="fc" id="L331">        push_.close();</span>
+<span class="fc" id="L332">    }</span>
+
+    private ZMsg convertMessage(Message message) {
+<span class="fc" id="L335">        ZMsg msg = ZMsg.newStringMsg(message.getTopic(), message.getSender(), message.getTargetsAsString());</span>
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        for(String part: message.getMessagePartsIterable())</span>
+<span class="fc" id="L337">            msg.add(part);</span>
+<span class="fc" id="L338">        return msg;</span>
+    }
+
+    // Call MessageHandler on a separate thread to avoid blocking main loop.
+    private void callMessageHandlerOnThread(Message message) {
+<span class="fc" id="L343">        ZMsg msg = convertMessage(message);</span>
+<span class="fc" id="L344">        msg.addFirst(&quot;MessageHandler&quot;);</span>
+<span class="fc" id="L345">        msg.send(push_, false);</span>
+<span class="fc" id="L346">    }</span>
+
+    // Call NodeStateChangeHandler on a separate thread to avoid blocking main loop.
+    private void callNodeStateChangeHandlerOnThread(String node, RemoteNodeState state, long lastSeen) {
+<span class="fc" id="L350">        ZMsg msg = ZMsg.newStringMsg(&quot;NodeStateChangeHandler&quot;, node, state.toString(), Long.toString(lastSeen));</span>
+<span class="fc" id="L351">        msg.send(push_, false);</span>
+<span class="fc" id="L352">    }</span>
+
+    // ZeroMQ based worker threads.
+    private void pullLoop() {
+<span class="fc" id="L356">        ZMQ.Socket pull = CTX.socket(SocketType.PULL);</span>
+<span class="fc" id="L357">        pull.connect(&quot;inproc://thread_pool&quot;);</span>
+<span class="fc bfc" id="L358" title="All 2 branches covered.">        while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc" id="L359">            ZMsg msg = indirectCall_.call(pull, true);</span>
+<span class="pc bpc" id="L360" title="1 of 2 branches missed.">            if(msg != null) {</span>
+<span class="fc" id="L361">                String call = msg.removeFirst().getString(StandardCharsets.UTF_8);</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">                if(call.equals(&quot;NodeStateChangeHandler&quot;)) {</span>
+<span class="nc" id="L363">                    String node = msg.removeFirst().getString(StandardCharsets.UTF_8);</span>
+<span class="nc" id="L364">                    RemoteNodeState state = RemoteNodeState.valueOf(msg.removeFirst().getString(StandardCharsets.UTF_8));</span>
+<span class="nc" id="L365">                    long seen = Long.parseLong(msg.removeFirst().getString(StandardCharsets.UTF_8));</span>
+<span class="nc" id="L366">                    synchronized (nodeStateChangeHandler_) {</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">                        for (NodeStateChangeHandler handler : nodeStateChangeHandler_)</span>
+<span class="nc" id="L368">                            handler.nodeStateChanged(node, state, seen);</span>
+<span class="nc" id="L369">                    }</span>
+<span class="pc bpc" id="L370" title="1 of 2 branches missed.">                } else if(call.equals(&quot;MessageHandler&quot;)) {</span>
+<span class="nc" id="L371">                    String topic = msg.removeFirst().getString(StandardCharsets.UTF_8);</span>
+<span class="nc" id="L372">                    MessageHandler handler = messageHandlers_.getOrDefault(topic, null);</span>
+<span class="nc" id="L373">                    Message message = new Message(topic, msg.removeFirst().getString(StandardCharsets.UTF_8),</span>
+<span class="nc" id="L374">                            msg.removeFirst().getString(StandardCharsets.UTF_8), parseFrames(msg));</span>
+<span class="nc" id="L375">                    handler.handleMessage(message);</span>
+<span class="nc" id="L376">                } else</span>
+<span class="fc" id="L377">                    log_.warning(&quot;Unknown callback on thread: '&quot; + call + &quot;'!&quot;);</span>
+            }
+<span class="fc" id="L379">        }</span>
+<span class="fc" id="L380">        pull.close();</span>
+<span class="fc" id="L381">    }</span>
+
+    // Constructor of instance set only
+    private final Logger log_;
+    private final String me_;
+<span class="fc" id="L386">    private final Map&lt;String, Pair&lt;Long,RemoteNodeState&gt;&gt; lastSeen_ = new HashMap&lt;&gt;();</span>
+    private final int port_;
+<span class="fc" id="L388">    private final Set&lt;NodeStateChangeHandler&gt; nodeStateChangeHandler_ = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L389">    private final Map&lt;Long, ZMQ.Socket&gt; nonZeroMQThreads_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L390">    private final Map&lt;String, MessageHandler&gt; messageHandlers_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L391">    private final List&lt;Thread&gt; threadPool_ = new ArrayList&lt;&gt;();</span>
+    private       ZLoop loop_; // Not final for UT override.
+<span class="fc" id="L393">    private       ZMsgReceiveMsg indirectCall_ = ZMsg::recvMsg; // For test overriding...</span>
+
+    // Variables
+    private ZMQ.Socket publish_;
+    private ZMQ.Socket push_;
+<span class="fc" id="L398">    private long zeroMQThreadId_ = Long.MIN_VALUE;</span>
+<span class="fc" id="L399">    private Thread zeroMQThread_ = null;</span>
+<span class="fc" id="L400">    private long expireDeltaMilliseconds_ = 4_000L;</span>
+<span class="fc" id="L401">    private long checkPeriodMilliseconds_ = 1_900L;</span>
+<span class="fc" id="L402">    private int zeroMQThreadCount_ = 1;</span>
+<span class="fc" id="L403">    private int threadPoolCount_ = 3;</span>
+
+    // Static Variables
+<span class="fc" id="L406">    private static ZMQ.Context CTX = null;</span>
+<span class="fc" id="L407">    private static NodeMonitoringZeroMQ instance_ = null;</span>
+
+    // Static Constants
+    private static final String ALIVE = &quot;ALIVE&quot;;
+    private static final String RELAY = &quot;RELAY&quot;;
+    private static final String STOP = &quot;STOP&quot;;
+    private static final String INPROC_URL = &quot;inproc://in_process&quot;;
+
+    // Internal classes
+    private static class Pair&lt;T1,T2&gt; {
+<span class="fc" id="L417">        Pair(T1 first, T2 second) { this.first = first; this.second = second; }</span>
+        T1 first;
+        T2 second;
+    }
+
+    @FunctionalInterface private interface ZMsgReceiveMsg { ZMsg call(ZMQ.Socket socket, boolean wait); }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NodeMonitoringClientZeroMQ.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.node_monitoring</a> &gt; <span class="el_source">NodeMonitoringClientZeroMQ.java</span></div><h1>NodeMonitoringClientZeroMQ.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.node_monitoring;
+
+import org.zeromq.SocketType;
+import org.zeromq.ZMQ;
+import org.zeromq.ZMsg;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+/**
+ * Default description for class NodeMonitoringClientZeroMQ
+ */
+class NodeMonitoringClientZeroMQ implements NodeMonitoringClient {
+<span class="fc" id="L20">    NodeMonitoringClientZeroMQ(String myHostname, List&lt;String&gt; allHostnames, int port, Logger logger) {</span>
+<span class="fc bfc" id="L21" title="All 4 branches covered.">        if(myHostname == null || myHostname.isBlank())</span>
+<span class="fc" id="L22">            throw new IllegalArgumentException(&quot;The 'myHostname' must not be null or empty!&quot;);</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if(port &lt; 1024)</span>
+<span class="fc" id="L24">            throw new IllegalArgumentException(&quot;Cannot be a privileged port!&quot;);</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        if(port &gt; 65534)</span>
+<span class="fc" id="L26">            throw new IllegalArgumentException(&quot;The 'port' cannot be greater than 65534 because the &quot; +</span>
+                    &quot;'port+1' is used in the client!&quot;);
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if(logger == null)</span>
+<span class="fc" id="L29">            throw new IllegalArgumentException(&quot;The 'logger' cannot be null!&quot;);</span>
+<span class="fc" id="L30">        log_ = logger;</span>
+<span class="fc" id="L31">        me_ = myHostname;</span>
+<span class="fc" id="L32">        url_ = String.format(&quot;tcp://localhost:%d&quot;, port + 1);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if(allHostnames != null)</span>
+<span class="fc" id="L34">            validNodes_.addAll(allHostnames);</span>
+<span class="fc" id="L35">        validNodes_.add(me_);</span>
+<span class="fc" id="L36">    }</span>
+
+    @Override
+    public boolean sendMessage(Message message) {
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if(message.getTargetsAsString().equals(&quot;*&quot;))</span>
+<span class="fc" id="L41">            message.replaceTargets(validNodes_);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if(!message.getSender().equals(me_))</span>
+<span class="fc" id="L43">            throw new IllegalArgumentException(&quot;You cannot spoof the sender, please use the getMyHostname() &quot; +</span>
+                    &quot;method to get the correct sender!&quot;);
+<span class="fc" id="L45">        ZMsg msg = convertMessage(message);</span>
+<span class="fc" id="L46">        createSocket();</span>
+<span class="pc bpc" id="L47" title="1 of 4 branches missed.">        if(socket_ == null || !indirectSend_.send(msg, socket_)) {</span>
+<span class="fc" id="L48">            log_.warning(&quot;Failed to send the message to the open socket. Is the socket open?&quot;);</span>
+<span class="fc" id="L49">            return false;</span>
+        }
+<span class="fc" id="L51">        return true;</span>
+    }
+
+    @Override
+    public String getMyHostname() {
+<span class="fc" id="L56">        return me_;</span>
+    }
+
+    @Override
+    public void close() throws Exception {
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(socket_ != null) {</span>
+<span class="fc" id="L62">            socket_.close();</span>
+<span class="fc" id="L63">            socket_ = null;</span>
+        }
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if(ctx_ != null) {</span>
+<span class="fc" id="L66">            ctx_.close();</span>
+<span class="fc" id="L67">            ctx_ = null;</span>
+        }
+<span class="fc" id="L69">    }</span>
+
+    private void createSocket() {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if(ctx_ == null)</span>
+<span class="fc" id="L73">            ctx_ = indirectCall_.create(1);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if(socket_ == null) {</span>
+<span class="fc" id="L75">            socket_ = ctx_.socket(SocketType.PUSH);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if(socket_ == null) {</span>
+<span class="nc" id="L77">                log_.warning(&quot;Failed to create a PUSH socket!&quot;);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">            } else if(!socket_.connect(url_)) {</span>
+<span class="fc" id="L79">                log_.warning(&quot;Failed to connect to the specified port at localhost!&quot;);</span>
+<span class="fc" id="L80">                socket_.close();</span>
+<span class="fc" id="L81">                socket_ = null;</span>
+            }
+        }
+<span class="fc" id="L84">    }</span>
+
+    private ZMsg convertMessage(Message message) {
+<span class="fc" id="L87">        ZMsg msg = ZMsg.newStringMsg(message.getTopic(), message.getSender(), message.getTargetsAsString());</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        for(String part: message.getMessagePartsIterable())</span>
+<span class="fc" id="L89">            msg.add(part);</span>
+<span class="fc" id="L90">        return msg;</span>
+    }
+
+    private ZMQ.Context indirectCtx(int threads) {
+<span class="fc" id="L94">        return ZMQ.context(threads);</span>
+    }
+
+    private boolean indirectSend(ZMsg msg, ZMQ.Socket socket) {
+<span class="fc" id="L98">        return msg.send(socket);</span>
+    }
+
+    private final Logger log_;
+    private final String me_;
+    private final String url_;
+<span class="fc" id="L104">    private final Set&lt;String&gt; validNodes_ = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L105">    private       IndirectCtx indirectCall_ = this::indirectCtx;</span>
+<span class="fc" id="L106">    private       IndirectSend indirectSend_ = this::indirectSend;</span>
+
+<span class="fc" id="L108">    private ZMQ.Context ctx_ = null;</span>
+<span class="fc" id="L109">    private ZMQ.Socket socket_ = null;</span>
+
+    @FunctionalInterface private interface IndirectCtx { ZMQ.Context create(int threads); }
+    @FunctionalInterface private interface IndirectSend { boolean send(ZMsg msg, ZMQ.Socket socket); }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

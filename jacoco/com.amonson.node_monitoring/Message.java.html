@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Message.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.node_monitoring</a> &gt; <span class="el_source">Message.java</span></div><h1>Message.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.node_monitoring;
+
+import java.util.*;
+
+/**
+ * Message class for messages handled by the {@link NodeMonitoringZeroMQ} class.
+ */
+public class Message {
+    /**
+     * Create a Message instance with topic, sender, target(s) and optional payload parts.
+     *
+     * @param topic The topic used to send the message. If the topic is not registered by peers the message
+     *             will be lost.
+     * @param sender This is your hostname, network resolvable. Use of non-resolvable names here will result
+     *              in lost messages.
+     * @param targets The list of targets to send the message. The collection cannot be null or empty.
+     * @param messageParts The list of message parts of the payload. It is acceptable to not have any payload parts.
+     * @throws IllegalArgumentException if topic and sender are null or empty, also if targets is null or length 0.
+     */
+    public Message(String topic, String sender, Iterable&lt;String&gt; targets, String... messageParts) {
+<span class="fc" id="L25">        this(topic, sender, targets, Arrays.asList(messageParts));</span>
+<span class="fc" id="L26">    }</span>
+
+    /**
+     * Create a Message instance with topic, sender, target(s) and optional payload parts.
+     *
+     * @param topic The topic used to send the message. If the topic is not registered by peers the message
+     *             will be lost.
+     * @param sender This is your hostname, network resolvable. Use of non-resolvable names here will result
+     *              in lost messages.
+     * @param targets The list of targets to send the message. The string is a comma separated list with no spaces.
+     * @param messageParts The list of message parts of the payload. It is acceptable to not have any payload parts.
+     * @throws IllegalArgumentException if topic, sender or targets are null or empty.
+     */
+    public Message(String topic, String sender, String targets, String... messageParts) {
+<span class="fc" id="L40">        this(topic, sender, targets, Arrays.asList(messageParts));</span>
+<span class="fc" id="L41">    }</span>
+
+    /**
+     * Create a Message instance with topic, sender, target(s) and optional payload parts.
+     *
+     * @param topic The topic used to send the message. If the topic is not registered by peers the message
+     *             will be lost.
+     * @param sender This is your hostname, network resolvable. Use of non-resolvable names here will result
+     *              in lost messages.
+     * @param targets The list of targets to send the message. The string is a comma separated list with no spaces.
+     * @param messageParts The list of message parts of the payload. It is acceptable to use 0 parts in the collection.
+     * @throws IllegalArgumentException if topic, sender or targets are null or empty.
+     */
+    public Message(String topic, String sender, String targets, Iterable&lt;String&gt; messageParts) {
+<span class="fc" id="L55">        this(topic, sender);</span>
+<span class="fc bfc" id="L56" title="All 4 branches covered.">        if(targets == null || targets.isBlank())</span>
+<span class="fc" id="L57">            throw new IllegalArgumentException(&quot;The 'targets' cannot be null or empty!&quot;);</span>
+<span class="fc" id="L58">        targets_.addAll(Arrays.asList(targets.split(&quot;,&quot;)));</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if(messageParts != null)</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            for(String part: messageParts)</span>
+<span class="fc" id="L61">                frames_.add(part);</span>
+<span class="fc" id="L62">    }</span>
+
+    /**
+     * Create a Message instance with topic, sender, target(s) and optional payload parts.
+     *
+     * @param topic The topic used to send the message. If the topic is not registered by peers the message
+     *             will be lost.
+     * @param sender This is your hostname, network resolvable. Use of non-resolvable names here will result
+     *              in lost messages.
+     * @param targets The list of targets to send the message. The collection cannot be null or empty.
+     * @param messageParts The list of message parts of the payload. It is acceptable to use 0 parts in the collection.
+     * @throws IllegalArgumentException if topic and sender are null or empty, also if targets is null or length 0.
+     */
+    public Message(String topic, String sender, Iterable&lt;String&gt; targets, Iterable&lt;String&gt; messageParts) {
+<span class="fc" id="L76">        this(topic, sender);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if(targets == null)</span>
+<span class="fc" id="L78">            throw new IllegalArgumentException(&quot;The 'targets' cannot be null!&quot;);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        for(String target: targets)</span>
+<span class="fc" id="L80">            targets_.add(target);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if(targets_.size() == 0)</span>
+<span class="fc" id="L82">            throw new IllegalArgumentException(&quot;The 'targets' cannot be empty!&quot;);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if(messageParts != null)</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for(String part: messageParts)</span>
+<span class="fc" id="L85">                frames_.add(part);</span>
+<span class="fc" id="L86">    }</span>
+
+    /**
+     * Used by package local client to create a Message with not targets or message parts.
+     *
+     * @param topic The topic used to send the message. If the topic is not registered by peers the message
+     *             will be lost.
+     * @param sender This is your hostname, network resolvable. Use of non-resolvable names here will result
+     *              in lost messages.
+     * @throws IllegalArgumentException if topic and sender are null or empty, also if targets is null or length 0.
+     */
+<span class="fc" id="L97">    Message(String topic, String sender) {</span>
+<span class="fc bfc" id="L98" title="All 4 branches covered.">        if(topic == null || topic.isBlank())</span>
+<span class="fc" id="L99">            throw new IllegalArgumentException(&quot;The 'topic' cannot be null or empty!&quot;);</span>
+<span class="fc bfc" id="L100" title="All 4 branches covered.">        if(sender == null || sender.isBlank())</span>
+<span class="fc" id="L101">            throw new IllegalArgumentException(&quot;The 'from' cannot be null or empty!&quot;);</span>
+<span class="fc" id="L102">        topic_ = topic;</span>
+<span class="fc" id="L103">        sender_ = sender;</span>
+<span class="fc" id="L104">    }</span>
+
+    /**
+     * Check if the hostname node passed is in the targets list of this instance.
+     *
+     * @param node The hostname to check for inclusion in the targets list.
+     * @return true indicates the passed node is present in the targets list, false otherwise.
+     */
+<span class="fc" id="L112">    public boolean targetsContains(String node) { return targets_.contains(node); }</span>
+
+    /**
+     * Get the targets list as a string.
+     *
+     * @return The comma separated list of targets in this instance.
+     */
+    public String getTargetsAsString() {
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if(targets_.size() == 1)</span>
+<span class="fc" id="L121">            return targets_.iterator().next();</span>
+        else
+<span class="fc" id="L123">            return String.join(&quot;,&quot;, targets_);</span>
+    }
+
+    /**
+     * Functional interface for callback forEachTargetDo() target name in this instance.
+     */
+    @FunctionalInterface public interface FECallback {
+        /**
+         * Internal call to callback.
+         *
+         * @param target The target the callback is called for.
+         * @param arg The arg passed to the forEachTargetDo() method.
+         */
+        void call(String target, Object arg);
+    }
+
+    /**
+     * Loop over targets calling a callback.
+     *
+     * @param action The callback called for each target in this instance.
+     */
+    public void forEachTargetDo(FECallback action, Object arg) {
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        for(String target: targets_)</span>
+<span class="fc" id="L146">            action.call(target, arg);</span>
+<span class="fc" id="L147">    }</span>
+
+    /**
+     * Get the message payload parts as a String[].
+     *
+     * @return The String[] of all payload message parts.
+     */
+    public String[] getMessageParts() {
+<span class="fc" id="L155">        String[] results = new String[frames_.size()];</span>
+<span class="fc" id="L156">        return frames_.toArray(results);</span>
+    }
+
+    /**
+     * Get the payload message parts as a string iterable.
+     *
+     * @return The iterable for the list of payload message parts.
+     */
+    public Iterable&lt;String&gt; getMessagePartsIterable() {
+<span class="fc" id="L165">        return frames_;</span>
+    }
+
+    /**
+     * Add one or more targets to the targets list as a collection.
+     *
+     * @param newTargets The collection of new targets.
+     */
+<span class="fc" id="L173">    public void addTargets(Collection&lt;String&gt; newTargets) { targets_.addAll(newTargets); }</span>
+
+    /**
+     * Add one or more targets to the targets list as a String[].
+     *
+     * @param newTargets The String[] of new targets.
+     */
+<span class="fc" id="L180">    public void addTargets(String... newTargets) { Collections.addAll(targets_, newTargets); }</span>
+
+    /**
+     * Replace targets with one or more targets to the targets list as a collection.
+     *
+     * @param newTargets The collection of new targets.
+     */
+<span class="fc" id="L187">    public void replaceTargets(Collection&lt;String&gt; newTargets) { targets_.clear(); addTargets(newTargets); }</span>
+
+    /**
+     * Replace targets with one or more targets to the targets list as a String[].
+     *
+     * @param newTargets The String[] of new targets.
+     */
+<span class="fc" id="L194">    public void replaceTargets(String... newTargets) { targets_.clear(); addTargets(newTargets); }</span>
+
+    /**
+     * Add one or more parts to the payload message parts list as a String[].
+     *
+     * @param newParts The String[] of new targets.
+     */
+<span class="fc" id="L201">    public void addMessageParts(String... newParts) { frames_.addAll(Arrays.asList(newParts)); }</span>
+
+    /**
+     * Add one or more parts to the payload message parts list as a collection.
+     *
+     * @param newParts The collection of new targets.
+     */
+<span class="fc" id="L208">    public void addMessageParts(Collection&lt;String&gt; newParts) { frames_.addAll(newParts); }</span>
+
+    /**
+     * Get the message's topic.
+     *
+     * @return The topic passed in the ctor()
+     */
+<span class="fc" id="L215">    public String getTopic() { return topic_; }</span>
+
+    /**
+     * Get the message's sender.
+     *
+     * @return The sender passed in the ctor()
+     */
+<span class="fc" id="L222">    public String getSender() { return sender_; }</span>
+
+    /**
+     * Convert the entire message to a string for display. NOTE: do not use in tight loops as this is not efficient.
+     *
+     * @return The string representation of the message.
+     */
+    @Override public String toString() {
+<span class="fc" id="L230">        return String.format(&quot;Topic='%s'; Sender='%s'; Targets='%s', Frames='%s'&quot;, topic_, sender_,</span>
+<span class="fc" id="L231">                getTargetsAsString(), String.join(&quot;|&quot;, getMessageParts()));</span>
+    }
+
+    private final String topic_;
+    private final String sender_;
+<span class="fc" id="L236">    private final Set&lt;String&gt; targets_ = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L237">    private final ArrayList&lt;String&gt; frames_ = new ArrayList&lt;&gt;();</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

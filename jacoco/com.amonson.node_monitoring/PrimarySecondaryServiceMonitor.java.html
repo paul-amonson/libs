@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrimarySecondaryServiceMonitor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">libs</a> &gt; <a href="index.source.html" class="el_package">com.amonson.node_monitoring</a> &gt; <span class="el_source">PrimarySecondaryServiceMonitor.java</span></div><h1>PrimarySecondaryServiceMonitor.java</h1><pre class="source lang-java linenums">// Copyright (C) 2021 Paul Amonson
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+package com.amonson.node_monitoring;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.logging.Logger;
+
+/**
+ * Class for making a single node in a cluster the &quot;Primary&quot; node. This is done cooperatively.
+ */
+public class PrimarySecondaryServiceMonitor {
+
+    /**
+     * Create a monitor for deciding who in a cluster is has a Primary role and the rest are Secondary roles.
+     *
+     * @param monitoring The {@link NodeMonitoring} object that performs the basic messaging including which nodes
+     *                  are alive and which are not.
+     * @param handler The callback receiving the notification of you current role. This will happen on role change.
+     */
+<span class="fc" id="L25">    public PrimarySecondaryServiceMonitor(NodeMonitoring monitoring, PrimarySecondaryRoleChange handler) {</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if(monitoring == null)</span>
+<span class="fc" id="L27">            throw new IllegalArgumentException(&quot;The 'monitoring' parameter cannot be null!&quot;);</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if(handler == null)</span>
+<span class="fc" id="L29">            throw new IllegalArgumentException(&quot;The 'handler' parameter cannot be null!&quot;);</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if(!monitoring.isRunning())</span>
+<span class="fc" id="L31">            throw new RuntimeException(&quot;The underlying monitoring must be running before creating this class!&quot;);</span>
+<span class="fc" id="L32">        monitoring_ = monitoring;</span>
+<span class="fc" id="L33">        log_ = monitoring_.getLogger();</span>
+<span class="fc" id="L34">        monitoring_.addNodeStateChangeHandler(this::nodeStateChangeCallback);</span>
+<span class="fc" id="L35">        monitoring_.addOrReplaceMessageHandler(ANNOUNCE,this::announceHandler);</span>
+<span class="fc" id="L36">        me_ = monitoring_.getMyHostname();</span>
+<span class="fc" id="L37">        primary_ = me_;</span>
+<span class="fc" id="L38">        handler_ = handler;</span>
+<span class="fc" id="L39">        log_.fine(&quot;Greedily assuming I am the primary...&quot;);</span>
+<span class="fc" id="L40">        enableHandler(true);</span>
+<span class="fc" id="L41">        makePriority();</span>
+<span class="fc" id="L42">        evaluatePrimary(true);</span>
+<span class="fc" id="L43">        announce();</span>
+<span class="fc" id="L44">    }</span>
+
+    /**
+     * Allow enabling and disabling of the Role callback. This is enabled in the constructor by default.
+     *
+     * @param enable true will enable role notification, false disables role notifications.
+     */
+    public void enableHandler(boolean enable) {
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if(enable)</span>
+<span class="fc" id="L53">            monitoring_.addOrReplaceMessageHandler(ANNOUNCE, this::announceHandler);</span>
+        else
+<span class="fc" id="L55">            monitoring_.removeMessageHandler(ANNOUNCE);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        log_.info(String.format(&quot;%s Role Monitoring.&quot;, enable?&quot;Enabled&quot;:&quot;Disabled&quot;));</span>
+<span class="fc" id="L57">    }</span>
+
+    private void makePriority() {
+<span class="fc" id="L60">        map_.put(me_, rng_.nextInt(Integer.MAX_VALUE));</span>
+<span class="fc" id="L61">    }</span>
+
+    private void nodeStateChangeCallback(String node, RemoteNodeState newState, long lastSeen) {
+<span class="fc" id="L64">        log_.fine(String.format(&quot;STATE CHANGE: %s: %s&quot;, newState, node));</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if(newState == RemoteNodeState.ACTIVE)</span>
+<span class="fc" id="L66">            announce();</span>
+        else {
+<span class="fc" id="L68">            map_.put(node, 0);</span>
+<span class="fc" id="L69">            evaluatePrimary(false);</span>
+        }
+<span class="fc" id="L71">    }</span>
+
+    private void announceHandler(Message message) {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if(!message.getSender().equals(me_)) {</span>
+<span class="fc" id="L75">            int remotePriority = Integer.parseInt(message.getMessagePartsIterable().iterator().next());</span>
+<span class="fc" id="L76">            map_.put(message.getSender(), remotePriority);</span>
+<span class="fc" id="L77">            log_.fine(String.format(&quot;%s: %s=%d&quot;, ANNOUNCE, message.getSender(), remotePriority));</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            boolean needToAnnounce = remotePriority == map_.get(me_);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            while(remotePriority == map_.get(me_))</span>
+<span class="fc" id="L80">                makePriority();</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            if(needToAnnounce) {</span>
+<span class="fc" id="L82">                log_.fine(&quot;Detected priority collision, selecting new priority and re-announcing.&quot;);</span>
+<span class="fc" id="L83">                announce();</span>
+            }
+<span class="fc" id="L85">            evaluatePrimary(false);</span>
+        }
+<span class="fc" id="L87">    }</span>
+
+    private void announce() {
+<span class="fc" id="L90">        Message msg = new  Message(ANNOUNCE, me_, &quot;*&quot;, Long.toString(map_.get(me_)));</span>
+<span class="fc" id="L91">        monitoring_.sendMessage(msg);</span>
+<span class="fc" id="L92">        log_.fine(String.format(&quot;Sent %s message to everyone.&quot;, ANNOUNCE));</span>
+<span class="fc" id="L93">    }</span>
+
+    private void evaluatePrimary(boolean initial) {
+<span class="fc" id="L96">        String candidate = me_;</span>
+<span class="fc" id="L97">        int candidateRank = map_.get(me_);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for(Map.Entry&lt;String,Integer&gt; entry: map_.entrySet())</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            if(entry.getValue() &gt; candidateRank) {</span>
+<span class="fc" id="L100">                candidateRank = entry.getValue();</span>
+<span class="fc" id="L101">                candidate = entry.getKey();</span>
+            }
+<span class="fc" id="L103">        log_.fine(String.format(&quot;Current primary='%s (%d)'; new candidate='%s (%d)'&quot;, primary_, map_.get(primary_),</span>
+<span class="fc" id="L104">                candidate, candidateRank));</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if(initial)</span>
+<span class="fc" id="L106">            handler_.stateChanged(PrimarySecondaryRole.Primary);</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        else if(!primary_.equals(candidate)) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            if(primary_.equals(me_))</span>
+<span class="fc" id="L109">                handler_.stateChanged(PrimarySecondaryRole.Secondary);</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            if(candidate.equals(me_))</span>
+<span class="fc" id="L111">                handler_.stateChanged(PrimarySecondaryRole.Primary);</span>
+<span class="fc" id="L112">            primary_ = candidate;</span>
+        }
+<span class="fc" id="L114">    }</span>
+
+    private final NodeMonitoring monitoring_;
+    private final String me_;
+    private final PrimarySecondaryRoleChange handler_;
+    private final Logger log_;
+<span class="fc" id="L120">    private final Map&lt;String, Integer&gt; map_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L121">    private       Random rng_ = new Random(Instant.now().toEpochMilli()); // Not final for testing</span>
+
+    private String primary_;
+
+    private static final String ANNOUNCE = &quot;_ANNOUNCE_&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
