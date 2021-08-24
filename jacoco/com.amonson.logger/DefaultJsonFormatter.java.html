@@ -25,27 +25,18 @@ public class DefaultJsonFormatter extends Formatter {
     /**
      * Default ctor that prefetches the hostname and PID for the process and stores them as fields.
      *
-     * @throws RuntimeException if the JSON parser cannot be created or the hostname cannot be retrieved.
+     * @param hostname Passed in host name, this class will not determine the hostname.
+     * @throws RuntimeException if the parser could not be created.
      */
-<span class="fc" id="L30">    public DefaultJsonFormatter() {</span>
+<span class="fc" id="L31">    public DefaultJsonFormatter(String hostname) {</span>
         try {
-<span class="fc" id="L32">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
-<span class="fc" id="L33">            String program = &quot;/usr/bin/hostname&quot;;</span>
-<span class="pc bpc" id="L34" title="1 of 2 branches missed.">            if (System.getProperty(&quot;os.name&quot;).startsWith(&quot;Windows&quot;))</span>
-<span class="nc" id="L35">                program = &quot;/Windows/System32/HOSTNAME.EXE&quot;;</span>
-<span class="fc" id="L36">            ProcessBuilder pb = new ProcessBuilder(program);</span>
-<span class="fc" id="L37">            Process p = pb.start();</span>
-<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (!p.waitFor(5, TimeUnit.SECONDS)) {</span>
-<span class="nc" id="L39">                p.destroyForcibly();</span>
-<span class="nc" id="L40">                throw new IOException(&quot;Failed to get hostname using: &quot; + program);</span>
-            }
-<span class="fc" id="L42">            hostName_ = new String(new BufferedInputStream(p.getInputStream()).readAllBytes(),</span>
-<span class="fc" id="L43">                    StandardCharsets.US_ASCII).trim();</span>
-<span class="nc" id="L44">        } catch(InterruptedException | IOException | PropStoreFactoryException e) {</span>
-<span class="nc" id="L45">            throw new RuntimeException(&quot;Failed to get the system hostname!&quot;, e);</span>
-<span class="fc" id="L46">        }</span>
-<span class="fc" id="L47">        pid_ = ProcessHandle.current().pid();</span>
-<span class="fc" id="L48">    }</span>
+<span class="fc" id="L33">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="nc" id="L34">        } catch(PropStoreFactoryException e) {</span>
+<span class="nc" id="L35">            throw new RuntimeException(e);</span>
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">        hostName_ = hostname;</span>
+<span class="fc" id="L38">        pid_ = ProcessHandle.current().pid();</span>
+<span class="fc" id="L39">    }</span>
 
     /**
      * Overridden format method used by the Handler to format the LogRecord as a String. In this case a JSON string.
@@ -55,10 +46,10 @@ public class DefaultJsonFormatter extends Formatter {
      */
     @Override
     public String format(LogRecord logRecord) {
-<span class="fc" id="L58">        PropMap map = LogRecordSerialization.serializeLogRecord(logRecord);</span>
-<span class="fc" id="L59">        map.put(&quot;hostname&quot;, hostName_);</span>
-<span class="fc" id="L60">        map.put(&quot;pid&quot;, pid_);</span>
-<span class="fc" id="L61">        return parser_.toString(map);</span>
+<span class="fc" id="L49">        PropMap map = LogRecordSerialization.serializeLogRecord(logRecord);</span>
+<span class="fc" id="L50">        map.put(&quot;hostname&quot;, hostName_);</span>
+<span class="fc" id="L51">        map.put(&quot;pid&quot;, pid_);</span>
+<span class="fc" id="L52">        return parser_.toString(map);</span>
     }
 
     private final String hostName_;

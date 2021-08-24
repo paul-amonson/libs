@@ -11,7 +11,17 @@ import java.util.logging.LogRecord;
  * as the last character of the message. The will behave correctly when using the ConsoleHandler and show one JSON
  * message per line on the console.
  */
-<span class="fc" id="L14">public class DefaultLineFormatter extends DefaultJsonFormatter {</span>
+public class DefaultLineFormatter extends DefaultJsonFormatter {
+    /**
+     * Default ctor that prefetches the hostname and PID for the process and stores them as fields.
+     *
+     * @param hostname Passed in host name, this class will not determine the hostname.
+     * @throws RuntimeException if the JSON parser cannot be created or the hostname cannot be retrieved.
+     */
+    public DefaultLineFormatter(String hostname) {
+<span class="fc" id="L22">        super(hostname);</span>
+<span class="fc" id="L23">    }</span>
+
     /**
      * Call the parent (DefaultJsonFormatter) format method and appends a newline for text output.
      *
@@ -20,7 +30,7 @@ import java.util.logging.LogRecord;
      */
     @Override
     public String format(LogRecord logRecord) {
-<span class="fc" id="L23">        return super.format(logRecord) + &quot;\n&quot;;</span>
+<span class="fc" id="L33">        return super.format(logRecord) + &quot;\n&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

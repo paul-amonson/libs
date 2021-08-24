@@ -57,7 +57,7 @@ public final class LogRecordSerialization {
 <span class="fc" id="L57">        record.setThreadID(map.getInteger(&quot;thread&quot;));</span>
 <span class="fc" id="L58">        record.setSourceClassName(map.getString(&quot;class&quot;));</span>
 <span class="fc" id="L59">        record.setSourceMethodName(map.getString(&quot;method&quot;));</span>
-<span class="fc bfc" id="L60" title="All 2 branches covered.">        if(map.getMap(&quot;exception&quot;) != null)</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if(map.getMap(&quot;exception&quot;) != null)</span>
 <span class="fc" id="L61">            record.setThrown(deserializeThrowable(map.getMap(&quot;exception&quot;)));</span>
 <span class="fc" id="L62">        return record;</span>
     }

@@ -20,10 +20,11 @@ public final class NativeLoggerFactory {
      * a LogManager. The default handler used is the ConsoleHandler. The default formatter is the DefaultLineFormatter.
      *
      * @param name The name of the logger to create.
+     * @param arg Arbitrary argument that is implementation dependent on methods where a formatter is created.
      * @return The new constructed and configured logger.
      */
-    public static Logger getNamedConfiguredLogger(String name) {
-<span class="fc" id="L26">        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter());</span>
+    public static Logger getNamedConfiguredLogger(String name, Object arg) {
+<span class="fc" id="L27">        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter(arg.toString()));</span>
     }
 
     /**
@@ -36,7 +37,7 @@ public final class NativeLoggerFactory {
      * @return The new constructed and configured logger.
      */
     public static Logger getNamedConfiguredLogger(String name, Formatter formatter) {
-<span class="fc" id="L39">        return getNamedConfiguredLogger(name, new ConsoleHandler(), formatter);</span>
+<span class="fc" id="L40">        return getNamedConfiguredLogger(name, new ConsoleHandler(), formatter);</span>
     }
 
     /**
@@ -46,10 +47,11 @@ public final class NativeLoggerFactory {
      *
      * @param name The name of the logger to create.
      * @param handler The Handler that &quot;publishes&quot; the logged message.
+     * @param arg Arbitrary argument that is implementation dependent on methods where a formatter is created.
      * @return The new constructed and configured logger.
      */
-    public static Logger getNamedConfiguredLogger(String name, Handler handler) {
-<span class="fc" id="L52">        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter());</span>
+    public static Logger getNamedConfiguredLogger(String name, Handler handler, Object arg) {
+<span class="fc" id="L54">        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter(arg.toString()));</span>
     }
 
     /**
@@ -62,13 +64,13 @@ public final class NativeLoggerFactory {
      * @return The new constructed and configured logger.
      */
     public static Logger getNamedConfiguredLogger(String name, Handler handler, Formatter formatter) {
-<span class="fc" id="L65">        Logger logger = Logger.getLogger(name);</span>
-<span class="fc" id="L66">        logger.setUseParentHandlers(false);</span>
-<span class="fc" id="L67">        logger.addHandler(handler);</span>
-<span class="fc" id="L68">        logger.getHandlers()[0].setLevel(Level.FINEST);</span>
-<span class="fc" id="L69">        logger.getHandlers()[0].setFormatter(formatter);</span>
-<span class="fc" id="L70">        logger.setLevel(Level.FINEST);</span>
-<span class="fc" id="L71">        return logger;</span>
+<span class="fc" id="L67">        Logger logger = Logger.getLogger(name);</span>
+<span class="fc" id="L68">        logger.setUseParentHandlers(false);</span>
+<span class="fc" id="L69">        logger.addHandler(handler);</span>
+<span class="fc" id="L70">        logger.getHandlers()[0].setLevel(Level.FINEST);</span>
+<span class="fc" id="L71">        logger.getHandlers()[0].setFormatter(formatter);</span>
+<span class="fc" id="L72">        logger.setLevel(Level.FINEST);</span>
+<span class="fc" id="L73">        return logger;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
