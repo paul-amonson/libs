@@ -13,6 +13,16 @@ import java.util.logging.LogRecord;
  */
 public class DefaultLineFormatter extends DefaultJsonFormatter {
     /**
+     * Default ctor that prefetches the hostname and PID for the process and stores them as fields.
+     *
+     * @param hostname Passed in host name, this class will not determine the hostname.
+     * @throws RuntimeException if the JSON parser cannot be created or the hostname cannot be retrieved.
+     */
+    public DefaultLineFormatter(String hostname) {
+        super(hostname);
+    }
+
+    /**
      * Call the parent (DefaultJsonFormatter) format method and appends a newline for text output.
      *
      * @param logRecord The LogRecord to format from the handler.

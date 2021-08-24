@@ -11,12 +11,13 @@ import spock.lang.Specification
 
 import java.util.logging.Handler
 import java.util.logging.LogRecord
+import java.util.logging.Logger
 
 class NativeLoggerFactorySpec extends Specification {
     def "Test GetNamedConfiguredLogger name and handler"() {
         Handler handler = new TestHandler()
         boolean ok = true
-        java.util.logging.Logger logger = NativeLoggerFactory.getNamedConfiguredLogger("test", handler)
+        Logger logger = NativeLoggerFactory.getNamedConfiguredLogger("test", handler, "host")
         logger.finest("finest")
         ok = ok && handler.validJson
         logger.finer("finer")
@@ -41,14 +42,14 @@ class NativeLoggerFactorySpec extends Specification {
     }
 
     def "Test GetNamedConfiguredLogger name only"() {
-        java.util.logging.Logger logger = NativeLoggerFactory.getNamedConfiguredLogger("test")
+        Logger logger = NativeLoggerFactory.getNamedConfiguredLogger("test", "host")
         logger.entering("", "GetNamedConfiguredLogger")
         logger.exiting(getClass().getCanonicalName(), "")
         expect: true
     }
 
     def "Test GetNamedConfiguredLogger name and formatter"() {
-        java.util.logging.Logger logger = NativeLoggerFactory.getNamedConfiguredLogger("test", new DefaultLineFormatter())
+        Logger logger = NativeLoggerFactory.getNamedConfiguredLogger("test", new DefaultLineFormatter("host"))
         logger.severe("severe")
         expect: true
     }

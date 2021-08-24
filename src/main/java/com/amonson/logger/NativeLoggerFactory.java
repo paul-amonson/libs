@@ -20,10 +20,11 @@ public final class NativeLoggerFactory {
      * a LogManager. The default handler used is the ConsoleHandler. The default formatter is the DefaultLineFormatter.
      *
      * @param name The name of the logger to create.
+     * @param arg Arbitrary argument that is implementation dependent on methods where a formatter is created.
      * @return The new constructed and configured logger.
      */
-    public static Logger getNamedConfiguredLogger(String name) {
-        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter());
+    public static Logger getNamedConfiguredLogger(String name, Object arg) {
+        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter(arg.toString()));
     }
 
     /**
@@ -46,10 +47,11 @@ public final class NativeLoggerFactory {
      *
      * @param name The name of the logger to create.
      * @param handler The Handler that "publishes" the logged message.
+     * @param arg Arbitrary argument that is implementation dependent on methods where a formatter is created.
      * @return The new constructed and configured logger.
      */
-    public static Logger getNamedConfiguredLogger(String name, Handler handler) {
-        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter());
+    public static Logger getNamedConfiguredLogger(String name, Handler handler, Object arg) {
+        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter(arg.toString()));
     }
 
     /**

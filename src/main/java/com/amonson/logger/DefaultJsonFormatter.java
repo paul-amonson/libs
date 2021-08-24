@@ -25,25 +25,16 @@ public class DefaultJsonFormatter extends Formatter {
     /**
      * Default ctor that prefetches the hostname and PID for the process and stores them as fields.
      *
-     * @throws RuntimeException if the JSON parser cannot be created or the hostname cannot be retrieved.
+     * @param hostname Passed in host name, this class will not determine the hostname.
+     * @throws RuntimeException if the parser could not be created.
      */
-    public DefaultJsonFormatter() {
+    public DefaultJsonFormatter(String hostname) {
         try {
             parser_ = PropStoreFactory.getStore("json");
-            String program = "/usr/bin/hostname";
-            if (System.getProperty("os.name").startsWith("Windows"))
-                program = "/Windows/System32/HOSTNAME.EXE";
-            ProcessBuilder pb = new ProcessBuilder(program);
-            Process p = pb.start();
-            if (!p.waitFor(5, TimeUnit.SECONDS)) {
-                p.destroyForcibly();
-                throw new IOException("Failed to get hostname using: " + program);
-            }
-            hostName_ = new String(new BufferedInputStream(p.getInputStream()).readAllBytes(),
-                    StandardCharsets.US_ASCII).trim();
-        } catch(InterruptedException | IOException | PropStoreFactoryException e) {
-            throw new RuntimeException("Failed to get the system hostname!", e);
+        } catch(PropStoreFactoryException e) {
+            throw new RuntimeException(e);
         }
+        hostName_ = hostname;
         pid_ = ProcessHandle.current().pid();
     }
 
