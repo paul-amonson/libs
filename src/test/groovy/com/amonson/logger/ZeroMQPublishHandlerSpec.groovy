@@ -4,6 +4,8 @@
 //
 package com.amonson.logger
 
+import com.amonson.prop_store.PropStoreFactoryException
+import org.zeromq.SocketType
 import org.zeromq.ZMQException
 import org.zeromq.ZMQ
 import spock.lang.Specification
@@ -12,42 +14,32 @@ import java.util.logging.LogRecord
 import java.util.logging.Level
 
 class ZeroMQPublishHandlerSpec extends Specification {
-    ZMQ.Socket creator() {
-        return Mock(ZMQ.Socket)
-    }
-
-    ZMQ.Socket creator2() {
-        ZMQ.Socket socket = Mock(ZMQ.Socket)
-        socket.send(_ as String, _ as Integer) >> { throw new ZMQException("Message", -1) }
-        return socket
-    }
-
+    ZMQ.Socket socket_
     def underTest_
     def setup() {
-        underTest_ = new ZeroMQPublishHandler("url", "test")
-        underTest_.creator_ = this::creator
-        underTest_.setFormatter(new DefaultJsonFormatter())
+        socket_ = Mock(ZMQ.Socket)
+        underTest_ = new ZeroMQPublishHandler("url")
+        underTest_.ctx_ = Mock(ZMQ.Context)
+        underTest_.ctx_.socket(_ as SocketType) >> socket_
+        underTest_.setFormatter(new DefaultJsonFormatter("hostname"))
     }
 
     def "Test Publish"() {
         LogRecord record = new LogRecord(Level.INFO, "some message")
         underTest_.publish(record)
+        underTest_.publish(record)
+        underTest_.flush()
+        underTest_.close()
         expect: true
     }
 
     def "Test Publish Negative"() {
         given:
-            underTest_.creator_ = this::creator2
+            socket_.send(_ as String, _ as Integer) >> { throw new ZMQException(1); }
             LogRecord record = new LogRecord(Level.INFO, "some message")
         when:
             underTest_.publish(record)
         then:
             thrown(RuntimeException)
-    }
-
-    def "Test createSocket"() {
-        underTest_.flush()
-        underTest_.close()
-        expect: underTest_.createSocket() != null
     }
 }

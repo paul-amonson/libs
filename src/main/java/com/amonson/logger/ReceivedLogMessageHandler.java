@@ -14,8 +14,7 @@ public interface ReceivedLogMessageHandler {
     /**
      * Method signature of callback with data from ZeroMQPublishHandler.
      *
-     * @param topic The topic this message was received on.
      * @param rawJson The raw JSON received over the network.
      */
-    void received(String topic, String rawJson);
+    void received(String rawJson);
 }

@@ -21,12 +21,10 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
      *
      * @param url The ZeroMQ URL to bind to. The address may be '*' to bind to all interfaces.
      * @param messageCallback The callback that will receive all published log messages.
-     * @param topics The topics to listen on. If no topics are specified then all are listened to.
      */
-    public ZeroMQLogSubscriber(String url, ReceivedLogMessageHandler messageCallback, String... topics) {
+    public ZeroMQLogSubscriber(String url, ReceivedLogMessageHandler messageCallback) {
         url_ = url;
         callback_ = messageCallback;
-        topics_ = topics;
         ctx_ = ZMQ.context(1);
     }
 
@@ -76,20 +74,12 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
             throw new IOException("Server is already Running!");
         running_.set(true);
         zeroMQThread_ = Thread.currentThread();
-        try (ZMQ.Socket subscriber = ctx_.socket(SocketType.SUB)) {
-            if(topics_.length > 0)
-                for(String topic: topics_)
-                    subscriber.subscribe(topic);
-            else
-                subscriber.subscribe(""); // subscribe to all topics.
+        try (ZMQ.Socket subscriber = ctx_.socket(SocketType.PULL)) {
             subscriber.bind(url_);
             while(!Thread.currentThread().isInterrupted()) {
-                String topic = subscriber.recvStr(0);
-                if(topic != null) {
-                    String message = subscriber.recvStr(0);
-                    if (message != null && callback_ != null)
-                        callback_.received(topic, message);
-                }
+                String message = subscriber.recvStr(0);
+                if (message != null && callback_ != null)
+                    callback_.received(message);
             }
         } catch(ZMQException e) {
             if(e.getErrorCode() != 4)
@@ -101,7 +91,6 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
     }
 
     private final String url_;
-    private final String[] topics_;
     private final ReceivedLogMessageHandler callback_;
     private final AtomicBoolean running_ = new AtomicBoolean(false);
     private       ZMQ.Context ctx_; // Not final for testing...

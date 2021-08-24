@@ -11,7 +11,7 @@ class ZeroMQLogSubscriberSpec extends Specification {
     ZeroMQLogSubscriber underTest_
     def setup() {
         socket_ = Mock(ZMQ.Socket)
-        socket_.recvStr(_ as Integer) >>> ["topic", message_,"topic",null,null]
+        socket_.recvStr(_ as Integer) >>> [message_,null]
         ctx_ = Mock(ZMQ.Context)
         ctx_.socket(_ as SocketType) >> socket_
         messageCount_ = 0
@@ -19,7 +19,7 @@ class ZeroMQLogSubscriberSpec extends Specification {
         underTest_.ctx_ = ctx_
     }
 
-    void callback(String topic, String json) {
+    void callback(String json) {
         messageCount_++
     }
 
@@ -33,17 +33,17 @@ class ZeroMQLogSubscriberSpec extends Specification {
         expect: messageCount_ > 0
         and:    !underTest_.isRunning()
     }
-
-    def "Test Run with Topics"() {
-        underTest_ = new ZeroMQLogSubscriber("tcp://*:20000", this::callback, "t1", "t2")
-        underTest_.ctx_ = ctx_
-        new Thread(() -> {
-            Thread.sleep(10)
-            underTest_.signalStopServer()
-        }).start()
-        underTest_.run()
-        expect: messageCount_ > 0
-    }
+//
+//    def "Test Run with Topics"() {
+//        underTest_ = new ZeroMQLogSubscriber("tcp://*:20000", this::callback, "t1", "t2")
+//        underTest_.ctx_ = ctx_
+//        new Thread(() -> {
+//            Thread.sleep(10)
+//            underTest_.signalStopServer()
+//        }).start()
+//        underTest_.run()
+//        expect: messageCount_ > 0
+//    }
 
     def "Test Run Twice"() {
         new Thread(underTest_).start()
