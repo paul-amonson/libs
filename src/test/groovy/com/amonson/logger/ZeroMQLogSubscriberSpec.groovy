@@ -11,7 +11,7 @@ class ZeroMQLogSubscriberSpec extends Specification {
     ZeroMQLogSubscriber underTest_
     def setup() {
         socket_ = Mock(ZMQ.Socket)
-        socket_.recvStr(_ as Integer) >>> [message_,null]
+        socket_.recvStr(_ as Integer) >>> ["L", message_, "L", null, null]
         ctx_ = Mock(ZMQ.Context)
         ctx_.socket(_ as SocketType) >> socket_
         messageCount_ = 0

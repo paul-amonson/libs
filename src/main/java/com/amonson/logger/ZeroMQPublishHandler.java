@@ -51,6 +51,7 @@ public class ZeroMQPublishHandler extends Handler {
         int retries = 0;
         while(!sent && retries < 15) {
             try {
+                publish_.sendMore("L");
                 publish_.send(message, 0);
                 sent = true;
             } catch (ZMQException | NullPointerException e) {
@@ -75,7 +76,7 @@ public class ZeroMQPublishHandler extends Handler {
                 publish_.close();
             } catch(ZMQException e) { /* Ignore error as we are resetting... */ }
         }
-        publish_ = ctx_.socket(SocketType.PUSH);
+        publish_ = ctx_.socket(SocketType.PUB);
         publish_.connect(url_);
         try { Thread.sleep(50); } catch(InterruptedException e2) { /* */ }
     }

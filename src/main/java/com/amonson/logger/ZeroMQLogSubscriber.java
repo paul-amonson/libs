@@ -74,12 +74,15 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
             throw new IOException("Server is already Running!");
         running_.set(true);
         zeroMQThread_ = Thread.currentThread();
-        try (ZMQ.Socket subscriber = ctx_.socket(SocketType.PULL)) {
+        try (ZMQ.Socket subscriber = ctx_.socket(SocketType.XPUB)) {
             subscriber.bind(url_);
             while(!Thread.currentThread().isInterrupted()) {
-                String message = subscriber.recvStr(0);
-                if (message != null && callback_ != null)
-                    callback_.received(message);
+                String topic = subscriber.recvStr(0);
+                if(topic != null) {
+                    String message = subscriber.recvStr(0);
+                    if (message != null && callback_ != null)
+                        callback_.received(message);
+                }
             }
         } catch(ZMQException e) {
             if(e.getErrorCode() != 4)
