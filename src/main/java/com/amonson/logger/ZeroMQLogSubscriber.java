@@ -4,16 +4,13 @@
 //
 package com.amonson.logger;
 
-import com.amonson.prop_store.PropMap;
-import com.amonson.prop_store.PropStore;
-import com.amonson.prop_store.PropStoreFactory;
-import com.amonson.prop_store.PropStoreFactoryException;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQException;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class to receive data from the ZeroMQPublishHandler class.
@@ -25,17 +22,11 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
      * @param url The ZeroMQ URL to bind to. The address may be '*' to bind to all interfaces.
      * @param messageCallback The callback that will receive all published log messages.
      * @param topics The topics to listen on. If no topics are specified then all are listened to.
-     * @throws RuntimeException if the JSON parser cannot be created.
      */
     public ZeroMQLogSubscriber(String url, ReceivedLogMessageHandler messageCallback, String... topics) {
         url_ = url;
         callback_ = messageCallback;
         topics_ = topics;
-        try {
-            parser_ = PropStoreFactory.getStore("json");
-        } catch(PropStoreFactoryException e) {
-            throw new RuntimeException(e);
-        }
         ctx_ = ZMQ.context(1);
     }
 
@@ -69,10 +60,8 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
      * Signal the server receive loop to stop.
      */
     public void signalStopServer() {
-        if(thread_ != null && !thread_.isInterrupted()) {
-            thread_.interrupt();
-            try { thread_.join(500); } catch(InterruptedException e) { /* Ignore */ }
-        }
+        if(isRunning())
+            zeroMQThread_.interrupt();
     }
 
     /**
@@ -80,53 +69,41 @@ public class ZeroMQLogSubscriber implements Runnable, Callable<Void> {
      *
      * @return true is the server is in the receiving loop, false otherwise.
      */
-    public boolean isRunning() { return thread_ != null; }
+    public boolean isRunning() { return running_.get(); }
 
     private void internalRun() throws Exception {
         if(isRunning())
             throw new IOException("Server is already Running!");
-        try (ZMQ.Socket subscriber = creator_.create()) {
-            subscriber.bind(url_);
+        running_.set(true);
+        zeroMQThread_ = Thread.currentThread();
+        try (ZMQ.Socket subscriber = ctx_.socket(SocketType.SUB)) {
             if(topics_.length > 0)
                 for(String topic: topics_)
                     subscriber.subscribe(topic);
             else
                 subscriber.subscribe(""); // subscribe to all topics.
-            Thread.sleep(100); // Apparently there is a bug and this is required.
-            thread_ = Thread.currentThread();
+            subscriber.bind(url_);
             while(!Thread.currentThread().isInterrupted()) {
-                byte[] topic = subscriber.recv(0);
-                byte[] message = subscriber.recv(0);
-                if (callback_ != null) {
-                    PropMap map = parser_.fromStringToMap(new String(message, ZMQ.CHARSET));
-                    callback_.received(new String(topic, ZMQ.CHARSET),
-                            LogRecordSerialization.deserializeLogRecord(map),
-                            map.getStringOrDefault("hostname", null),
-                            map.getIntegerOrDefault("pid", 0));
+                String topic = subscriber.recvStr(0);
+                if(topic != null) {
+                    String message = subscriber.recvStr(0);
+                    if (message != null && callback_ != null)
+                        callback_.received(topic, message);
                 }
             }
         } catch(ZMQException e) {
             if(e.getErrorCode() != 4)
                 throw new IOException(e);
         } finally {
-            thread_ = null;
+            zeroMQThread_ = null;
+            running_.set(false);
         }
     }
 
-    private ZMQ.Socket createSocket() {
-        return ctx_.socket(SocketType.SUB);
-    }
-
-    private final PropStore parser_;
     private final String url_;
     private final String[] topics_;
-    private final ZMQ.Context ctx_;
-    private       Thread thread_;
     private final ReceivedLogMessageHandler callback_;
-    private       SocketCreator creator_ = this::createSocket;
-
-    @FunctionalInterface
-    interface SocketCreator {
-        ZMQ.Socket create();
-    }
+    private final AtomicBoolean running_ = new AtomicBoolean(false);
+    private       ZMQ.Context ctx_; // Not final for testing...
+    private       Thread zeroMQThread_ = null;
 }

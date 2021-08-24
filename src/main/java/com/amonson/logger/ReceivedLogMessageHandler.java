@@ -15,9 +15,7 @@ public interface ReceivedLogMessageHandler {
      * Method signature of callback with data from ZeroMQPublishHandler.
      *
      * @param topic The topic this message was received on.
-     * @param record The received LogRecord of the logger.
-     * @param hostname The originating hostname of the system of log message source.
-     * @param remoteProcessId The process ID (PID) of the process on the originating system.
+     * @param rawJson The raw JSON received over the network.
      */
-    void received(String topic, LogRecord record, String hostname, int remoteProcessId);
+    void received(String topic, String rawJson);
 }

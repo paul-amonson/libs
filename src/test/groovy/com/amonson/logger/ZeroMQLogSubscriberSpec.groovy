@@ -1,47 +1,47 @@
 package com.amonson.logger
 
+import org.zeromq.SocketType
 import org.zeromq.ZMQ
 import spock.lang.Specification
 
-import java.util.logging.LogRecord
-
 class ZeroMQLogSubscriberSpec extends Specification {
-    def messageCount_
-
-    ZMQ.Socket createMockSocket() {
-        ZMQ.Socket socket = Mock(ZMQ.Socket)
-        socket.recv(_ as Integer) >>> ["topic".bytes, message_.bytes]
-        return socket
+    int messageCount_
+    ZMQ.Socket socket_
+    ZMQ.Context ctx_
+    ZeroMQLogSubscriber underTest_
+    def setup() {
+        socket_ = Mock(ZMQ.Socket)
+        socket_.recvStr(_ as Integer) >>> ["topic", message_,"topic",null,null]
+        ctx_ = Mock(ZMQ.Context)
+        ctx_.socket(_ as SocketType) >> socket_
+        messageCount_ = 0
+        underTest_ = new ZeroMQLogSubscriber("tcp://*:20000", this::callback)
+        underTest_.ctx_ = ctx_
     }
 
-    void callback(String topic, LogRecord record, String hostname, int remoteProcessId) {
+    void callback(String topic, String json) {
         messageCount_++
     }
 
-    ZeroMQLogSubscriber underTest_
-    def setup() {
-        messageCount_ = 0
-        underTest_ = new ZeroMQLogSubscriber("tcp://*:20000", this::callback)
-        underTest_.creator_ = this::createMockSocket
-    }
-
     def "Test Run"() {
-        new Thread(underTest_).start()
-        while(!underTest_.isRunning()) { Thread.sleep(10) }
-        Thread.sleep(10)
+        new Thread(() -> {
+            Thread.sleep(10)
+            underTest_.signalStopServer()
+        }).start()
+        underTest_.run()
         underTest_.signalStopServer()
-        while(underTest_.isRunning()) { Thread.sleep(10) }
         expect: messageCount_ > 0
+        and:    !underTest_.isRunning()
     }
 
     def "Test Run with Topics"() {
         underTest_ = new ZeroMQLogSubscriber("tcp://*:20000", this::callback, "t1", "t2")
-        underTest_.creator_ = this::createMockSocket
-        new Thread(underTest_).start()
-        while(!underTest_.isRunning()) { Thread.sleep(10) }
-        Thread.sleep(10)
-        underTest_.signalStopServer()
-        while(underTest_.isRunning()) { Thread.sleep(10) }
+        underTest_.ctx_ = ctx_
+        new Thread(() -> {
+            Thread.sleep(10)
+            underTest_.signalStopServer()
+        }).start()
+        underTest_.run()
         expect: messageCount_ > 0
     }
 
@@ -51,10 +51,6 @@ class ZeroMQLogSubscriberSpec extends Specification {
         when: underTest_.run()
         then: thrown(RuntimeException)
         and:  underTest_.signalStopServer()
-    }
-
-    def "Test CreateSocket"() {
-        expect: underTest_.createSocket() != null
     }
 
     String message_ = """{
