@@ -21,19 +21,17 @@ public class ZeroMQPublishHandler extends Handler {
      * Create a ZeroMQ PUB Handler for logging.
      *
      * @param zeroMQUrl The zeroMQ URL to connect to (must be a SUB server).
-     * @param topic  The topic to publish to at the above url.
      * @throws RuntimeException when the JSON parser cannot be created. This should be very rare.
      */
-<span class="fc" id="L27">    public ZeroMQPublishHandler(String zeroMQUrl, String topic) {</span>
-<span class="fc" id="L28">        url_ = zeroMQUrl;</span>
-<span class="fc" id="L29">        topic_ = topic;</span>
+<span class="fc" id="L26">    public ZeroMQPublishHandler(String zeroMQUrl) {</span>
+<span class="fc" id="L27">        url_ = zeroMQUrl;</span>
         try {
-<span class="fc" id="L31">            store_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
-<span class="nc" id="L32">        } catch(PropStoreFactoryException e) {</span>
-<span class="nc" id="L33">            throw new RuntimeException(&quot;Failed to create a JSON parser instance!&quot;, e);</span>
-<span class="fc" id="L34">        }</span>
-<span class="fc" id="L35">        ctx_ = ZMQ.context(1);</span>
-<span class="fc" id="L36">    }</span>
+<span class="fc" id="L29">            store_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="nc" id="L30">        } catch(PropStoreFactoryException e) {</span>
+<span class="nc" id="L31">            throw new RuntimeException(&quot;Failed to create a JSON parser instance!&quot;, e);</span>
+<span class="fc" id="L32">        }</span>
+<span class="fc" id="L33">        ctx_ = ZMQ.context(1);</span>
+<span class="fc" id="L34">    }</span>
 
     /**
      * Send the topic and message to the PUB socket connected to the SUB server.
@@ -43,56 +41,48 @@ public class ZeroMQPublishHandler extends Handler {
      */
     @Override
     public void publish(LogRecord logRecord) {
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        if(publish_ == null)</span>
-<span class="fc" id="L47">            repairConnection();</span>
-<span class="fc" id="L48">        publishZeroMQ(getFormatter().format(logRecord));</span>
-<span class="fc" id="L49">    }</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if(publish_ == null)</span>
+<span class="fc" id="L45">            repairConnection();</span>
+<span class="fc" id="L46">        publishZeroMQ(getFormatter().format(logRecord));</span>
+<span class="fc" id="L47">    }</span>
 
     private synchronized void publishZeroMQ(String message) {
-<span class="fc" id="L52">        boolean sent = false;</span>
-<span class="fc" id="L53">        int retries = 0;</span>
-<span class="fc bfc" id="L54" title="All 4 branches covered.">        while(!sent &amp;&amp; retries &lt; 15) {</span>
+<span class="fc" id="L50">        boolean sent = false;</span>
+<span class="fc" id="L51">        int retries = 0;</span>
+<span class="fc bfc" id="L52" title="All 4 branches covered.">        while(!sent &amp;&amp; retries &lt; 15) {</span>
             try {
-<span class="fc" id="L56">                publish_.send(topic_, ZMQ.SNDMORE);</span>
-<span class="fc" id="L57">                publish_.send(message);</span>
-<span class="fc" id="L58">                sent = true;</span>
-<span class="fc" id="L59">            } catch (ZMQException | NullPointerException e) {</span>
-<span class="fc" id="L60">                repairConnection();</span>
-<span class="fc" id="L61">                retries++;</span>
-<span class="fc" id="L62">            }</span>
+<span class="fc" id="L54">                publish_.send(message, 0);</span>
+<span class="fc" id="L55">                sent = true;</span>
+<span class="fc" id="L56">            } catch (ZMQException | NullPointerException e) {</span>
+<span class="fc" id="L57">                repairConnection();</span>
+<span class="fc" id="L58">                retries++;</span>
+<span class="fc" id="L59">            }</span>
         }
-<span class="fc bfc" id="L64" title="All 2 branches covered.">        if(retries &gt;= 15)</span>
-<span class="fc" id="L65">            throw new RuntimeException(&quot;Failed to send message: &quot; + message);</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(retries &gt;= 15)</span>
+<span class="fc" id="L62">            throw new RuntimeException(&quot;Failed to send message: &quot; + message);</span>
+<span class="fc" id="L63">    }</span>
 
-<span class="fc" id="L68">    @Override public void flush() { }</span>
-<span class="fc" id="L69">    @Override public void close() throws SecurityException { }</span>
+<span class="fc" id="L65">    @Override public void flush() { }</span>
+    @Override public void close() throws SecurityException {
+<span class="fc" id="L67">        publish_.close();</span>
+<span class="fc" id="L68">        publish_ = null;</span>
+<span class="fc" id="L69">    }</span>
 
     private void repairConnection() {
 <span class="fc bfc" id="L72" title="All 2 branches covered.">        if(publish_ != null) {</span>
             try {
 <span class="fc" id="L74">                publish_.disconnect(url_);</span>
-<span class="pc" id="L75">            } catch(ZMQException e) { /* Ignore error as we are resetting... */ }</span>
+<span class="fc" id="L75">                publish_.close();</span>
+<span class="pc" id="L76">            } catch(ZMQException e) { /* Ignore error as we are resetting... */ }</span>
         }
-<span class="fc" id="L77">        publish_ = creator_.create();</span>
-<span class="fc" id="L78">        publish_.connect(url_);</span>
-<span class="pc" id="L79">        try { Thread.sleep(50); } catch(InterruptedException e2) { /* */ }</span>
-<span class="fc" id="L80">    }</span>
-
-    private ZMQ.Socket createSocket() {
-<span class="fc" id="L83">        return ctx_.socket(SocketType.PUB);</span>
-    }
+<span class="fc" id="L78">        publish_ = ctx_.socket(SocketType.PUSH);</span>
+<span class="fc" id="L79">        publish_.connect(url_);</span>
+<span class="pc" id="L80">        try { Thread.sleep(50); } catch(InterruptedException e2) { /* */ }</span>
+<span class="fc" id="L81">    }</span>
 
     private final PropStore store_;
     private final String url_;
-    private final String topic_;
-    private final ZMQ.Context  ctx_;
-<span class="fc" id="L90">    private       ZMQ.Socket publish_ = null;</span>
-<span class="fc" id="L91">    private       SocketCreator creator_ = this::createSocket;</span>
-
-    @FunctionalInterface
-    interface SocketCreator {
-        ZMQ.Socket create();
-    }
+    private       ZMQ.Context  ctx_; // Not final for testing...
+<span class="fc" id="L86">    private       ZMQ.Socket publish_ = null;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
