@@ -162,6 +162,7 @@ public class Task {
     private Task(Class<?> mainClass, String[] args, Object userData) {
         class_ = mainClass;
         arguments_ = args;
+        userData_ = userData;
     }
 
     private void doProcessExecute() {
@@ -199,7 +200,7 @@ public class Task {
     private final String[] arguments_;
     private final AtomicInteger result_ = new AtomicInteger(0);
     private final AtomicReference<Throwable> exception_ = new AtomicReference<>(null);
-    private final Object userData_ = null;
+    private final Object userData_;
     private       Process process_ = null;
     private       Thread thread_ = null;
 }
