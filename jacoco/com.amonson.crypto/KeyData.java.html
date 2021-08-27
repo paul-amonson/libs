@@ -22,42 +22,42 @@ public class KeyData {
      * @param iv The Base64 encoded initialization vector.
      * @param key The base64 encoded key.
      */
-<span class="fc" id="L25">    public KeyData(String iv, String key) {</span>
-<span class="fc" id="L26">        iv_ = iv;</span>
-<span class="fc" id="L27">        key_ = key;</span>
-<span class="fc" id="L28">    }</span>
+<span class="nc" id="L25">    public KeyData(String iv, String key) {</span>
+<span class="nc" id="L26">        iv_ = iv;</span>
+<span class="nc" id="L27">        key_ = key;</span>
+<span class="nc" id="L28">    }</span>
 
     /**
      * Duplicating constructor for Key data.
      * @param data The KeyData instance to copy from.
      */
-<span class="fc" id="L34">    public KeyData(KeyData data) {</span>
-<span class="fc" id="L35">        iv_ = data.IV();</span>
-<span class="fc" id="L36">        key_ = data.key();</span>
-<span class="fc" id="L37">    }</span>
+<span class="nc" id="L34">    public KeyData(KeyData data) {</span>
+<span class="nc" id="L35">        iv_ = data.IV();</span>
+<span class="nc" id="L36">        key_ = data.key();</span>
+<span class="nc" id="L37">    }</span>
 
     /**
      * Generates new strong IV and Key's for AES encryption/decryption.
      * @throws NoSuchAlgorithmException Thrown when the JRE platform does not support strong algorithms for
      * IV/Key generation.
      */
-<span class="fc" id="L44">    public KeyData() throws NoSuchAlgorithmException {</span>
-<span class="fc" id="L45">        SecureRandom randomSecureRandom = SecureRandom.getInstance(getAlgorithm());</span>
-<span class="fc" id="L46">        byte[] iv = new byte[16];</span>
-<span class="fc" id="L47">        randomSecureRandom.nextBytes(iv);</span>
-<span class="fc" id="L48">        iv_ = Base64.getEncoder().encodeToString(iv);</span>
-<span class="fc" id="L49">        KeyGenerator kgen = KeyGenerator.getInstance(&quot;AES&quot;);</span>
-<span class="fc" id="L50">        kgen.init(128);</span>
-<span class="fc" id="L51">        SecretKey aesKey = kgen.generateKey();</span>
-<span class="fc" id="L52">        key_ = Base64.getEncoder().encodeToString(aesKey.getEncoded());</span>
-<span class="fc" id="L53">    }</span>
+<span class="nc" id="L44">    public KeyData() throws NoSuchAlgorithmException {</span>
+<span class="nc" id="L45">        SecureRandom randomSecureRandom = SecureRandom.getInstance(getAlgorithm());</span>
+<span class="nc" id="L46">        byte[] iv = new byte[16];</span>
+<span class="nc" id="L47">        randomSecureRandom.nextBytes(iv);</span>
+<span class="nc" id="L48">        iv_ = Base64.getEncoder().encodeToString(iv);</span>
+<span class="nc" id="L49">        KeyGenerator kgen = KeyGenerator.getInstance(&quot;AES&quot;);</span>
+<span class="nc" id="L50">        kgen.init(128);</span>
+<span class="nc" id="L51">        SecretKey aesKey = kgen.generateKey();</span>
+<span class="nc" id="L52">        key_ = Base64.getEncoder().encodeToString(aesKey.getEncoded());</span>
+<span class="nc" id="L53">    }</span>
 
     /**
      * IV Accessor method.
      * @return The base64 encoded initialization vector.
      */
     public String IV() {
-<span class="fc" id="L60">        return iv_;</span>
+<span class="nc" id="L60">        return iv_;</span>
     }
 
     /**
@@ -65,7 +65,7 @@ public class KeyData {
      * @return The base64 encoded key.
      */
     public String key() {
-<span class="fc" id="L68">        return key_;</span>
+<span class="nc" id="L68">        return key_;</span>
     }
 
     /**
@@ -74,7 +74,7 @@ public class KeyData {
      */
     @Override
     public String toString() {
-<span class="fc" id="L77">        return String.format(&quot;IV='%s'; Key='%s'&quot;, iv_, key_);</span>
+<span class="nc" id="L77">        return String.format(&quot;IV='%s'; Key='%s'&quot;, iv_, key_);</span>
     }
 
     /**
@@ -83,9 +83,9 @@ public class KeyData {
      */
     @Override
     public boolean equals(Object o) {
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        if(o instanceof KeyData) {</span>
-<span class="fc" id="L87">            KeyData kd = (KeyData)o;</span>
-<span class="fc bfc" id="L88" title="All 4 branches covered.">            return kd.iv_.equals(iv_) &amp;&amp; kd.key_.equals(key_);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if(o instanceof KeyData) {</span>
+<span class="nc" id="L87">            KeyData kd = (KeyData)o;</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">            return kd.iv_.equals(iv_) &amp;&amp; kd.key_.equals(key_);</span>
         }
 <span class="nc" id="L90">        return super.equals(o);</span>
     }
@@ -104,7 +104,7 @@ public class KeyData {
      * @return The IV as bytes.
      */
     public byte[] IVAsBytes() {
-<span class="fc" id="L107">        return Base64.getDecoder().decode(iv_);</span>
+<span class="nc" id="L107">        return Base64.getDecoder().decode(iv_);</span>
     }
 
     /**
@@ -112,7 +112,7 @@ public class KeyData {
      * @return The Key as bytes.
      */
     public byte[] keyAsBytes() {
-<span class="fc" id="L115">        return Base64.getDecoder().decode(key_);</span>
+<span class="nc" id="L115">        return Base64.getDecoder().decode(key_);</span>
     }
 
     /**
@@ -120,10 +120,10 @@ public class KeyData {
      * @return The PropMap representation of this object.
      */
     public PropMap toPropMap() {
-<span class="fc" id="L123">        return new PropMap() {{</span>
-<span class="fc" id="L124">            put(&quot;A&quot;, iv_);</span>
-<span class="fc" id="L125">            put(&quot;B&quot;, key_);</span>
-<span class="fc" id="L126">        }};</span>
+<span class="nc" id="L123">        return new PropMap() {{</span>
+<span class="nc" id="L124">            put(&quot;A&quot;, iv_);</span>
+<span class="nc" id="L125">            put(&quot;B&quot;, key_);</span>
+<span class="nc" id="L126">        }};</span>
     }
 
     /**
@@ -132,9 +132,9 @@ public class KeyData {
      * @return The new KeyData instance.
      */
     public static KeyData fromPropMap(PropMap keyProp) {
-<span class="fc" id="L135">        String iv = keyProp.getString(&quot;A&quot;);</span>
-<span class="fc" id="L136">        String key = keyProp.getString(&quot;B&quot;);</span>
-<span class="fc" id="L137">        return new KeyData(iv, key);</span>
+<span class="nc" id="L135">        String iv = keyProp.getString(&quot;A&quot;);</span>
+<span class="nc" id="L136">        String key = keyProp.getString(&quot;B&quot;);</span>
+<span class="nc" id="L137">        return new KeyData(iv, key);</span>
     }
 
     String iv_;
@@ -142,10 +142,10 @@ public class KeyData {
 
     // Strong but may block on some OSes. Try &quot;NativePRNGNonBlocking&quot; if you have problems.
     private static String getAlgorithm() {
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">        if(System.getProperty(&quot;os.name&quot;).matches(&quot;.*[wW]indows.*&quot;))</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if(System.getProperty(&quot;os.name&quot;).matches(&quot;.*[wW]indows.*&quot;))</span>
 <span class="nc" id="L146">            return &quot;Windows-PRNG&quot;;</span>
         else
-<span class="fc" id="L148">            return &quot;NativePRNGBlocking&quot;;</span>
+<span class="nc" id="L148">            return &quot;NativePRNGBlocking&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

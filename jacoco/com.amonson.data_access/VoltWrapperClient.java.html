@@ -6,7 +6,9 @@ package com.amonson.data_access;
 
 import org.voltdb.client.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Properties;
@@ -21,66 +23,69 @@ import java.util.logging.Logger;
  *      password        - (Optional; def = &quot;&quot;) Password or empty string for credentials.
  *      port            - (Optional; def = &quot;21212&quot;) Port for VoltDB servers.
  *      retry_delay     - (Optional; def = &quot;2000&quot;) Delay between retries to a connection in milliseconds.
+ *      resource_file   - (Optional) Resource file to load into VoltDB.
+ *      filename        - (Optional) Filename in file system to load into VoltDB.
+ *      jar_files       - (Optional) Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)
  */
-<span class="pc bpc" id="L25" title="1 of 2 branches missed.">class VoltWrapperClient extends ClientStatusListenerExt {</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">class VoltWrapperClient extends ClientStatusListenerExt {</span>
     /**
      * Constructs the object and internal client but does not connect.
      *
      * @param properties Properties to configure the internal client.
      * @param logger This is where logging messages go.
      */
-<span class="fc" id="L32">    VoltWrapperClient(Properties properties, Logger logger) {</span>
-<span class="pc bpc" id="L33" title="2 of 6 branches missed.">        assert properties != null &amp;&amp; properties.containsKey(SERVERS);</span>
-<span class="pc bpc" id="L34" title="2 of 4 branches missed.">        assert logger != null;</span>
-<span class="fc" id="L35">        log_ = logger;</span>
-<span class="fc" id="L36">        port_ = Integer.parseInt(properties.getProperty(PORT, Integer.toString(Client.VOLTDB_SERVER_PORT)));</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        for(String server: properties.getProperty(SERVERS).split(&quot;,&quot;))</span>
-<span class="fc" id="L38">            connections_.put(server, false);</span>
-<span class="fc" id="L39">        properties_ = properties;</span>
-<span class="fc" id="L40">        client_ = ClientFactory.createClient(initClient());</span>
-<span class="fc" id="L41">    }</span>
+<span class="fc" id="L37">    VoltWrapperClient(Properties properties, Logger logger) {</span>
+<span class="pc bpc" id="L38" title="2 of 6 branches missed.">        assert properties != null &amp;&amp; properties.containsKey(SERVERS);</span>
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">        assert logger != null;</span>
+<span class="fc" id="L40">        log_ = logger;</span>
+<span class="fc" id="L41">        port_ = Integer.parseInt(properties.getProperty(PORT, Integer.toString(Client.VOLTDB_SERVER_PORT)));</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        for(String server: properties.getProperty(SERVERS).split(&quot;,&quot;))</span>
+<span class="fc" id="L43">            connections_.put(server, false);</span>
+<span class="fc" id="L44">        properties_ = properties;</span>
+<span class="fc" id="L45">        client_ = ClientFactory.createClient(initClient());</span>
+<span class="fc" id="L46">    }</span>
 
     /**
      * Starts a connection thread that will attempt keep connections to the hosts.
      */
     public void connect() {
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        if(connectionThread_ != null)</span>
-<span class="fc" id="L48">            return;</span>
-<span class="fc" id="L49">        connectionThread_ = new Thread(() -&gt; {</span>
-<span class="fc bfc" id="L50" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">                for (Map.Entry&lt;String, Boolean&gt; entry : connections_.entrySet())</span>
-<span class="pc bpc" id="L52" title="1 of 2 branches missed.">                    if (!entry.getValue())</span>
-<span class="fc" id="L53">                        entry.setValue(connectInternal(entry.getKey()));</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if(connectionThread_ != null)</span>
+<span class="fc" id="L53">            return;</span>
+<span class="fc" id="L54">        connectionThread_ = new Thread(() -&gt; {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">                for (Map.Entry&lt;String, Boolean&gt; entry : connections_.entrySet())</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">                    if (!entry.getValue())</span>
+<span class="fc" id="L58">                        entry.setValue(connectInternal(entry.getKey()));</span>
                 try {
-<span class="pc" id="L55">                    Thread.sleep(Long.parseLong(properties_.getProperty(CONNECTION_RETRY_DELAY_MS,</span>
-<span class="fc" id="L56">                            Long.toString(2_000L))));</span>
-<span class="fc" id="L57">                } catch (InterruptedException e) {</span>
-<span class="fc" id="L58">                    Thread.currentThread().interrupt();</span>
-<span class="pc" id="L59">                }</span>
+<span class="pc" id="L60">                    Thread.sleep(Long.parseLong(properties_.getProperty(CONNECTION_RETRY_DELAY_MS,</span>
+<span class="fc" id="L61">                            Long.toString(2_000L))));</span>
+<span class="fc" id="L62">                } catch (InterruptedException e) {</span>
+<span class="fc" id="L63">                    Thread.currentThread().interrupt();</span>
+<span class="pc" id="L64">                }</span>
             }
-<span class="fc" id="L61">        });</span>
-<span class="fc" id="L62">        connectionThread_.start();</span>
-<span class="fc" id="L63">    }</span>
+<span class="fc" id="L66">        });</span>
+<span class="fc" id="L67">        connectionThread_.start();</span>
+<span class="fc" id="L68">    }</span>
 
     /**
      * Stops the connection thread that was attempting to keep connections to the hosts. Object cannot be reused
      * after disconnect is called on a connected client.
      */
     public void disconnect() {
-<span class="fc bfc" id="L70" title="All 2 branches covered.">        if(connectionThread_ == null)</span>
-<span class="fc" id="L71">            return;</span>
-<span class="fc" id="L72">        connectionThread_.interrupt();</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if(connectionThread_ == null)</span>
+<span class="fc" id="L76">            return;</span>
+<span class="fc" id="L77">        connectionThread_.interrupt();</span>
         try {
-<span class="fc" id="L74">            connectionThread_.join();</span>
-<span class="pc" id="L75">        } catch(InterruptedException e) { /* Ignore because we are closing anyway. */ }</span>
-<span class="fc" id="L76">        connectionThread_ = null;</span>
+<span class="fc" id="L79">            connectionThread_.join();</span>
+<span class="pc" id="L80">        } catch(InterruptedException e) { /* Ignore because we are closing anyway. */ }</span>
+<span class="fc" id="L81">        connectionThread_ = null;</span>
         try {
-<span class="fc" id="L78">            client_.drain();</span>
-<span class="pc" id="L79">        } catch(NoConnectionsException | InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
+<span class="fc" id="L83">            client_.drain();</span>
+<span class="pc" id="L84">        } catch(NoConnectionsException | InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
         try {
-<span class="fc" id="L81">            client_.close();</span>
-<span class="pc" id="L82">        } catch(InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
-<span class="fc" id="L83">    }</span>
+<span class="fc" id="L86">            client_.close();</span>
+<span class="pc" id="L87">        } catch(InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
+<span class="fc" id="L88">    }</span>
 
     /**
      * &lt;p&gt;Synchronously invoke a procedure. Blocks until a result is available. A {@link ProcCallException}
@@ -95,7 +100,7 @@ import java.util.logging.Logger;
      */
     public ClientResponse callProcedureSync(String procedureName, Object... params)
             throws IOException, ProcCallException {
-<span class="fc" id="L98">        return client_.callProcedure(procedureName, params);</span>
+<span class="fc" id="L103">        return client_.callProcedure(procedureName, params);</span>
     }
 
     /**
@@ -114,8 +119,8 @@ import java.util.logging.Logger;
      */
     public void callProcedureAsync(ProcedureCallback callback, String procedureName, Object... params)
             throws IOException {
-<span class="fc" id="L117">        client_.callProcedure(callback, procedureName, params);</span>
-<span class="fc" id="L118">    }</span>
+<span class="fc" id="L122">        client_.callProcedure(callback, procedureName, params);</span>
+<span class="fc" id="L123">    }</span>
 
     /**
      * Checks for any connection to the VoltDB cluster.
@@ -123,7 +128,7 @@ import java.util.logging.Logger;
      * @return &lt;code&gt;true&lt;/code&gt; if there is at least one connection; &lt;code&gt;false&lt;/code&gt; if there are no connections.
      */
     public boolean haveConnection() {
-<span class="fc bfc" id="L126" title="All 2 branches covered.">        return client_.getConnectedHostList().size() &gt; 0;</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        return client_.getConnectedHostList().size() &gt; 0;</span>
     }
 
     /**
@@ -133,65 +138,174 @@ import java.util.logging.Logger;
      * &lt;code&gt;false&lt;/code&gt; if no connection during timeout period.
      */
     public boolean waitForConnection(long timeoutMilliseconds) {
-<span class="fc" id="L136">        long now = Instant.now().toEpochMilli();</span>
-<span class="fc" id="L137">        long futureTimeout = now + timeoutMilliseconds;</span>
-<span class="fc bfc" id="L138" title="All 4 branches covered.">        while(!haveConnection() &amp;&amp; now &lt; futureTimeout) { // Wait for at least one connection</span>
+<span class="fc" id="L141">        long now = Instant.now().toEpochMilli();</span>
+<span class="fc" id="L142">        long futureTimeout = now + timeoutMilliseconds;</span>
+<span class="fc bfc" id="L143" title="All 4 branches covered.">        while(!haveConnection() &amp;&amp; now &lt; futureTimeout) { // Wait for at least one connection</span>
             try {
-<span class="fc" id="L140">                Thread.sleep(100); // Busy wait intentional.</span>
-<span class="pc" id="L141">            } catch(InterruptedException e) { /* Ignore this, should not happen */ }</span>
-<span class="fc" id="L142">            now = Instant.now().toEpochMilli();</span>
+<span class="fc" id="L145">                Thread.sleep(100); // Busy wait intentional.</span>
+<span class="pc" id="L146">            } catch(InterruptedException e) { /* Ignore this, should not happen */ }</span>
+<span class="fc" id="L147">            now = Instant.now().toEpochMilli();</span>
         }
-<span class="fc bfc" id="L144" title="All 2 branches covered.">        return now &lt; futureTimeout;</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        return now &lt; futureTimeout;</span>
+    }
+
+    /**
+     * Using the configuration properties &quot;resource_file&quot;, &quot;filename&quot;, and &quot;jar_files&quot;. initialize the schema and
+     * stored Java procedures (JARs). Resource files are attempted before file in the filesystem. Loading JARs is
+     * last.
+     *
+     * @return true if everything present is loaded ok, false something was attempted to load and failed.
+     */
+    public boolean initializeVoltDBAfterConnect() {
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        if(properties_.containsKey(RESOURCE_FILE)) {</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">            if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))</span>
+<span class="fc" id="L162">                return false;</span>
+        }
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        if(properties_.containsKey(FILENAME)) {</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">            if(!loadSQLFromFile(properties_.getProperty(FILENAME)))</span>
+<span class="fc" id="L166">                return false;</span>
+        }
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if(properties_.containsKey(JAR_FILES)) {</span>
+<span class="fc" id="L169">            return loadJarFiles(properties_.getProperty(JAR_FILES));</span>
+        }
+<span class="fc" id="L171">        return true;</span>
     }
 
     @Override
     public void connectionLost(String hostname, int port, int connectionsLeft, DisconnectCause cause) {
-<span class="fc" id="L149">        connections_.put(hostname, false);</span>
-<span class="fc bfc" id="L150" title="All 2 branches covered.">        if(connectionsLeft == 0)</span>
-<span class="fc" id="L151">            log_.severe(&quot;All connections to the VoltDB servers have been lost.&quot;);</span>
+<span class="fc" id="L176">        connections_.put(hostname, false);</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if(connectionsLeft == 0)</span>
+<span class="fc" id="L178">            log_.severe(&quot;All connections to the VoltDB servers have been lost.&quot;);</span>
         else
-<span class="fc" id="L153">            log_.warning(String.format(&quot;Connection to '%s' was disconnected for reason '%s', there are %d &quot; +</span>
-<span class="fc" id="L154">                            &quot;connections left.&quot;, hostname, cause.toString(), connectionsLeft));</span>
-<span class="fc" id="L155">    }</span>
+<span class="fc" id="L180">            log_.warning(String.format(&quot;Connection to '%s' was disconnected for reason '%s', there are %d &quot; +</span>
+<span class="fc" id="L181">                            &quot;connections left.&quot;, hostname, cause.toString(), connectionsLeft));</span>
+<span class="fc" id="L182">    }</span>
 
     @Override
     public void connectionCreated(String hostname, int port, AutoConnectionStatus status) {
-<span class="pc bpc" id="L159" title="1 of 4 branches missed.">        if(status == AutoConnectionStatus.SUCCESS &amp;&amp; !connections_.containsKey(hostname))</span>
-<span class="fc" id="L160">            connections_.put(hostname, true);</span>
+<span class="pc bpc" id="L186" title="1 of 4 branches missed.">        if(status == AutoConnectionStatus.SUCCESS &amp;&amp; !connections_.containsKey(hostname))</span>
+<span class="fc" id="L187">            connections_.put(hostname, true);</span>
         else
-<span class="fc" id="L162">            connections_.put(hostname, false);</span>
-<span class="fc" id="L163">    }</span>
+<span class="fc" id="L189">            connections_.put(hostname, false);</span>
+<span class="fc" id="L190">    }</span>
+
+    private boolean loadJarFiles(String jarFiles) {
+<span class="fc" id="L193">        String[] jars = jarFiles.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        for(String jarFilename: jars) {</span>
+<span class="fc" id="L195">            File jar = new File(jarFilename);</span>
+<span class="pc bpc" id="L196" title="1 of 4 branches missed.">            if(!jar.exists() || !jar.canRead()) {</span>
+<span class="fc" id="L197">                log_.severe(String.format(&quot;Jar file '%s' is missing or cannot be read!&quot;, jar));</span>
+<span class="fc" id="L198">                return false;</span>
+            }
+            try {
+<span class="fc" id="L201">                ClientResponse response = client_.updateClasses(jar, &quot;&quot;);</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">                if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L203">                    log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
+<span class="nc" id="L204">                    return false;</span>
+                }
+<span class="nc" id="L206">            } catch (IOException | ProcCallException e) {</span>
+<span class="nc" id="L207">                log_.severe(String.format(&quot;Failed to load the JAR file '%s' into VoltDB!&quot;, jar));</span>
+<span class="nc" id="L208">                log_.throwing(getClass().getCanonicalName(), &quot;loadJarFiles&quot;, e);</span>
+<span class="nc" id="L209">                return false;</span>
+<span class="fc" id="L210">            }</span>
+        }
+<span class="fc" id="L212">        return true;</span>
+    }
+
+    private boolean loadSQLFromFile(String filename) {
+<span class="fc" id="L216">        File file = new File(filename);</span>
+<span class="fc bfc" id="L217" title="All 2 branches covered.">        if(!file.canRead()) {</span>
+<span class="fc" id="L218">            log_.severe(String.format(&quot;File '%s' does not exist or is not readable!&quot;, file));</span>
+<span class="fc" id="L219">            return false;</span>
+        }
+        String sql;
+        try {
+<span class="fc" id="L223">            sql = new String(Files.readAllBytes(file.toPath()));</span>
+<span class="nc" id="L224">        } catch (IOException e) {</span>
+<span class="nc" id="L225">            log_.severe(String.format(&quot;Failed to read SQL file '%s'&quot;, file));</span>
+<span class="nc" id="L226">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromFile&quot;, e);</span>
+<span class="nc" id="L227">            return false;</span>
+<span class="fc" id="L228">        }</span>
+        try {
+<span class="fc" id="L230">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L232">                log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
+<span class="nc" id="L233">                return false;</span>
+            }
+<span class="nc" id="L235">        } catch(IOException | ProcCallException e) {</span>
+<span class="nc" id="L236">            log_.severe(String.format(&quot;Failed to load the SQL file '%s' into VoltDB!&quot;, file));</span>
+<span class="nc" id="L237">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromFile&quot;, e);</span>
+<span class="nc" id="L238">            return false;</span>
+<span class="fc" id="L239">        }</span>
+<span class="fc" id="L240">        return true;</span>
+    }
+
+    private boolean loadSQLFromResource(String resourceName) {
+<span class="fc" id="L244">        URL url = getClass().getClassLoader().getResource(resourceName);</span>
+<span class="fc bfc" id="L245" title="All 2 branches covered.">        if(url == null) {</span>
+<span class="fc" id="L246">            log_.severe(String.format(&quot;ClassLoader failed to get resource URL for '%s'!&quot;, resourceName));</span>
+<span class="fc" id="L247">            return false;</span>
+        }
+<span class="fc" id="L249">        File file = new File(url.getFile());</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">        if(!file.exists()) {</span>
+<span class="nc" id="L251">            log_.severe(String.format(&quot;The resource file '%s' does not exist!&quot;, file));</span>
+<span class="nc" id="L252">            return false;</span>
+        }
+        String sql;
+        try {
+<span class="fc" id="L256">            sql = new String(Files.readAllBytes(file.toPath()));</span>
+<span class="nc" id="L257">        } catch (IOException e) {</span>
+<span class="nc" id="L258">            log_.severe(String.format(&quot;Failed to read the resource SQL file '%s'!&quot;, file));</span>
+<span class="nc" id="L259">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromResource&quot;, e);</span>
+<span class="nc" id="L260">            return false;</span>
+<span class="fc" id="L261">        }</span>
+        try {
+<span class="fc" id="L263">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L265">                log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
+<span class="nc" id="L266">                return false;</span>
+            }
+<span class="nc" id="L268">        } catch(IOException | ProcCallException e) {</span>
+<span class="nc" id="L269">            log_.severe(String.format(&quot;Failed to load the resource SQL file '%s' into VoltDB!&quot;, file));</span>
+<span class="nc" id="L270">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromResource&quot;, e);</span>
+<span class="nc" id="L271">            return false;</span>
+<span class="fc" id="L272">        }</span>
+<span class="fc" id="L273">        return true;</span>
+    }
 
     private boolean connectInternal(String server) {
         try {
-<span class="fc" id="L167">            client_.createConnection(server, port_);</span>
-<span class="fc" id="L168">            return true;</span>
-<span class="fc" id="L169">        } catch (IOException e) {</span>
-<span class="fc" id="L170">            return false;</span>
+<span class="fc" id="L278">            client_.createConnection(server, port_);</span>
+<span class="fc" id="L279">            return true;</span>
+<span class="fc" id="L280">        } catch (IOException e) {</span>
+<span class="fc" id="L281">            return false;</span>
         }
     }
 
     private ClientConfig initClient() {
         ClientConfig config;
-<span class="fc" id="L176">        config = new ClientConfig(properties_.getProperty(USERNAME, &quot;&quot;), properties_.getProperty(PASSWORD, &quot;&quot;), this);</span>
-<span class="fc" id="L177">        config.enableAutoTune();</span>
-<span class="fc" id="L178">        config.setReconnectOnConnectionLoss(true);</span>
-<span class="fc" id="L179">        config.setClientAffinity(true);</span>
-<span class="fc" id="L180">        config.setTopologyChangeAware(true);</span>
-<span class="fc" id="L181">        return config;</span>
+<span class="fc" id="L287">        config = new ClientConfig(properties_.getProperty(USERNAME, &quot;&quot;), properties_.getProperty(PASSWORD, &quot;&quot;), this);</span>
+<span class="fc" id="L288">        config.enableAutoTune();</span>
+<span class="fc" id="L289">        config.setReconnectOnConnectionLoss(true);</span>
+<span class="fc" id="L290">        config.setClientAffinity(true);</span>
+<span class="fc" id="L291">        config.setTopologyChangeAware(true);</span>
+<span class="fc" id="L292">        return config;</span>
     }
 
     private final Logger              log_;
     private final Properties          properties_;
-<span class="fc" id="L186">    private final Map&lt;String,Boolean&gt; connections_ = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L297">    private final Map&lt;String,Boolean&gt; connections_ = new ConcurrentHashMap&lt;&gt;();</span>
     private       Client              client_;
     private final int                 port_;
-<span class="fc" id="L189">    private       Thread              connectionThread_ = null;</span>
+<span class="fc" id="L300">    private       Thread              connectionThread_ = null;</span>
 
     public static final String USERNAME                  = &quot;username&quot;;
     public static final String PASSWORD                  = &quot;password&quot;;
     public static final String PORT                      = &quot;port&quot;;
     public static final String CONNECTION_RETRY_DELAY_MS = &quot;retry_delay&quot;;
     public static final String SERVERS                   = &quot;list_of_servers&quot;;
+    public static final String RESOURCE_FILE             = &quot;resource_file&quot;;
+    public static final String FILENAME                  = &quot;filename&quot;;
+    public static final String JAR_FILES                 = &quot;jar_files&quot;;
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -22,7 +22,7 @@ public final class PropStoreFactory {
      * @throws PropStoreFactoryException is thrown when the instance cannot be created or the name is not registered.
      */
     public static PropStore getStore(String name) throws PropStoreFactoryException {
-<span class="fc" id="L25">        return getStore(name, null);</span>
+<span class="nc" id="L25">        return getStore(name, null);</span>
     }
 
     /**
@@ -34,15 +34,15 @@ public final class PropStoreFactory {
      * @throws PropStoreFactoryException is thrown when the instance cannot be created or the name is not registered.
      */
     public static PropStore getStore(String name, Properties args) throws PropStoreFactoryException {
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        if(name == null)</span>
-<span class="fc" id="L38">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be null!&quot;);</span>
-<span class="fc" id="L39">        name = name.toLowerCase().trim();</span>
-<span class="fc bfc" id="L40" title="All 2 branches covered.">        if(name.trim().equals(&quot;&quot;))</span>
-<span class="fc" id="L41">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be empty!&quot;);</span>
-<span class="fc bfc" id="L42" title="All 2 branches covered.">        if(!supportedImplementations_.containsKey(name))</span>
-<span class="fc" id="L43">            throw new PropStoreFactoryException(String.format(&quot;Implementation '%s' is not supported!&quot;, name));</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if(name == null)</span>
+<span class="nc" id="L38">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be null!&quot;);</span>
+<span class="nc" id="L39">        name = name.toLowerCase().trim();</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if(name.trim().equals(&quot;&quot;))</span>
+<span class="nc" id="L41">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be empty!&quot;);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if(!supportedImplementations_.containsKey(name))</span>
+<span class="nc" id="L43">            throw new PropStoreFactoryException(String.format(&quot;Implementation '%s' is not supported!&quot;, name));</span>
         try {
-<span class="fc" id="L45">            return supportedImplementations_.get(name).getConstructor(Properties.class).newInstance(args);</span>
+<span class="nc" id="L45">            return supportedImplementations_.get(name).getConstructor(Properties.class).newInstance(args);</span>
 <span class="nc" id="L46">        } catch(NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {</span>
 <span class="nc" id="L47">            throw new PropStoreFactoryException(&quot;Failed to construct PropStore; is the ctor&quot;, e); // This cannot happen!</span>
         }
@@ -59,17 +59,17 @@ public final class PropStoreFactory {
      */
     public static boolean registerNewStore(String name, Class&lt;? extends PropStore&gt; classObject)
             throws PropStoreFactoryException {
-<span class="fc bfc" id="L62" title="All 2 branches covered.">        if(name == null)</span>
-<span class="fc" id="L63">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be null!&quot;);</span>
-<span class="fc" id="L64">        name = name.toLowerCase().trim();</span>
-<span class="fc bfc" id="L65" title="All 2 branches covered.">        if(name.equals(&quot;&quot;))</span>
-<span class="fc" id="L66">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be empty!&quot;);</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">        if(classObject == null) throw new IllegalArgumentException(&quot;The 'classObject' argument cannot be null!&quot;);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(name == null)</span>
+<span class="nc" id="L63">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be null!&quot;);</span>
+<span class="nc" id="L64">        name = name.toLowerCase().trim();</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if(name.equals(&quot;&quot;))</span>
+<span class="nc" id="L66">            throw new IllegalArgumentException(&quot;The 'name' argument cannot be empty!&quot;);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if(classObject == null) throw new IllegalArgumentException(&quot;The 'classObject' argument cannot be null!&quot;);</span>
         try {
-<span class="fc" id="L69">            classObject.getConstructor(Properties.class).newInstance(new Properties());</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">            return supportedImplementations_.putIfAbsent(name, classObject) == null;</span>
-<span class="fc" id="L71">        } catch(NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {</span>
-<span class="fc" id="L72">            throw new PropStoreFactoryException(&quot;PropStore implementation doesn't appear to have a valid ctor!&quot;, e);</span>
+<span class="nc" id="L69">            classObject.getConstructor(Properties.class).newInstance(new Properties());</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            return supportedImplementations_.putIfAbsent(name, classObject) == null;</span>
+<span class="nc" id="L71">        } catch(NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {</span>
+<span class="nc" id="L72">            throw new PropStoreFactoryException(&quot;PropStore implementation doesn't appear to have a valid ctor!&quot;, e);</span>
         }
     }
 
@@ -79,16 +79,16 @@ public final class PropStoreFactory {
      * @return The collection of names supported by the factory.
      */
     public static Collection&lt;String&gt; getNames() {
-<span class="fc" id="L82">        return supportedImplementations_.keySet();</span>
+<span class="nc" id="L82">        return supportedImplementations_.keySet();</span>
     }
 
     /**
      * Setup supplied internal implementations.
      */
-<span class="fc" id="L88">    static Map&lt;String, Class&lt;? extends PropStore&gt;&gt; supportedImplementations_ =</span>
-<span class="fc" id="L89">            new HashMap&lt;&gt;() {{</span>
-<span class="fc" id="L90">        put(&quot;json&quot;, JsonStore.class);</span>
-<span class="fc" id="L91">        put(&quot;yaml&quot;, YamlStore.class);</span>
-<span class="fc" id="L92">    }};</span>
+<span class="nc" id="L88">    static Map&lt;String, Class&lt;? extends PropStore&gt;&gt; supportedImplementations_ =</span>
+<span class="nc" id="L89">            new HashMap&lt;&gt;() {{</span>
+<span class="nc" id="L90">        put(&quot;json&quot;, JsonStore.class);</span>
+<span class="nc" id="L91">        put(&quot;yaml&quot;, YamlStore.class);</span>
+<span class="nc" id="L92">    }};</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
