@@ -50,6 +50,13 @@ public abstract class DataAccessLayer {
     public abstract void connect();
 
     /**
+     * Populate nay schemas, stored procedures, etc... use by the implementation.
+     *
+     * @return true on success, false on failure.
+     */
+    public abstract boolean initializeAfterConnect();
+
+    /**
      * Disconnect the object from the data source(s).
      */
     public abstract void disconnect();

@@ -11,6 +11,8 @@ class DataAccessLayerSpec extends Specification {
         @Override void query(DataAccessLayerCallback callback, String name, Object... params) {}
         @Override long queryForLong(String name, Object... params) throws DataAccessLayerException { return 0 }
         @Override void connect() {}
+        @Override boolean initializeAfterConnect() { return false }
+
         @Override void disconnect() {}
         @Override boolean isConnected() { return false }
     }

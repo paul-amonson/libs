@@ -6,7 +6,9 @@ package com.amonson.data_access;
 
 import org.voltdb.client.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Properties;
@@ -21,6 +23,9 @@ import java.util.logging.Logger;
  *      password        - (Optional; def = "") Password or empty string for credentials.
  *      port            - (Optional; def = "21212") Port for VoltDB servers.
  *      retry_delay     - (Optional; def = "2000") Delay between retries to a connection in milliseconds.
+ *      resource_file   - (Optional) Resource file to load into VoltDB.
+ *      filename        - (Optional) Filename in file system to load into VoltDB.
+ *      jar_files       - (Optional) Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)
  */
 class VoltWrapperClient extends ClientStatusListenerExt {
     /**
@@ -144,6 +149,28 @@ class VoltWrapperClient extends ClientStatusListenerExt {
         return now < futureTimeout;
     }
 
+    /**
+     * Using the configuration properties "resource_file", "filename", and "jar_files". initialize the schema and
+     * stored Java procedures (JARs). Resource files are attempted before file in the filesystem. Loading JARs is
+     * last.
+     *
+     * @return true if everything present is loaded ok, false something was attempted to load and failed.
+     */
+    public boolean initializeVoltDBAfterConnect() {
+        if(properties_.containsKey(RESOURCE_FILE)) {
+            if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))
+                return false;
+        }
+        if(properties_.containsKey(FILENAME)) {
+            if(!loadSQLFromFile(properties_.getProperty(FILENAME)))
+                return false;
+        }
+        if(properties_.containsKey(JAR_FILES)) {
+            return loadJarFiles(properties_.getProperty(JAR_FILES));
+        }
+        return true;
+    }
+
     @Override
     public void connectionLost(String hostname, int port, int connectionsLeft, DisconnectCause cause) {
         connections_.put(hostname, false);
@@ -160,6 +187,90 @@ class VoltWrapperClient extends ClientStatusListenerExt {
             connections_.put(hostname, true);
         else
             connections_.put(hostname, false);
+    }
+
+    private boolean loadJarFiles(String jarFiles) {
+        String[] jars = jarFiles.split(",");
+        for(String jarFilename: jars) {
+            File jar = new File(jarFilename);
+            if(!jar.exists() || !jar.canRead()) {
+                log_.severe(String.format("Jar file '%s' is missing or cannot be read!", jar));
+                return false;
+            }
+            try {
+                ClientResponse response = client_.updateClasses(jar, "");
+                if(response.getStatus() != ClientResponse.SUCCESS) {
+                    log_.severe(String.format("Failed to call VoltDB: %s", response.getStatusString()));
+                    return false;
+                }
+            } catch (IOException | ProcCallException e) {
+                log_.severe(String.format("Failed to load the JAR file '%s' into VoltDB!", jar));
+                log_.throwing(getClass().getCanonicalName(), "loadJarFiles", e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean loadSQLFromFile(String filename) {
+        File file = new File(filename);
+        if(!file.canRead()) {
+            log_.severe(String.format("File '%s' does not exist or is not readable!", file));
+            return false;
+        }
+        String sql;
+        try {
+            sql = new String(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            log_.severe(String.format("Failed to read SQL file '%s'", file));
+            log_.throwing(getClass().getCanonicalName(), "loadSQLFromFile", e);
+            return false;
+        }
+        try {
+            ClientResponse response = callProcedureSync("@AdHoc", sql);
+            if(response.getStatus() != ClientResponse.SUCCESS) {
+                log_.severe(String.format("Failed to call VoltDB: %s", response.getStatusString()));
+                return false;
+            }
+        } catch(IOException | ProcCallException e) {
+            log_.severe(String.format("Failed to load the SQL file '%s' into VoltDB!", file));
+            log_.throwing(getClass().getCanonicalName(), "loadSQLFromFile", e);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean loadSQLFromResource(String resourceName) {
+        URL url = getClass().getClassLoader().getResource(resourceName);
+        if(url == null) {
+            log_.severe(String.format("ClassLoader failed to get resource URL for '%s'!", resourceName));
+            return false;
+        }
+        File file = new File(url.getFile());
+        if(!file.exists()) {
+            log_.severe(String.format("The resource file '%s' does not exist!", file));
+            return false;
+        }
+        String sql;
+        try {
+            sql = new String(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            log_.severe(String.format("Failed to read the resource SQL file '%s'!", file));
+            log_.throwing(getClass().getCanonicalName(), "loadSQLFromResource", e);
+            return false;
+        }
+        try {
+            ClientResponse response = callProcedureSync("@AdHoc", sql);
+            if(response.getStatus() != ClientResponse.SUCCESS) {
+                log_.severe(String.format("Failed to call VoltDB: %s", response.getStatusString()));
+                return false;
+            }
+        } catch(IOException | ProcCallException e) {
+            log_.severe(String.format("Failed to load the resource SQL file '%s' into VoltDB!", file));
+            log_.throwing(getClass().getCanonicalName(), "loadSQLFromResource", e);
+            return false;
+        }
+        return true;
     }
 
     private boolean connectInternal(String server) {
@@ -193,4 +304,7 @@ class VoltWrapperClient extends ClientStatusListenerExt {
     public static final String PORT                      = "port";
     public static final String CONNECTION_RETRY_DELAY_MS = "retry_delay";
     public static final String SERVERS                   = "list_of_servers";
+    public static final String RESOURCE_FILE             = "resource_file";
+    public static final String FILENAME                  = "filename";
+    public static final String JAR_FILES                 = "jar_files";
 }

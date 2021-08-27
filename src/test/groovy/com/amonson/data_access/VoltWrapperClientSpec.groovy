@@ -5,6 +5,7 @@
 package com.amonson.data_access
 
 import org.voltdb.client.Client
+import org.voltdb.client.ClientResponse
 import org.voltdb.client.ClientStatusListenerExt
 import spock.lang.Specification
 
@@ -12,11 +13,18 @@ import java.util.logging.Logger
 
 class VoltWrapperClientSpec extends Specification {
     def list = new ArrayList<InetSocketAddress>()
-    def underTest
+    Properties props_
+    VoltWrapperClient underTest
     void setup() {
-        Properties props = new Properties()
-        props.setProperty("list_of_servers", "server1,server2")
-        underTest = new VoltWrapperClient(props, Mock(Logger))
+        new File("/tmp/test.sql").text = """-- Dummy test file... 
+"""
+        new File("/tmp/test.jar").text = ""
+        props_ = new Properties()
+        props_.setProperty("list_of_servers", "server1,server2")
+        props_.setProperty("resource_file", "test.sql")
+        props_.setProperty("filename", "/tmp/test.sql")
+        props_.setProperty("jar_files", "/tmp/test.jar")
+        underTest = new VoltWrapperClient(props_, Mock(Logger))
         underTest.client_ = Mock(Client)
         underTest.client_.getConnectedHostList() >> list
     }
@@ -65,5 +73,67 @@ class VoltWrapperClientSpec extends Specification {
         underTest.connectionCreated("server1", 50000, ClientStatusListenerExt.AutoConnectionStatus.UNABLE_TO_CONNECT)
         underTest.connectionCreated("server3", 50000, ClientStatusListenerExt.AutoConnectionStatus.SUCCESS)
         expect: true
+    }
+
+    def "Test initialization"() {
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: underTest.initializeVoltDBAfterConnect()
+    }
+
+    def "Test initialization no resource 1"() {
+        props_.remove("resource_file")
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: underTest.initializeVoltDBAfterConnect()
+    }
+
+    def "Test initialization no file 1"() {
+        props_.remove("filename")
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: underTest.initializeVoltDBAfterConnect()
+    }
+
+    def "Test initialization no jar 1"() {
+        props_.remove("jar_files")
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: underTest.initializeVoltDBAfterConnect()
+    }
+
+    def "Test initialization missing resource"() {
+        props_.put("resource_file", "/tmp/missing.sql")
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: !underTest.initializeVoltDBAfterConnect()
+    }
+
+    def "Test initialization missing file"() {
+        props_.put("filename", "/tmp/missing.sql")
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: !underTest.initializeVoltDBAfterConnect()
+    }
+
+    def "Test initialization missing jar"() {
+        props_.put("jar_files", "/tmp/missing.jar")
+        ClientResponse response = Mock(ClientResponse)
+        response.getStatus() >> ClientResponse.SUCCESS
+        underTest.client_.callProcedure("@AdHoc", _ as String) >> response
+        underTest.client_.updateClasses(_ as File, _ as String) >> response
+        expect: !underTest.initializeVoltDBAfterConnect()
     }
 }

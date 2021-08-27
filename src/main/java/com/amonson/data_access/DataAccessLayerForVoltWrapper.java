@@ -102,6 +102,16 @@ public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
     }
 
     /**
+     * Populate nay schemas, stored procedures, etc... use by the implementation.
+     *
+     * @return true on success, false on failure.
+     */
+    @Override
+    public boolean initializeAfterConnect() {
+        return client_.initializeVoltDBAfterConnect();
+    }
+
+    /**
      * Disconnect the object from the data source(s).
      */
     @Override
