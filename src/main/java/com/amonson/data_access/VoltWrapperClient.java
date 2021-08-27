@@ -193,7 +193,7 @@ class VoltWrapperClient extends ClientStatusListenerExt {
         String[] jars = jarFiles.split(",");
         for(String jarFilename: jars) {
             File jar = new File(jarFilename);
-            if(!jar.exists() || !jar.canRead()) {
+            if(!jar.canRead()) {
                 log_.severe(String.format("Jar file '%s' is missing or cannot be read!", jar));
                 return false;
             }
