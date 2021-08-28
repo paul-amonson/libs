@@ -20,6 +20,15 @@ import java.util.logging.Logger;
 
 /**
  * VoltDB Implementation of DataAccessLayer.
+ * Properties Possible:
+ *      list_of_servers - (Required; def = "") Required comma separated list of VoltDB servers.
+ *      username        - (Optional; def = "") Username or empty string for credentials.
+ *      password        - (Optional; def = "") Password or empty string for credentials.
+ *      port            - (Optional; def = "21212") Port for VoltDB servers.
+ *      retry_delay     - (Optional; def = "2000") Delay between retries to a connection in milliseconds.
+ *      resource_file   - (Optional) Resource file to load into VoltDB.
+ *      filename        - (Optional) Filename in file system to load into VoltDB.
+ *      jar_files       - (Optional) Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)
  */
 public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
     DataAccessLayerForVoltWrapper(Properties configurationValues, Logger logger) {

@@ -50,7 +50,7 @@ public abstract class DataAccessLayer {
     public abstract void connect();
 
     /**
-     * Populate nay schemas, stored procedures, etc... use by the implementation.
+     * Populate any schemas, stored procedures, etc... use by the implementation.
      *
      * @return true on success, false on failure.
      */
