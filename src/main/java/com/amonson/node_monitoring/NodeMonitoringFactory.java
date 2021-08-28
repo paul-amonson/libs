@@ -37,6 +37,7 @@ public class NodeMonitoringFactory {
      *             Privileged ports are not allowed (ports &lt; 1024) .
      * @param nodeStateChangeHandler The callback which is called when a node becomes alive or is deemed missing.
      * @param logger The logger used for logging in this class.
+     * @param config The configuration properties for the created instance.
      * @return The newly created instance or the previously created instance.
      * @throws IllegalArgumentException if any required arguments passed are null. These are: "myHostname" and
      *                                  "logger".
