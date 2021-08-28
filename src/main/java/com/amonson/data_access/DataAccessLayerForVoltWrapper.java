@@ -19,18 +19,18 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * VoltDB Implementation of DataAccessLayer.<br />
- * <div style="font-weight: bold">Properties Possible:</div>
- * <table border="1">
- *  <tr><td>list_of_servers</td><td><i>(Required; def = "")</i> Required comma separated list of VoltDB servers.</td></tr>
- *  <tr><td>username</td><td><i>(Optional; def = "")</i> Username or empty string for credentials.</td></tr>
- *  <tr><td>password</td><td><i>(Optional; def = "")</i> Password or empty string for credentials.</td></tr>
- *  <tr><td>port</td><td><i>(Optional; def = "21212")</i> Port for VoltDB servers.</td></tr>
- *  <tr><td>retry_delay</td><td><i>(Optional; def = "2000")</i> Delay between retries to a connection in milliseconds.</td></tr>
- *  <tr><td>resource_file</td><td><i>(Optional)</i> Resource file to load into VoltDB.</td></tr>
- *  <tr><td>filename</td><td><i>(Optional)</i> Filename in file system to load into VoltDB.</td></tr>
- *  <tr><td>jar_files</td><td><i>(Optional)</i> Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)</td></tr>
- * </table>
+ * <p>VoltDB Implementation of DataAccessLayer. Use the implementation string "" in the {@link DataAccessLayerFactory}</p>.
+ * <p style="font-weight: bold">Properties Possible:</p>
+ * <blockquote><table style="width: 70%; border-collapse: collapse; border: 2pt solid black" caption="Properties for this implementation." summary="Properties for this implementation.">
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">list_of_servers</td><td style="padding: 3pt; border: 1pt solid black"><i>(Required; def = "")</i> Required comma separated list of VoltDB servers.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">username</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional; def = "")</i> Username or empty string for credentials.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">password</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional; def = "")</i> Password or empty string for credentials.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">port</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional; def = "21212")</i> Port for VoltDB servers.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">retry_delay</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional; def = "2000")</i> Delay between retries to a connection in milliseconds.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">resource_file</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional)</i> Resource file to load into VoltDB.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">filename</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional)</i> Filename in file system to load into VoltDB.</td></tr>
+ *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">jar_files</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional)</i> Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)</td></tr>
+ * </table></blockquote>
  */
 public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
     DataAccessLayerForVoltWrapper(Properties configurationValues, Logger logger) {
