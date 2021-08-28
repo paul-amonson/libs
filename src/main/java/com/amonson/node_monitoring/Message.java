@@ -140,6 +140,7 @@ public class Message {
      * Loop over targets calling a callback.
      *
      * @param action The callback called for each target in this instance.
+     * @param arg Any object you want to pass through into the callback.
      */
     public void forEachTargetDo(FECallback action, Object arg) {
         for(String target: targets_)

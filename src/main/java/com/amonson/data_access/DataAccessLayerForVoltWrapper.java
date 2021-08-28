@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 /**
  * <p>VoltDB Implementation of DataAccessLayer. Use the implementation string "" in the {@link DataAccessLayerFactory}</p>.
  * <p style="font-weight: bold">Properties Possible:</p>
- * <blockquote><table style="width: 70%; border-collapse: collapse; border: 2pt solid black" caption="Properties for this implementation." summary="Properties for this implementation.">
+ * <blockquote><table style="width: 70%; border-collapse: collapse; border: 2pt solid black">
  *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">list_of_servers</td><td style="padding: 3pt; border: 1pt solid black"><i>(Required; def = "")</i> Required comma separated list of VoltDB servers.</td></tr>
  *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">username</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional; def = "")</i> Username or empty string for credentials.</td></tr>
  *  <tr style="background: #e0e0e0"><td style="padding: 3pt; border: 1pt solid black; width: 120pts">password</td><td style="padding: 3pt; border: 1pt solid black"><i>(Optional; def = "")</i> Password or empty string for credentials.</td></tr>
