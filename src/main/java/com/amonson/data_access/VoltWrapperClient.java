@@ -5,9 +5,10 @@
 package com.amonson.data_access;
 
 import org.voltdb.client.*;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Map;
@@ -241,21 +242,17 @@ class VoltWrapperClient extends ClientStatusListenerExt {
     }
 
     private boolean loadSQLFromResource(String resourceName) {
-        URL url = getClass().getClassLoader().getResource(resourceName);
-        if(url == null) {
-            log_.severe(String.format("ClassLoader failed to get resource URL for '%s'!", resourceName));
+        InputStream stream = ClassLoader.getSystemResourceAsStream(resourceName);
+        if(stream == null) {
+            log_.severe(String.format("ClassLoader failed to get resource stream for '%s'!", resourceName));
             return false;
         }
-        File file = new File(url.getFile());
-        if(!file.exists()) {
-            log_.severe(String.format("The resource file '%s' does not exist!", file));
-            return false;
-        }
+
         String sql;
         try {
-            sql = new String(Files.readAllBytes(file.toPath()));
+            sql = IOUtils.toString(stream, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log_.severe(String.format("Failed to read the resource SQL file '%s'!", file));
+            log_.severe(String.format("ClassLoader failed to get read the stream for '%s'!", resourceName));
             log_.throwing(getClass().getCanonicalName(), "loadSQLFromResource", e);
             return false;
         }
@@ -266,7 +263,7 @@ class VoltWrapperClient extends ClientStatusListenerExt {
                 return false;
             }
         } catch(IOException | ProcCallException e) {
-            log_.severe(String.format("Failed to load the resource SQL file '%s' into VoltDB!", file));
+            log_.severe(String.format("Failed to load the resource SQL '%s' into VoltDB!", resourceName));
             log_.throwing(getClass().getCanonicalName(), "loadSQLFromResource", e);
             return false;
         }
