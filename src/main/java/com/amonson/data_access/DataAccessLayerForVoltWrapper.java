@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * </table></blockquote>
  */
 public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
-    DataAccessLayerForVoltWrapper(Properties configurationValues, Logger logger) {
+    public DataAccessLayerForVoltWrapper(Properties configurationValues, Logger logger) {
         super(configurationValues, logger);
         client_ = new VoltWrapperClient(configurationValues, logger);
     }
