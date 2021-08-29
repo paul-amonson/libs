@@ -30,23 +30,23 @@ public class TaskMonitor implements Closeable, AutoCloseable {
      *
      * @param callback The callback to call when the Task finishes.
      */
-<span class="nc" id="L33">    public TaskMonitor(Callback callback) {</span>
-<span class="nc" id="L34">        callback_ = callback;</span>
-<span class="nc" id="L35">        monitoringThread_ = new Thread(() -&gt; {</span>
-<span class="nc bnc" id="L36" title="All 2 branches missed.">            while(!halt_.get()) {</span>
-<span class="nc" id="L37">                try { Thread.sleep(MONITOR_LOOP); } catch(InterruptedException e) { /* Ignore */ }</span>
-<span class="nc bnc" id="L38" title="All 2 branches missed.">                if(!halt_.get()) {</span>
-<span class="nc bnc" id="L39" title="All 2 branches missed.">                    for(Task task: tasks_)</span>
-<span class="nc" id="L40">                        checkTask(task);</span>
-<span class="nc bnc" id="L41" title="All 2 branches missed.">                    for(Task remove: removeList_)</span>
-<span class="nc" id="L42">                        tasks_.remove(remove);</span>
-<span class="nc" id="L43">                    removeList_.clear();</span>
-<span class="nc bnc" id="L44" title="All 2 branches missed.">                    if(Thread.currentThread().isInterrupted()) halt_.set(true);</span>
+<span class="fc" id="L33">    public TaskMonitor(Callback callback) {</span>
+<span class="fc" id="L34">        callback_ = callback;</span>
+<span class="fc" id="L35">        monitoringThread_ = new Thread(() -&gt; {</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">            while(!halt_.get()) {</span>
+<span class="pc" id="L37">                try { Thread.sleep(MONITOR_LOOP); } catch(InterruptedException e) { /* Ignore */ }</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">                if(!halt_.get()) {</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">                    for(Task task: tasks_)</span>
+<span class="fc" id="L40">                        checkTask(task);</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">                    for(Task remove: removeList_)</span>
+<span class="fc" id="L42">                        tasks_.remove(remove);</span>
+<span class="fc" id="L43">                    removeList_.clear();</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">                    if(Thread.currentThread().isInterrupted()) halt_.set(true);</span>
                 }
             }
-<span class="nc" id="L47">        });</span>
-<span class="nc" id="L48">        monitoringThread_.start();</span>
-<span class="nc" id="L49">    }</span>
+<span class="fc" id="L47">        });</span>
+<span class="fc" id="L48">        monitoringThread_.start();</span>
+<span class="fc" id="L49">    }</span>
 
     /**
      * Add the task to the monitor.
@@ -54,8 +54,8 @@ public class TaskMonitor implements Closeable, AutoCloseable {
      * @param task The running Task to add to the monitor.
      */
     public void addTask(Task task) {
-<span class="nc" id="L57">        tasks_.add(task);</span>
-<span class="nc" id="L58">    }</span>
+<span class="fc" id="L57">        tasks_.add(task);</span>
+<span class="fc" id="L58">    }</span>
 
     /**
      * Remove a task from the monitored tasks.
@@ -73,30 +73,30 @@ public class TaskMonitor implements Closeable, AutoCloseable {
      */
     @Override
     public void close() throws IOException {
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        if(!halt_.get()) {</span>
-<span class="nc" id="L77">            halt_.set(true);</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if(!halt_.get()) {</span>
+<span class="fc" id="L77">            halt_.set(true);</span>
             try {
-<span class="nc" id="L79">                monitoringThread_.join(CLOSE_TIMEOUT);</span>
-<span class="nc" id="L80">            } catch (InterruptedException e) { /* Do nothing */ }</span>
+<span class="fc" id="L79">                monitoringThread_.join(CLOSE_TIMEOUT);</span>
+<span class="pc" id="L80">            } catch (InterruptedException e) { /* Do nothing */ }</span>
         }
-<span class="nc" id="L82">    }</span>
+<span class="fc" id="L82">    }</span>
 
     private void checkTask(Task task) {
-<span class="nc bnc" id="L85" title="All 2 branches missed.">        if(!task.isRunning()) {</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">            if(callback_ != null) callback_.taskEnded(task);</span>
-<span class="nc" id="L87">            removeList_.add(task);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if(!task.isRunning()) {</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">            if(callback_ != null) callback_.taskEnded(task);</span>
+<span class="fc" id="L87">            removeList_.add(task);</span>
         }
-<span class="nc" id="L89">    }</span>
+<span class="fc" id="L89">    }</span>
 
-<span class="nc" id="L91">    private final ConcurrentLinkedQueue&lt;Task&gt; tasks_ = new ConcurrentLinkedQueue&lt;&gt;();</span>
-<span class="nc" id="L92">    private final ConcurrentLinkedQueue&lt;Task&gt; removeList_ = new ConcurrentLinkedQueue&lt;&gt;();</span>
+<span class="fc" id="L91">    private final ConcurrentLinkedQueue&lt;Task&gt; tasks_ = new ConcurrentLinkedQueue&lt;&gt;();</span>
+<span class="fc" id="L92">    private final ConcurrentLinkedQueue&lt;Task&gt; removeList_ = new ConcurrentLinkedQueue&lt;&gt;();</span>
     private final Thread monitoringThread_;
     private final Callback callback_;
-<span class="nc" id="L95">    private final AtomicBoolean halt_ = new AtomicBoolean(false);</span>
+<span class="fc" id="L95">    private final AtomicBoolean halt_ = new AtomicBoolean(false);</span>
 
-<span class="nc" id="L97">    private final static long MONITOR_LOOP = Integer.parseInt(System.getProperty(</span>
+<span class="fc" id="L97">    private final static long MONITOR_LOOP = Integer.parseInt(System.getProperty(</span>
             &quot;com.amonson.task_manager.monitor_pause&quot;, &quot;50&quot;));
-<span class="nc" id="L99">    private final static long CLOSE_TIMEOUT = Integer.parseInt(System.getProperty(</span>
+<span class="fc" id="L99">    private final static long CLOSE_TIMEOUT = Integer.parseInt(System.getProperty(</span>
             &quot;com.amonson.task_manager.shutdown_timeout&quot;, &quot;5000&quot;));
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -28,18 +28,18 @@ public final class LogRecordSerialization {
      * @return The PropMap containing the contents of the LogRecord minus the above listed exceptions.
      */
     public static PropMap serializeLogRecord(LogRecord record) {
-<span class="nc" id="L31">        PropMap map = new PropMap();</span>
-<span class="nc" id="L32">        map.put(&quot;timestamp&quot;, (record.getInstant().getEpochSecond() * 1_000_000_000L) +</span>
-<span class="nc" id="L33">                ((long)record.getInstant().getNano()));</span>
-<span class="nc" id="L34">        map.put(&quot;name&quot;, record.getLoggerName());</span>
-<span class="nc" id="L35">        map.put(&quot;severity&quot;, record.getLevel().toString());</span>
-<span class="nc" id="L36">        map.put(&quot;thread&quot;, record.getThreadID());</span>
-<span class="nc" id="L37">        map.put(&quot;sequence&quot;, record.getSequenceNumber());</span>
-<span class="nc" id="L38">        map.put(&quot;message&quot;, record.getMessage());</span>
-<span class="nc" id="L39">        map.put(&quot;class&quot;, record.getSourceClassName());</span>
-<span class="nc" id="L40">        map.put(&quot;method&quot;, record.getSourceMethodName());</span>
-<span class="nc" id="L41">        map.put(&quot;exception&quot;, serializeThrowable(record.getThrown()));</span>
-<span class="nc" id="L42">        return map;</span>
+<span class="fc" id="L31">        PropMap map = new PropMap();</span>
+<span class="fc" id="L32">        map.put(&quot;timestamp&quot;, (record.getInstant().getEpochSecond() * 1_000_000_000L) +</span>
+<span class="fc" id="L33">                ((long)record.getInstant().getNano()));</span>
+<span class="fc" id="L34">        map.put(&quot;name&quot;, record.getLoggerName());</span>
+<span class="fc" id="L35">        map.put(&quot;severity&quot;, record.getLevel().toString());</span>
+<span class="fc" id="L36">        map.put(&quot;thread&quot;, record.getThreadID());</span>
+<span class="fc" id="L37">        map.put(&quot;sequence&quot;, record.getSequenceNumber());</span>
+<span class="fc" id="L38">        map.put(&quot;message&quot;, record.getMessage());</span>
+<span class="fc" id="L39">        map.put(&quot;class&quot;, record.getSourceClassName());</span>
+<span class="fc" id="L40">        map.put(&quot;method&quot;, record.getSourceMethodName());</span>
+<span class="fc" id="L41">        map.put(&quot;exception&quot;, serializeThrowable(record.getThrown()));</span>
+<span class="fc" id="L42">        return map;</span>
     }
 
     /**
@@ -49,63 +49,63 @@ public final class LogRecordSerialization {
      * @return The converted LogRecord.
      */
     public static LogRecord deserializeLogRecord(PropMap map) {
-<span class="nc" id="L52">        LogRecord record = new LogRecord(Level.parse(map.getString(&quot;severity&quot;)), map.getString(&quot;message&quot;));</span>
-<span class="nc" id="L53">        long ts = map.getLong(&quot;timestamp&quot;);</span>
-<span class="nc" id="L54">        record.setInstant(Instant.ofEpochSecond(ts / 1_000_000_000L, (int)(ts % 1_000_000_000L)));</span>
-<span class="nc" id="L55">        record.setLoggerName(map.getString(&quot;name&quot;));</span>
-<span class="nc" id="L56">        record.setSequenceNumber(map.getLong(&quot;sequence&quot;));</span>
-<span class="nc" id="L57">        record.setThreadID(map.getInteger(&quot;thread&quot;));</span>
-<span class="nc" id="L58">        record.setSourceClassName(map.getString(&quot;class&quot;));</span>
-<span class="nc" id="L59">        record.setSourceMethodName(map.getString(&quot;method&quot;));</span>
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        if(map.getMap(&quot;exception&quot;) != null)</span>
-<span class="nc" id="L61">            record.setThrown(deserializeThrowable(map.getMap(&quot;exception&quot;)));</span>
-<span class="nc" id="L62">        return record;</span>
+<span class="fc" id="L52">        LogRecord record = new LogRecord(Level.parse(map.getString(&quot;severity&quot;)), map.getString(&quot;message&quot;));</span>
+<span class="fc" id="L53">        long ts = map.getLong(&quot;timestamp&quot;);</span>
+<span class="fc" id="L54">        record.setInstant(Instant.ofEpochSecond(ts / 1_000_000_000L, (int)(ts % 1_000_000_000L)));</span>
+<span class="fc" id="L55">        record.setLoggerName(map.getString(&quot;name&quot;));</span>
+<span class="fc" id="L56">        record.setSequenceNumber(map.getLong(&quot;sequence&quot;));</span>
+<span class="fc" id="L57">        record.setThreadID(map.getInteger(&quot;thread&quot;));</span>
+<span class="fc" id="L58">        record.setSourceClassName(map.getString(&quot;class&quot;));</span>
+<span class="fc" id="L59">        record.setSourceMethodName(map.getString(&quot;method&quot;));</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if(map.getMap(&quot;exception&quot;) != null)</span>
+<span class="fc" id="L61">            record.setThrown(deserializeThrowable(map.getMap(&quot;exception&quot;)));</span>
+<span class="fc" id="L62">        return record;</span>
     }
 
     private static PropMap serializeThrowable(Throwable exception) {
-<span class="nc" id="L66">        PropMap map = new PropMap();</span>
-<span class="nc bnc" id="L67" title="All 2 branches missed.">        if(exception == null)</span>
-<span class="nc" id="L68">            return null;</span>
-<span class="nc" id="L69">        map.put(&quot;class&quot;, exception.getClass().getCanonicalName());</span>
-<span class="nc" id="L70">        map.put(&quot;message&quot;, exception.getMessage());</span>
-<span class="nc" id="L71">        PropList st = new PropList();</span>
-<span class="nc bnc" id="L72" title="All 2 branches missed.">        for(StackTraceElement e: exception.getStackTrace())</span>
-<span class="nc" id="L73">            st.add(serializeStackTraceElement(e));</span>
-<span class="nc" id="L74">        map.put(&quot;stack&quot;, st);</span>
-<span class="nc bnc" id="L75" title="All 2 branches missed.">        if(exception.getCause() != null)</span>
-<span class="nc" id="L76">            map.put(&quot;cause&quot;, serializeThrowable(exception.getCause()));</span>
+<span class="fc" id="L66">        PropMap map = new PropMap();</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if(exception == null)</span>
+<span class="fc" id="L68">            return null;</span>
+<span class="fc" id="L69">        map.put(&quot;class&quot;, exception.getClass().getCanonicalName());</span>
+<span class="fc" id="L70">        map.put(&quot;message&quot;, exception.getMessage());</span>
+<span class="fc" id="L71">        PropList st = new PropList();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        for(StackTraceElement e: exception.getStackTrace())</span>
+<span class="fc" id="L73">            st.add(serializeStackTraceElement(e));</span>
+<span class="fc" id="L74">        map.put(&quot;stack&quot;, st);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if(exception.getCause() != null)</span>
+<span class="fc" id="L76">            map.put(&quot;cause&quot;, serializeThrowable(exception.getCause()));</span>
 
-<span class="nc" id="L78">        return map;</span>
+<span class="fc" id="L78">        return map;</span>
     }
 
     private static Throwable createThrowableDynamically(String className, String message)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
-<span class="nc" id="L84">        return createThrowableDynamically(className, message, null);</span>
+<span class="fc" id="L84">        return createThrowableDynamically(className, message, null);</span>
     }
 
     private static Throwable createThrowableDynamically(String className, String message, Throwable cause)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
             InstantiationException {
-<span class="nc" id="L90">        Class&lt;?&gt; clazz = Class.forName(className);</span>
+<span class="fc" id="L90">        Class&lt;?&gt; clazz = Class.forName(className);</span>
         Constructor&lt;?&gt; ctor;
-<span class="nc bnc" id="L92" title="All 2 branches missed.">        if(cause == null) {</span>
-<span class="nc" id="L93">            ctor = clazz.getConstructor(String.class);</span>
-<span class="nc" id="L94">            return (Throwable)ctor.newInstance(message);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if(cause == null) {</span>
+<span class="fc" id="L93">            ctor = clazz.getConstructor(String.class);</span>
+<span class="fc" id="L94">            return (Throwable)ctor.newInstance(message);</span>
         } else {
-<span class="nc" id="L96">            ctor = clazz.getConstructor(String.class, Throwable.class);</span>
-<span class="nc" id="L97">            return (Throwable)ctor.newInstance(message, cause);</span>
+<span class="fc" id="L96">            ctor = clazz.getConstructor(String.class, Throwable.class);</span>
+<span class="fc" id="L97">            return (Throwable)ctor.newInstance(message, cause);</span>
         }
     }
 
     private static Throwable deserializeThrowable(PropMap map) {
         Throwable cause;
         try {
-<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (map.getMap(&quot;cause&quot;) != null)</span>
-<span class="nc" id="L105">                cause = createThrowableDynamically(map.getString(&quot;class&quot;), map.getString(&quot;message&quot;),</span>
-<span class="nc" id="L106">                        deserializeThrowable(map.getMap(&quot;cause&quot;)));</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            if (map.getMap(&quot;cause&quot;) != null)</span>
+<span class="fc" id="L105">                cause = createThrowableDynamically(map.getString(&quot;class&quot;), map.getString(&quot;message&quot;),</span>
+<span class="fc" id="L106">                        deserializeThrowable(map.getMap(&quot;cause&quot;)));</span>
             else
-<span class="nc" id="L108">                cause = createThrowableDynamically(map.getString(&quot;class&quot;), map.getString(&quot;message&quot;));</span>
+<span class="fc" id="L108">                cause = createThrowableDynamically(map.getString(&quot;class&quot;), map.getString(&quot;message&quot;));</span>
 <span class="nc" id="L109">        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |</span>
                 ClassNotFoundException e) {
             // Fall back to a generic exception...
@@ -113,34 +113,34 @@ public final class LogRecordSerialization {
 <span class="nc" id="L113">                cause = new Throwable(map.getString(&quot;message&quot;), deserializeThrowable(map.getMap(&quot;cause&quot;)));</span>
             else
 <span class="nc" id="L115">                cause = new Throwable(map.getString(&quot;message&quot;));</span>
-<span class="nc" id="L116">        }</span>
-<span class="nc" id="L117">        StackTraceElement[] st = new StackTraceElement[map.getArray(&quot;stack&quot;).size()];</span>
-<span class="nc bnc" id="L118" title="All 2 branches missed.">        for(int i = 0; i &lt; st.length; i++)</span>
-<span class="nc" id="L119">            st[i] = deserializeStackTraceElement(map.getArray(&quot;stack&quot;).getMap(i));</span>
-<span class="nc" id="L120">        cause.setStackTrace(st);</span>
-<span class="nc" id="L121">        return cause;</span>
+<span class="fc" id="L116">        }</span>
+<span class="fc" id="L117">        StackTraceElement[] st = new StackTraceElement[map.getArray(&quot;stack&quot;).size()];</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        for(int i = 0; i &lt; st.length; i++)</span>
+<span class="fc" id="L119">            st[i] = deserializeStackTraceElement(map.getArray(&quot;stack&quot;).getMap(i));</span>
+<span class="fc" id="L120">        cause.setStackTrace(st);</span>
+<span class="fc" id="L121">        return cause;</span>
     }
 
     private static PropMap serializeStackTraceElement(StackTraceElement element) {
-<span class="nc" id="L125">        PropMap map = new PropMap();</span>
-<span class="nc" id="L126">        map.put(&quot;loader&quot;, element.getClassLoaderName());</span>
-<span class="nc" id="L127">        map.put(&quot;module&quot;, element.getModuleName());</span>
-<span class="nc" id="L128">        map.put(&quot;version&quot;, element.getModuleVersion());</span>
-<span class="nc" id="L129">        map.put(&quot;class&quot;, element.getClassName());</span>
-<span class="nc" id="L130">        map.put(&quot;method&quot;, element.getMethodName());</span>
-<span class="nc" id="L131">        map.put(&quot;file&quot;, element.getFileName());</span>
-<span class="nc" id="L132">        map.put(&quot;line&quot;, element.getLineNumber());</span>
-<span class="nc" id="L133">        return map;</span>
+<span class="fc" id="L125">        PropMap map = new PropMap();</span>
+<span class="fc" id="L126">        map.put(&quot;loader&quot;, element.getClassLoaderName());</span>
+<span class="fc" id="L127">        map.put(&quot;module&quot;, element.getModuleName());</span>
+<span class="fc" id="L128">        map.put(&quot;version&quot;, element.getModuleVersion());</span>
+<span class="fc" id="L129">        map.put(&quot;class&quot;, element.getClassName());</span>
+<span class="fc" id="L130">        map.put(&quot;method&quot;, element.getMethodName());</span>
+<span class="fc" id="L131">        map.put(&quot;file&quot;, element.getFileName());</span>
+<span class="fc" id="L132">        map.put(&quot;line&quot;, element.getLineNumber());</span>
+<span class="fc" id="L133">        return map;</span>
     }
 
     private static StackTraceElement deserializeStackTraceElement(PropMap map) {
-<span class="nc" id="L137">        return new StackTraceElement(map.getString(&quot;loader&quot;),</span>
-<span class="nc" id="L138">                map.getString(&quot;module&quot;),</span>
-<span class="nc" id="L139">                map.getString(&quot;version&quot;),</span>
-<span class="nc" id="L140">                map.getString(&quot;class&quot;),</span>
-<span class="nc" id="L141">                map.getString(&quot;method&quot;),</span>
-<span class="nc" id="L142">                map.getString(&quot;file&quot;),</span>
-<span class="nc" id="L143">                map.getInteger(&quot;line&quot;));</span>
+<span class="fc" id="L137">        return new StackTraceElement(map.getString(&quot;loader&quot;),</span>
+<span class="fc" id="L138">                map.getString(&quot;module&quot;),</span>
+<span class="fc" id="L139">                map.getString(&quot;version&quot;),</span>
+<span class="fc" id="L140">                map.getString(&quot;class&quot;),</span>
+<span class="fc" id="L141">                map.getString(&quot;method&quot;),</span>
+<span class="fc" id="L142">                map.getString(&quot;file&quot;),</span>
+<span class="fc" id="L143">                map.getInteger(&quot;line&quot;));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

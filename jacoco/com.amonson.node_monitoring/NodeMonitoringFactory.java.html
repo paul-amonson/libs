@@ -37,6 +37,7 @@ public class NodeMonitoringFactory {
      *             Privileged ports are not allowed (ports &amp;lt; 1024) .
      * @param nodeStateChangeHandler The callback which is called when a node becomes alive or is deemed missing.
      * @param logger The logger used for logging in this class.
+     * @param config The configuration properties for the created instance.
      * @return The newly created instance or the previously created instance.
      * @throws IllegalArgumentException if any required arguments passed are null. These are: &quot;myHostname&quot; and
      *                                  &quot;logger&quot;.
@@ -45,15 +46,15 @@ public class NodeMonitoringFactory {
                                                          List&lt;String&gt; allHostnames, int port,
                                                          NodeStateChangeHandler nodeStateChangeHandler, Logger logger,
                                                          Properties config) {
-<span class="nc bnc" id="L48" title="All 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">            if(singleton_ == null)</span>
-<span class="nc" id="L50">                singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">            if(singleton_ == null)</span>
+<span class="fc" id="L51">                singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);</span>
             else
-<span class="nc" id="L52">                logger.warning(&quot;Returning an already created instance, the instance will not represent &quot; +</span>
+<span class="fc" id="L53">                logger.warning(&quot;Returning an already created instance, the instance will not represent &quot; +</span>
                         &quot;the new passed parameters!&quot;);
-<span class="nc" id="L54">            return singleton_;</span>
+<span class="fc" id="L55">            return singleton_;</span>
         } else
-<span class="nc" id="L56">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
+<span class="nc" id="L57">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
     }
 
     /**
@@ -76,14 +77,14 @@ public class NodeMonitoringFactory {
      */
     public static NodeMonitoringClient createClient(String implementation, String myHostname,
                                                     List&lt;String&gt; allHostnames, int port, Logger logger) {
-<span class="nc bnc" id="L79" title="All 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
-<span class="nc" id="L80">            return new NodeMonitoringClientZeroMQ(myHostname, allHostnames, port, logger);</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
+<span class="fc" id="L81">            return new NodeMonitoringClientZeroMQ(myHostname, allHostnames, port, logger);</span>
         } else
-<span class="nc" id="L82">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
+<span class="nc" id="L83">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
     }
 
     private NodeMonitoringFactory() {}
 
-<span class="nc" id="L87">    private static NodeMonitoring singleton_ = null;</span>
+<span class="fc" id="L88">    private static NodeMonitoring singleton_ = null;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

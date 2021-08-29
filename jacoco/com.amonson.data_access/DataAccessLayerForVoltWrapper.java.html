@@ -19,13 +19,24 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * VoltDB Implementation of DataAccessLayer.
+ * &lt;p&gt;VoltDB Implementation of DataAccessLayer. Use the implementation string &quot;voltdb&quot; in the {@link DataAccessLayerFactory}.&lt;/p&gt;
+ * &lt;blockquote&gt;&lt;table style=&quot;width: 70%; border-collapse: collapse; border: 2pt solid black&quot;&gt;
+ *  &lt;caption style=&quot;font-weight: bold&quot;&gt;Properties Used in This Implementation&lt;/caption&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;list_of_servers&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Required; def = &quot;&quot;)&lt;/i&gt; Required comma separated list of VoltDB servers.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;username&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional; def = &quot;&quot;)&lt;/i&gt; Username or empty string for credentials.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;password&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional; def = &quot;&quot;)&lt;/i&gt; Password or empty string for credentials.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;port&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional; def = &quot;21212&quot;)&lt;/i&gt; Port for VoltDB servers.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;retry_delay&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional; def = &quot;2000&quot;)&lt;/i&gt; Delay between retries to a connection in milliseconds.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;resource_file&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional)&lt;/i&gt; Resource file to load into VoltDB.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;filename&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional)&lt;/i&gt; Filename in file system to load into VoltDB.&lt;/td&gt;&lt;/tr&gt;
+ *  &lt;tr style=&quot;background: #e0e0e0&quot;&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black; width: 120pts&quot;&gt;jar_files&lt;/td&gt;&lt;td style=&quot;padding: 3pt; border: 1pt solid black&quot;&gt;&lt;i&gt;(Optional)&lt;/i&gt; Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)&lt;/td&gt;&lt;/tr&gt;
+ * &lt;/table&gt;&lt;/blockquote&gt;
  */
-<span class="nc bnc" id="L24" title="All 2 branches missed.">public class DataAccessLayerForVoltWrapper extends DataAccessLayer {</span>
-    DataAccessLayerForVoltWrapper(Properties configurationValues, Logger logger) {
-<span class="nc" id="L26">        super(configurationValues, logger);</span>
-<span class="nc" id="L27">        client_ = new VoltWrapperClient(configurationValues, logger);</span>
-<span class="nc" id="L28">    }</span>
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">public class DataAccessLayerForVoltWrapper extends DataAccessLayer {</span>
+    public DataAccessLayerForVoltWrapper(Properties configurationValues, Logger logger) {
+<span class="fc" id="L37">        super(configurationValues, logger);</span>
+<span class="fc" id="L38">        client_ = new VoltWrapperClient(configurationValues, logger);</span>
+<span class="fc" id="L39">    }</span>
 
     /**
      * Perform a synchronous query of the DataAccessLayer implementation.
@@ -37,14 +48,14 @@ import java.util.logging.Logger;
     @Override
     public DataAccessLayerResponse query(String name, Object... params) {
         try {
-<span class="nc" id="L40">            ClientResponse response = client_.callProcedureSync(name, params);</span>
-<span class="nc" id="L41">            return convertClientResponse(response);</span>
-<span class="nc" id="L42">        } catch (IOException e) {</span>
-<span class="nc" id="L43">            log_.throwing(this.getClass().getCanonicalName(), &quot;query&quot;, e);</span>
-<span class="nc" id="L44">            return new DataAccessLayerResponse(DataAccessLayerStatus.IO_FAILURE, null);</span>
-<span class="nc" id="L45">        } catch (ProcCallException e) {</span>
-<span class="nc" id="L46">            log_.throwing(this.getClass().getCanonicalName(), &quot;query&quot;, e);</span>
-<span class="nc" id="L47">            return new DataAccessLayerResponse(DataAccessLayerStatus.PROCEDURE_FAILURE, null);</span>
+<span class="fc" id="L51">            ClientResponse response = client_.callProcedureSync(name, params);</span>
+<span class="fc" id="L52">            return convertClientResponse(response);</span>
+<span class="fc" id="L53">        } catch (IOException e) {</span>
+<span class="fc" id="L54">            log_.throwing(this.getClass().getCanonicalName(), &quot;query&quot;, e);</span>
+<span class="fc" id="L55">            return new DataAccessLayerResponse(DataAccessLayerStatus.IO_FAILURE, null);</span>
+<span class="fc" id="L56">        } catch (ProcCallException e) {</span>
+<span class="fc" id="L57">            log_.throwing(this.getClass().getCanonicalName(), &quot;query&quot;, e);</span>
+<span class="fc" id="L58">            return new DataAccessLayerResponse(DataAccessLayerStatus.PROCEDURE_FAILURE, null);</span>
         }
     }
 
@@ -57,14 +68,14 @@ import java.util.logging.Logger;
      */
     @Override
     public void query(DataAccessLayerCallback callback, String name, Object... params) {
-<span class="nc bnc" id="L60" title="All 4 branches missed.">        assert callback != null:&quot;The 'callback' parameter cannot be null!&quot;;</span>
+<span class="pc bpc" id="L71" title="2 of 4 branches missed.">        assert callback != null:&quot;The 'callback' parameter cannot be null!&quot;;</span>
         try {
-<span class="nc" id="L62">            client_.callProcedureAsync((response) -&gt; clientCallback(response, callback), name, params);</span>
-<span class="nc" id="L63">        } catch (IOException e) {</span>
-<span class="nc" id="L64">            log_.throwing(this.getClass().getCanonicalName(), &quot;query&quot;, e);</span>
-<span class="nc" id="L65">            callback.callback(new DataAccessLayerResponse(DataAccessLayerStatus.IO_FAILURE, null));</span>
-<span class="nc" id="L66">        }</span>
-<span class="nc" id="L67">    }</span>
+<span class="fc" id="L73">            client_.callProcedureAsync((response) -&gt; clientCallback(response, callback), name, params);</span>
+<span class="fc" id="L74">        } catch (IOException e) {</span>
+<span class="fc" id="L75">            log_.throwing(this.getClass().getCanonicalName(), &quot;query&quot;, e);</span>
+<span class="fc" id="L76">            callback.callback(new DataAccessLayerResponse(DataAccessLayerStatus.IO_FAILURE, null));</span>
+<span class="fc" id="L77">        }</span>
+<span class="fc" id="L78">    }</span>
 
     /**
      * Perform a synchronous query of the DataAccessLayer implementation expecting a single long response.
@@ -77,19 +88,19 @@ import java.util.logging.Logger;
     @Override
     public long queryForLong(String name, Object... params) throws DataAccessLayerException {
         try {
-<span class="nc" id="L80">            ClientResponse response = client_.callProcedureSync(name, params);</span>
-<span class="nc bnc" id="L81" title="All 4 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS || response.getResults().length != 1)</span>
-<span class="nc" id="L82">                throw new DataAccessLayerException(DataAccessLayerStatus.SERVER_ERROR,</span>
+<span class="fc" id="L91">            ClientResponse response = client_.callProcedureSync(name, params);</span>
+<span class="pc bpc" id="L92" title="2 of 4 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS || response.getResults().length != 1)</span>
+<span class="nc" id="L93">                throw new DataAccessLayerException(DataAccessLayerStatus.SERVER_ERROR,</span>
                         &quot;Failed response, no results, or more than one result!&quot;);
-<span class="nc" id="L84">            response.getResults()[0].advanceRow();</span>
-<span class="nc bnc" id="L85" title="All 2 branches missed.">            if(response.getResults()[0].getColumnCount() != 1)</span>
-<span class="nc" id="L86">                throw new DataAccessLayerException(DataAccessLayerStatus.SERVER_ERROR,</span>
+<span class="fc" id="L95">            response.getResults()[0].advanceRow();</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">            if(response.getResults()[0].getColumnCount() != 1)</span>
+<span class="nc" id="L97">                throw new DataAccessLayerException(DataAccessLayerStatus.SERVER_ERROR,</span>
                         &quot;Failed response more than one column returned!&quot;);
-<span class="nc" id="L88">            return response.getResults()[0].asScalarLong();</span>
-<span class="nc" id="L89">        } catch(IOException e) {</span>
-<span class="nc" id="L90">            throw new DataAccessLayerException(DataAccessLayerStatus.SERVER_ERROR);</span>
-<span class="nc" id="L91">        } catch (ProcCallException e) {</span>
-<span class="nc" id="L92">            throw new DataAccessLayerException(DataAccessLayerStatus.PROCEDURE_FAILURE);</span>
+<span class="fc" id="L99">            return response.getResults()[0].asScalarLong();</span>
+<span class="nc" id="L100">        } catch(IOException e) {</span>
+<span class="nc" id="L101">            throw new DataAccessLayerException(DataAccessLayerStatus.SERVER_ERROR);</span>
+<span class="nc" id="L102">        } catch (ProcCallException e) {</span>
+<span class="nc" id="L103">            throw new DataAccessLayerException(DataAccessLayerStatus.PROCEDURE_FAILURE);</span>
         }
     }
 
@@ -98,8 +109,8 @@ import java.util.logging.Logger;
      */
     @Override
     public void connect() {
-<span class="nc" id="L101">        client_.connect();</span>
-<span class="nc" id="L102">    }</span>
+<span class="fc" id="L112">        client_.connect();</span>
+<span class="fc" id="L113">    }</span>
 
     /**
      * Populate nay schemas, stored procedures, etc... use by the implementation.
@@ -108,7 +119,7 @@ import java.util.logging.Logger;
      */
     @Override
     public boolean initializeAfterConnect() {
-<span class="nc" id="L111">        return client_.initializeVoltDBAfterConnect();</span>
+<span class="nc" id="L122">        return client_.initializeVoltDBAfterConnect();</span>
     }
 
     /**
@@ -116,8 +127,8 @@ import java.util.logging.Logger;
      */
     @Override
     public void disconnect() {
-<span class="nc" id="L119">        client_.disconnect();</span>
-<span class="nc" id="L120">    }</span>
+<span class="fc" id="L130">        client_.disconnect();</span>
+<span class="fc" id="L131">    }</span>
 
     /**
      * Does the object have a connection?
@@ -126,71 +137,71 @@ import java.util.logging.Logger;
      */
     @Override
     public boolean isConnected() {
-<span class="nc" id="L129">        return client_.haveConnection();</span>
+<span class="fc" id="L140">        return client_.haveConnection();</span>
     }
 
     private void clientCallback(ClientResponse clientResponse, DataAccessLayerCallback callback) throws Exception {
-<span class="nc" id="L133">        byte status = clientResponse.getStatus();</span>
-<span class="nc bnc" id="L134" title="All 2 branches missed.">        if(status != ClientResponse.SUCCESS) {</span>
-<span class="nc bnc" id="L135" title="All 2 branches missed.">            DataAccessLayerStatus das = connectionErrors_.contains(status) ? DataAccessLayerStatus.NO_CONNECTION :</span>
-<span class="nc" id="L136">                    DataAccessLayerStatus.SERVER_ERROR;</span>
-<span class="nc" id="L137">            callback.callback(new DataAccessLayerResponse(das, null));</span>
-<span class="nc" id="L138">        } else</span>
-<span class="nc" id="L139">            callback.callback(convertClientResponse(clientResponse));</span>
-<span class="nc" id="L140">    }</span>
+<span class="fc" id="L144">        byte status = clientResponse.getStatus();</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        if(status != ClientResponse.SUCCESS) {</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            DataAccessLayerStatus das = connectionErrors_.contains(status) ? DataAccessLayerStatus.NO_CONNECTION :</span>
+<span class="fc" id="L147">                    DataAccessLayerStatus.SERVER_ERROR;</span>
+<span class="fc" id="L148">            callback.callback(new DataAccessLayerResponse(das, null));</span>
+<span class="fc" id="L149">        } else</span>
+<span class="fc" id="L150">            callback.callback(convertClientResponse(clientResponse));</span>
+<span class="fc" id="L151">    }</span>
 
     private DataAccessLayerResponse convertClientResponse(ClientResponse clientResponse) {
-<span class="nc bnc" id="L143" title="All 2 branches missed.">        if(clientResponse.getStatus() != ClientResponse.SUCCESS)</span>
-<span class="nc" id="L144">            return new DataAccessLayerResponse(DataAccessLayerStatus.SERVER_ERROR, null);</span>
-<span class="nc" id="L145">        PropList results = new PropList();</span>
-<span class="nc bnc" id="L146" title="All 2 branches missed.">        for (int resultIndex = 0; resultIndex &lt; clientResponse.getResults().length; resultIndex++) {</span>
-<span class="nc" id="L147">            PropList result = new PropList();</span>
-<span class="nc" id="L148">            VoltTable table = clientResponse.getResults()[resultIndex];</span>
-<span class="nc bnc" id="L149" title="All 2 branches missed.">            for (int rowIndex = 0; rowIndex &lt; clientResponse.getResults()[resultIndex].getRowCount(); rowIndex++) {</span>
-<span class="nc" id="L150">                table.advanceRow();</span>
-<span class="nc" id="L151">                PropMap row = new PropMap();</span>
-<span class="nc bnc" id="L152" title="All 2 branches missed.">                for (int columnIndex = 0; columnIndex &lt; table.getColumnCount(); columnIndex++) {</span>
-<span class="nc" id="L153">                    String name = table.getColumnName(columnIndex);</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        if(clientResponse.getStatus() != ClientResponse.SUCCESS)</span>
+<span class="fc" id="L155">            return new DataAccessLayerResponse(DataAccessLayerStatus.SERVER_ERROR, null);</span>
+<span class="fc" id="L156">        PropList results = new PropList();</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        for (int resultIndex = 0; resultIndex &lt; clientResponse.getResults().length; resultIndex++) {</span>
+<span class="fc" id="L158">            PropList result = new PropList();</span>
+<span class="fc" id="L159">            VoltTable table = clientResponse.getResults()[resultIndex];</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            for (int rowIndex = 0; rowIndex &lt; clientResponse.getResults()[resultIndex].getRowCount(); rowIndex++) {</span>
+<span class="fc" id="L161">                table.advanceRow();</span>
+<span class="fc" id="L162">                PropMap row = new PropMap();</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                for (int columnIndex = 0; columnIndex &lt; table.getColumnCount(); columnIndex++) {</span>
+<span class="fc" id="L164">                    String name = table.getColumnName(columnIndex);</span>
                     try {
-<span class="nc" id="L155">                        Object value = voltTypeToType(table, columnIndex);</span>
-<span class="nc" id="L156">                        row.put(name, value);</span>
-<span class="nc" id="L157">                    } catch(UnsupportedOperationException e) {</span>
-<span class="nc" id="L158">                        log_.warning(String.format(&quot;Unsupported type '%s' was converted to a 'null' value for &quot; +</span>
-<span class="nc" id="L159">                                        &quot;column '%s'!&quot;, table.getColumnType(columnIndex), name));</span>
-<span class="nc" id="L160">                        row.put(name, null);</span>
-<span class="nc" id="L161">                    }</span>
+<span class="fc" id="L166">                        Object value = voltTypeToType(table, columnIndex);</span>
+<span class="fc" id="L167">                        row.put(name, value);</span>
+<span class="fc" id="L168">                    } catch(UnsupportedOperationException e) {</span>
+<span class="fc" id="L169">                        log_.warning(String.format(&quot;Unsupported type '%s' was converted to a 'null' value for &quot; +</span>
+<span class="fc" id="L170">                                        &quot;column '%s'!&quot;, table.getColumnType(columnIndex), name));</span>
+<span class="fc" id="L171">                        row.put(name, null);</span>
+<span class="fc" id="L172">                    }</span>
                 }
-<span class="nc" id="L163">                result.add(row);</span>
+<span class="fc" id="L174">                result.add(row);</span>
             }
-<span class="nc" id="L165">            results.add(result);</span>
+<span class="fc" id="L176">            results.add(result);</span>
         }
-<span class="nc" id="L167">        return new DataAccessLayerResponse(DataAccessLayerStatus.SUCCESS, results);</span>
+<span class="fc" id="L178">        return new DataAccessLayerResponse(DataAccessLayerStatus.SUCCESS, results);</span>
     }
 
     private Object voltTypeToType(VoltTable table, int columnIndex) {
-<span class="nc" id="L171">        VoltType type = table.getColumnType(columnIndex);</span>
-<span class="nc bnc" id="L172" title="All 6 branches missed.">        switch(type) {</span>
+<span class="fc" id="L182">        VoltType type = table.getColumnType(columnIndex);</span>
+<span class="fc bfc" id="L183" title="All 6 branches covered.">        switch(type) {</span>
             case STRING:
-<span class="nc" id="L174">                return table.getString(columnIndex);</span>
+<span class="fc" id="L185">                return table.getString(columnIndex);</span>
             case DECIMAL:
-<span class="nc" id="L176">                return table.getDecimalAsBigDecimal(columnIndex);</span>
+<span class="fc" id="L187">                return table.getDecimalAsBigDecimal(columnIndex);</span>
             case BIGINT:
             case SMALLINT:
             case INTEGER:
             case TINYINT:
-<span class="nc" id="L181">                return table.getLong(columnIndex);</span>
+<span class="fc" id="L192">                return table.getLong(columnIndex);</span>
             case FLOAT:
-<span class="nc" id="L183">                return table.getDouble(columnIndex);</span>
+<span class="fc" id="L194">                return table.getDouble(columnIndex);</span>
             case TIMESTAMP:
-<span class="nc" id="L185">                return table.getTimestampAsLong(columnIndex);</span>
+<span class="fc" id="L196">                return table.getTimestampAsLong(columnIndex);</span>
             default:
-<span class="nc" id="L187">                throw new UnsupportedOperationException(String.format(&quot;VoltType '%s' is not supported by the &quot; +</span>
+<span class="fc" id="L198">                throw new UnsupportedOperationException(String.format(&quot;VoltType '%s' is not supported by the &quot; +</span>
                         &quot;implementation of the DataAccessLayer!&quot;, type));
         }
     }
 
     private VoltWrapperClient client_;
-<span class="nc" id="L193">    private final static List&lt;Byte&gt; connectionErrors_ = Arrays.asList(ClientResponse.SERVER_UNAVAILABLE,</span>
-<span class="nc" id="L194">            ClientResponse.CONNECTION_LOST, ClientResponse.CONNECTION_TIMEOUT);</span>
+<span class="fc" id="L204">    private final static List&lt;Byte&gt; connectionErrors_ = Arrays.asList(ClientResponse.SERVER_UNAVAILABLE,</span>
+<span class="fc" id="L205">            ClientResponse.CONNECTION_LOST, ClientResponse.CONNECTION_TIMEOUT);</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
