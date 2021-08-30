@@ -200,7 +200,7 @@ class VoltWrapperClient extends ClientStatusListenerExt {
                         response.getStatusString());
                 return false;
             }
-            return response.getResults().length > 0;
+            return response.getResults().length > 1;
         } catch (NoConnectionsException e) {
             log_.warning("No connection to VoltDB databases!");
             log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
