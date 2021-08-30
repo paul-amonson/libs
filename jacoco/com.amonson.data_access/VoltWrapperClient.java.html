@@ -158,142 +158,169 @@ import java.util.logging.Logger;
      * @return true if everything present is loaded ok, false something was attempted to load and failed.
      */
     public boolean initializeVoltDBAfterConnect() {
-<span class="fc bfc" id="L161" title="All 2 branches covered.">        if(properties_.containsKey(RESOURCE_FILE)) {</span>
-<span class="fc bfc" id="L162" title="All 2 branches covered.">            if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))</span>
-<span class="fc" id="L163">                return false;</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if(!checkSchema()) {</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            if (properties_.containsKey(RESOURCE_FILE)) {</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))</span>
+<span class="fc" id="L164">                    return false;</span>
+            }
+<span class="fc bfc" id="L166" title="All 2 branches covered.">            if (properties_.containsKey(FILENAME)) {</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">                if (!loadSQLFromFile(properties_.getProperty(FILENAME)))</span>
+<span class="fc" id="L168">                    return false;</span>
+            }
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (properties_.containsKey(JAR_FILES)) {</span>
+<span class="fc" id="L171">                return loadJarFiles(properties_.getProperty(JAR_FILES));</span>
+            }
         }
-<span class="fc bfc" id="L165" title="All 2 branches covered.">        if(properties_.containsKey(FILENAME)) {</span>
-<span class="fc bfc" id="L166" title="All 2 branches covered.">            if(!loadSQLFromFile(properties_.getProperty(FILENAME)))</span>
-<span class="fc" id="L167">                return false;</span>
-        }
-<span class="fc bfc" id="L169" title="All 2 branches covered.">        if(properties_.containsKey(JAR_FILES)) {</span>
-<span class="fc" id="L170">            return loadJarFiles(properties_.getProperty(JAR_FILES));</span>
-        }
-<span class="fc" id="L172">        return true;</span>
+<span class="fc" id="L174">        return true;</span>
     }
 
     @Override
     public void connectionLost(String hostname, int port, int connectionsLeft, DisconnectCause cause) {
-<span class="fc" id="L177">        connections_.put(hostname, false);</span>
-<span class="fc bfc" id="L178" title="All 2 branches covered.">        if(connectionsLeft == 0)</span>
-<span class="fc" id="L179">            log_.severe(&quot;All connections to the VoltDB servers have been lost.&quot;);</span>
+<span class="fc" id="L179">        connections_.put(hostname, false);</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        if(connectionsLeft == 0)</span>
+<span class="fc" id="L181">            log_.severe(&quot;All connections to the VoltDB servers have been lost.&quot;);</span>
         else
-<span class="fc" id="L181">            log_.warning(String.format(&quot;Connection to '%s' was disconnected for reason '%s', there are %d &quot; +</span>
-<span class="fc" id="L182">                            &quot;connections left.&quot;, hostname, cause.toString(), connectionsLeft));</span>
-<span class="fc" id="L183">    }</span>
+<span class="fc" id="L183">            log_.warning(String.format(&quot;Connection to '%s' was disconnected for reason '%s', there are %d &quot; +</span>
+<span class="fc" id="L184">                            &quot;connections left.&quot;, hostname, cause.toString(), connectionsLeft));</span>
+<span class="fc" id="L185">    }</span>
 
     @Override
     public void connectionCreated(String hostname, int port, AutoConnectionStatus status) {
-<span class="pc bpc" id="L187" title="1 of 4 branches missed.">        if(status == AutoConnectionStatus.SUCCESS &amp;&amp; !connections_.containsKey(hostname))</span>
-<span class="fc" id="L188">            connections_.put(hostname, true);</span>
+<span class="pc bpc" id="L189" title="1 of 4 branches missed.">        if(status == AutoConnectionStatus.SUCCESS &amp;&amp; !connections_.containsKey(hostname))</span>
+<span class="fc" id="L190">            connections_.put(hostname, true);</span>
         else
-<span class="fc" id="L190">            connections_.put(hostname, false);</span>
-<span class="fc" id="L191">    }</span>
+<span class="fc" id="L192">            connections_.put(hostname, false);</span>
+<span class="fc" id="L193">    }</span>
+
+    private boolean checkSchema() {
+        try {
+<span class="fc" id="L197">            ClientResponse response = client_.callProcedure(&quot;@SystemCatalog&quot;, &quot;tables&quot;);</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L199">                log_.warning(&quot;Call to '@SystemCatalog' built-in procedure failed with: &quot; +</span>
+<span class="nc" id="L200">                        response.getStatusString());</span>
+<span class="nc" id="L201">                return false;</span>
+            }
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">            return response.getResults().length &gt; 0;</span>
+<span class="nc" id="L204">        } catch (NoConnectionsException e) {</span>
+<span class="nc" id="L205">            log_.warning(&quot;No connection to VoltDB databases!&quot;);</span>
+<span class="nc" id="L206">            log_.throwing(getClass().getCanonicalName(), &quot;checkSchema&quot;, e);</span>
+<span class="nc" id="L207">            return false;</span>
+<span class="nc" id="L208">        } catch (IOException e) {</span>
+<span class="nc" id="L209">            log_.warning(&quot;I/O exception when calling to VoltDB databases!&quot;);</span>
+<span class="nc" id="L210">            log_.throwing(getClass().getCanonicalName(), &quot;checkSchema&quot;, e);</span>
+<span class="nc" id="L211">            return false;</span>
+<span class="nc" id="L212">        } catch (ProcCallException e) {</span>
+<span class="nc" id="L213">            log_.warning(&quot;Call to built in '@SystemCatalog' failed! Is the name correct?&quot;);</span>
+<span class="nc" id="L214">            log_.throwing(getClass().getCanonicalName(), &quot;checkSchema&quot;, e);</span>
+<span class="nc" id="L215">            return false;</span>
+        }
+    }
 
     private boolean loadJarFiles(String jarFiles) {
-<span class="fc" id="L194">        String[] jars = jarFiles.split(&quot;,&quot;);</span>
-<span class="fc bfc" id="L195" title="All 2 branches covered.">        for(String jarFilename: jars) {</span>
-<span class="fc" id="L196">            File jar = new File(jarFilename);</span>
-<span class="fc bfc" id="L197" title="All 2 branches covered.">            if(!jar.canRead()) {</span>
-<span class="fc" id="L198">                log_.severe(String.format(&quot;Jar file '%s' is missing or cannot be read!&quot;, jar));</span>
-<span class="fc" id="L199">                return false;</span>
+<span class="fc" id="L220">        String[] jars = jarFiles.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        for(String jarFilename: jars) {</span>
+<span class="fc" id="L222">            File jar = new File(jarFilename);</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">            if(!jar.canRead()) {</span>
+<span class="fc" id="L224">                log_.severe(String.format(&quot;Jar file '%s' is missing or cannot be read!&quot;, jar));</span>
+<span class="fc" id="L225">                return false;</span>
             }
             try {
-<span class="fc" id="L202">                ClientResponse response = client_.updateClasses(jar, &quot;&quot;);</span>
-<span class="pc bpc" id="L203" title="1 of 2 branches missed.">                if(response.getStatus() != ClientResponse.SUCCESS) {</span>
-<span class="nc" id="L204">                    log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
-<span class="nc" id="L205">                    return false;</span>
+<span class="fc" id="L228">                ClientResponse response = client_.updateClasses(jar, &quot;&quot;);</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">                if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L230">                    log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
+<span class="nc" id="L231">                    return false;</span>
                 }
-<span class="nc" id="L207">            } catch (IOException | ProcCallException e) {</span>
-<span class="nc" id="L208">                log_.severe(String.format(&quot;Failed to load the JAR file '%s' into VoltDB!&quot;, jar));</span>
-<span class="nc" id="L209">                log_.throwing(getClass().getCanonicalName(), &quot;loadJarFiles&quot;, e);</span>
-<span class="nc" id="L210">                return false;</span>
-<span class="fc" id="L211">            }</span>
+<span class="nc" id="L233">            } catch (IOException | ProcCallException e) {</span>
+<span class="nc" id="L234">                log_.severe(String.format(&quot;Failed to load the JAR file '%s' into VoltDB!&quot;, jar));</span>
+<span class="nc" id="L235">                log_.throwing(getClass().getCanonicalName(), &quot;loadJarFiles&quot;, e);</span>
+<span class="nc" id="L236">                return false;</span>
+<span class="fc" id="L237">            }</span>
         }
-<span class="fc" id="L213">        return true;</span>
+<span class="fc" id="L239">        return true;</span>
     }
 
     private boolean loadSQLFromFile(String filename) {
-<span class="fc" id="L217">        File file = new File(filename);</span>
-<span class="fc bfc" id="L218" title="All 2 branches covered.">        if(!file.canRead()) {</span>
-<span class="fc" id="L219">            log_.severe(String.format(&quot;File '%s' does not exist or is not readable!&quot;, file));</span>
-<span class="fc" id="L220">            return false;</span>
+<span class="fc" id="L243">        File file = new File(filename);</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        if(!file.canRead()) {</span>
+<span class="fc" id="L245">            log_.severe(String.format(&quot;File '%s' does not exist or is not readable!&quot;, file));</span>
+<span class="fc" id="L246">            return false;</span>
         }
         String sql;
         try {
-<span class="fc" id="L224">            sql = new String(Files.readAllBytes(file.toPath()));</span>
-<span class="nc" id="L225">        } catch (IOException e) {</span>
-<span class="nc" id="L226">            log_.severe(String.format(&quot;Failed to read SQL file '%s'&quot;, file));</span>
-<span class="nc" id="L227">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromFile&quot;, e);</span>
-<span class="nc" id="L228">            return false;</span>
-<span class="fc" id="L229">        }</span>
+<span class="fc" id="L250">            sql = new String(Files.readAllBytes(file.toPath()));</span>
+<span class="nc" id="L251">        } catch (IOException e) {</span>
+<span class="nc" id="L252">            log_.severe(String.format(&quot;Failed to read SQL file '%s'&quot;, file));</span>
+<span class="nc" id="L253">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromFile&quot;, e);</span>
+<span class="nc" id="L254">            return false;</span>
+<span class="fc" id="L255">        }</span>
         try {
-<span class="fc" id="L231">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
-<span class="pc bpc" id="L232" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
-<span class="nc" id="L233">                log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
-<span class="nc" id="L234">                return false;</span>
+<span class="fc" id="L257">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L259">                log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
+<span class="nc" id="L260">                return false;</span>
             }
-<span class="nc" id="L236">        } catch(IOException | ProcCallException e) {</span>
-<span class="nc" id="L237">            log_.severe(String.format(&quot;Failed to load the SQL file '%s' into VoltDB!&quot;, file));</span>
-<span class="nc" id="L238">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromFile&quot;, e);</span>
-<span class="nc" id="L239">            return false;</span>
-<span class="fc" id="L240">        }</span>
-<span class="fc" id="L241">        return true;</span>
+<span class="nc" id="L262">        } catch(IOException | ProcCallException e) {</span>
+<span class="nc" id="L263">            log_.severe(String.format(&quot;Failed to load the SQL file '%s' into VoltDB!&quot;, file));</span>
+<span class="nc" id="L264">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromFile&quot;, e);</span>
+<span class="nc" id="L265">            return false;</span>
+<span class="fc" id="L266">        }</span>
+<span class="fc" id="L267">        return true;</span>
     }
 
     private boolean loadSQLFromResource(String resourceName) {
-<span class="fc" id="L245">        InputStream stream = ClassLoader.getSystemResourceAsStream(resourceName);</span>
-<span class="fc bfc" id="L246" title="All 2 branches covered.">        if(stream == null) {</span>
-<span class="fc" id="L247">            log_.severe(String.format(&quot;ClassLoader failed to get resource stream for '%s'!&quot;, resourceName));</span>
-<span class="fc" id="L248">            return false;</span>
+<span class="fc" id="L271">        InputStream stream = ClassLoader.getSystemResourceAsStream(resourceName);</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">        if(stream == null) {</span>
+<span class="fc" id="L273">            log_.severe(String.format(&quot;ClassLoader failed to get resource stream for '%s'!&quot;, resourceName));</span>
+<span class="fc" id="L274">            return false;</span>
         }
 
         String sql;
         try {
-<span class="fc" id="L253">            sql = IOUtils.toString(stream, StandardCharsets.UTF_8);</span>
-<span class="nc" id="L254">        } catch (IOException e) {</span>
-<span class="nc" id="L255">            log_.severe(String.format(&quot;ClassLoader failed to get read the stream for '%s'!&quot;, resourceName));</span>
-<span class="nc" id="L256">            return false;</span>
-<span class="fc" id="L257">        }</span>
+<span class="fc" id="L279">            sql = IOUtils.toString(stream, StandardCharsets.UTF_8);</span>
+<span class="nc" id="L280">        } catch (IOException e) {</span>
+<span class="nc" id="L281">            log_.severe(String.format(&quot;ClassLoader failed to get read the stream for '%s'!&quot;, resourceName));</span>
+<span class="nc" id="L282">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromResource&quot;, e);</span>
+<span class="nc" id="L283">            return false;</span>
+<span class="fc" id="L284">        }</span>
         try {
-<span class="fc" id="L259">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
-<span class="pc bpc" id="L260" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
-<span class="nc" id="L261">                log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
-<span class="nc" id="L262">                return false;</span>
+<span class="fc" id="L286">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="nc" id="L288">                log_.severe(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
+<span class="nc" id="L289">                return false;</span>
             }
-<span class="nc" id="L264">        } catch(IOException | ProcCallException e) {</span>
-<span class="nc" id="L265">            log_.severe(String.format(&quot;Failed to load the resource SQL '%s' into VoltDB!&quot;, resourceName));</span>
-<span class="nc" id="L266">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromResource&quot;, e);</span>
-<span class="nc" id="L267">            return false;</span>
-<span class="fc" id="L268">        }</span>
-<span class="fc" id="L269">        return true;</span>
+<span class="nc" id="L291">        } catch(IOException | ProcCallException e) {</span>
+<span class="nc" id="L292">            log_.severe(String.format(&quot;Failed to load the resource SQL '%s' into VoltDB!&quot;, resourceName));</span>
+<span class="nc" id="L293">            log_.throwing(getClass().getCanonicalName(), &quot;loadSQLFromResource&quot;, e);</span>
+<span class="nc" id="L294">            return false;</span>
+<span class="fc" id="L295">        }</span>
+<span class="fc" id="L296">        return true;</span>
     }
 
     private boolean connectInternal(String server) {
         try {
-<span class="fc" id="L274">            client_.createConnection(server, port_);</span>
-<span class="fc" id="L275">            return true;</span>
-<span class="fc" id="L276">        } catch (IOException e) {</span>
-<span class="fc" id="L277">            return false;</span>
+<span class="fc" id="L301">            client_.createConnection(server, port_);</span>
+<span class="fc" id="L302">            return true;</span>
+<span class="fc" id="L303">        } catch (IOException e) {</span>
+<span class="fc" id="L304">            return false;</span>
         }
     }
 
     private ClientConfig initClient() {
         ClientConfig config;
-<span class="fc" id="L283">        config = new ClientConfig(properties_.getProperty(USERNAME, &quot;&quot;), properties_.getProperty(PASSWORD, &quot;&quot;), this);</span>
-<span class="fc" id="L284">        config.enableAutoTune();</span>
-<span class="fc" id="L285">        config.setReconnectOnConnectionLoss(true);</span>
-<span class="fc" id="L286">        config.setClientAffinity(true);</span>
-<span class="fc" id="L287">        config.setTopologyChangeAware(true);</span>
-<span class="fc" id="L288">        return config;</span>
+<span class="fc" id="L310">        config = new ClientConfig(properties_.getProperty(USERNAME, &quot;&quot;), properties_.getProperty(PASSWORD, &quot;&quot;), this);</span>
+<span class="fc" id="L311">        config.enableAutoTune();</span>
+<span class="fc" id="L312">        config.setReconnectOnConnectionLoss(true);</span>
+<span class="fc" id="L313">        config.setClientAffinity(true);</span>
+<span class="fc" id="L314">        config.setTopologyChangeAware(true);</span>
+<span class="fc" id="L315">        return config;</span>
     }
 
     private final Logger              log_;
     private final Properties          properties_;
-<span class="fc" id="L293">    private final Map&lt;String,Boolean&gt; connections_ = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L320">    private final Map&lt;String,Boolean&gt; connections_ = new ConcurrentHashMap&lt;&gt;();</span>
     private       Client              client_;
     private final int                 port_;
-<span class="fc" id="L296">    private       Thread              connectionThread_ = null;</span>
+<span class="fc" id="L323">    private       Thread              connectionThread_ = null;</span>
 
     public static final String USERNAME                  = &quot;username&quot;;
     public static final String PASSWORD                  = &quot;password&quot;;
