@@ -158,16 +158,18 @@ class VoltWrapperClient extends ClientStatusListenerExt {
      * @return true if everything present is loaded ok, false something was attempted to load and failed.
      */
     public boolean initializeVoltDBAfterConnect() {
-        if(properties_.containsKey(RESOURCE_FILE)) {
-            if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))
-                return false;
-        }
-        if(properties_.containsKey(FILENAME)) {
-            if(!loadSQLFromFile(properties_.getProperty(FILENAME)))
-                return false;
-        }
-        if(properties_.containsKey(JAR_FILES)) {
-            return loadJarFiles(properties_.getProperty(JAR_FILES));
+        if(!checkSchema()) {
+            if (properties_.containsKey(RESOURCE_FILE)) {
+                if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))
+                    return false;
+            }
+            if (properties_.containsKey(FILENAME)) {
+                if (!loadSQLFromFile(properties_.getProperty(FILENAME)))
+                    return false;
+            }
+            if (properties_.containsKey(JAR_FILES)) {
+                return loadJarFiles(properties_.getProperty(JAR_FILES));
+            }
         }
         return true;
     }
@@ -188,6 +190,30 @@ class VoltWrapperClient extends ClientStatusListenerExt {
             connections_.put(hostname, true);
         else
             connections_.put(hostname, false);
+    }
+
+    private boolean checkSchema() {
+        try {
+            ClientResponse response = client_.callProcedure("@SystemCatalog", "tables");
+            if(response.getStatus() != ClientResponse.SUCCESS) {
+                log_.warning("Call to '@SystemCatalog' built-in procedure failed with: " +
+                        response.getStatusString());
+                return false;
+            }
+            return response.getResults().length > 0;
+        } catch (NoConnectionsException e) {
+            log_.warning("No connection to VoltDB databases!");
+            log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
+            return false;
+        } catch (IOException e) {
+            log_.warning("I/O exception when calling to VoltDB databases!");
+            log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
+            return false;
+        } catch (ProcCallException e) {
+            log_.warning("Call to built in '@SystemCatalog' failed! Is the name correct?");
+            log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
+            return false;
+        }
     }
 
     private boolean loadJarFiles(String jarFiles) {
