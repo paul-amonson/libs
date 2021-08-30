@@ -5,6 +5,7 @@
 package com.amonson.data_access
 
 import org.voltdb.VoltTable
+import org.voltdb.VoltType
 import org.voltdb.client.Client
 import org.voltdb.client.ClientResponse
 import org.voltdb.client.ClientStatusListenerExt
@@ -31,8 +32,10 @@ class VoltWrapperClientSpec extends Specification {
         underTest.client_.getConnectedHostList() >> list
         catResponse_ = Mock(ClientResponse)
         catResponse_.getStatus() >> ClientResponse.SUCCESS
-        catResponse_.getResults() >> new VoltTable[0]
-        underTest.client_.callProcedure("@SystemCatalog", "tables") >> catResponse_;
+        VoltTable[] vt = new VoltTable[] { new VoltTable(new VoltTable.ColumnInfo("Dummy", VoltType.STRING)) }
+        catResponse_.getResults() >> vt
+
+        underTest.client_.callProcedure("@SystemCatalog", "tables") >> catResponse_
     }
 
     static Properties props
