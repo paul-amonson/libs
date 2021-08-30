@@ -24,7 +24,7 @@ public final class NativeLoggerFactory {
      * @return The new constructed and configured logger.
      */
     public static Logger getNamedConfiguredLogger(String name, Object arg) {
-<span class="fc" id="L27">        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter(arg.toString()));</span>
+<span class="nc" id="L27">        return getNamedConfiguredLogger(name, new ConsoleHandler(), new DefaultLineFormatter(arg.toString()));</span>
     }
 
     /**
@@ -37,7 +37,7 @@ public final class NativeLoggerFactory {
      * @return The new constructed and configured logger.
      */
     public static Logger getNamedConfiguredLogger(String name, Formatter formatter) {
-<span class="fc" id="L40">        return getNamedConfiguredLogger(name, new ConsoleHandler(), formatter);</span>
+<span class="nc" id="L40">        return getNamedConfiguredLogger(name, new ConsoleHandler(), formatter);</span>
     }
 
     /**
@@ -51,7 +51,7 @@ public final class NativeLoggerFactory {
      * @return The new constructed and configured logger.
      */
     public static Logger getNamedConfiguredLogger(String name, Handler handler, Object arg) {
-<span class="fc" id="L54">        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter(arg.toString()));</span>
+<span class="nc" id="L54">        return getNamedConfiguredLogger(name, handler, new DefaultLineFormatter(arg.toString()));</span>
     }
 
     /**
@@ -64,13 +64,13 @@ public final class NativeLoggerFactory {
      * @return The new constructed and configured logger.
      */
     public static Logger getNamedConfiguredLogger(String name, Handler handler, Formatter formatter) {
-<span class="fc" id="L67">        Logger logger = Logger.getLogger(name);</span>
-<span class="fc" id="L68">        logger.setUseParentHandlers(false);</span>
-<span class="fc" id="L69">        logger.addHandler(handler);</span>
-<span class="fc" id="L70">        logger.getHandlers()[0].setLevel(Level.FINEST);</span>
-<span class="fc" id="L71">        logger.getHandlers()[0].setFormatter(formatter);</span>
-<span class="fc" id="L72">        logger.setLevel(Level.FINEST);</span>
-<span class="fc" id="L73">        return logger;</span>
+<span class="nc" id="L67">        Logger logger = Logger.getLogger(name);</span>
+<span class="nc" id="L68">        logger.setUseParentHandlers(false);</span>
+<span class="nc" id="L69">        logger.addHandler(handler);</span>
+<span class="nc" id="L70">        logger.getHandlers()[0].setLevel(Level.FINEST);</span>
+<span class="nc" id="L71">        logger.getHandlers()[0].setFormatter(formatter);</span>
+<span class="nc" id="L72">        logger.setLevel(Level.FINEST);</span>
+<span class="nc" id="L73">        return logger;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

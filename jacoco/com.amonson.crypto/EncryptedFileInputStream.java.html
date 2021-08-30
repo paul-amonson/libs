@@ -31,10 +31,10 @@ public class EncryptedFileInputStream extends InputStream {
      */
     public EncryptedFileInputStream(String filename, KeyData key) throws FileNotFoundException,
             InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
-<span class="fc" id="L34">        super();</span>
-<span class="fc" id="L35">        key_ = key;</span>
-<span class="fc" id="L36">        init(new File(filename));</span>
-<span class="fc" id="L37">    }</span>
+<span class="nc" id="L34">        super();</span>
+<span class="nc" id="L35">        key_ = key;</span>
+<span class="nc" id="L36">        init(new File(filename));</span>
+<span class="nc" id="L37">    }</span>
 
     /**
      * Open a file for read.
@@ -48,10 +48,10 @@ public class EncryptedFileInputStream extends InputStream {
      */
     public EncryptedFileInputStream(File file, KeyData key) throws FileNotFoundException,
             InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
-<span class="fc" id="L51">        super();</span>
-<span class="fc" id="L52">        key_ = key;</span>
-<span class="fc" id="L53">        init(file);</span>
-<span class="fc" id="L54">    }</span>
+<span class="nc" id="L51">        super();</span>
+<span class="nc" id="L52">        key_ = key;</span>
+<span class="nc" id="L53">        init(file);</span>
+<span class="nc" id="L54">    }</span>
 
     /**
      * Read a byte.
@@ -60,7 +60,7 @@ public class EncryptedFileInputStream extends InputStream {
      */
     @Override
     public int read() throws IOException {
-<span class="fc" id="L63">        return in_.read();</span>
+<span class="nc" id="L63">        return in_.read();</span>
     }
 
     /**
@@ -71,7 +71,7 @@ public class EncryptedFileInputStream extends InputStream {
      */
     @Override
     public int read(byte[] bytes) throws IOException {
-<span class="fc" id="L74">        return in_.read(bytes);</span>
+<span class="nc" id="L74">        return in_.read(bytes);</span>
     }
 
     /**
@@ -84,7 +84,7 @@ public class EncryptedFileInputStream extends InputStream {
      */
     @Override
     public int read(byte[] bytes, int off, int len) throws IOException {
-<span class="fc" id="L87">        return in_.read(bytes, off, len);</span>
+<span class="nc" id="L87">        return in_.read(bytes, off, len);</span>
     }
 
     /**
@@ -93,18 +93,18 @@ public class EncryptedFileInputStream extends InputStream {
      */
     @Override
     public void close() throws IOException {
-<span class="fc" id="L96">        super.close();</span>
-<span class="fc" id="L97">        in_.close();</span>
-<span class="fc" id="L98">    }</span>
+<span class="nc" id="L96">        super.close();</span>
+<span class="nc" id="L97">        in_.close();</span>
+<span class="nc" id="L98">    }</span>
 
     private void init(File file) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException, FileNotFoundException {
-<span class="fc" id="L102">        IvParameterSpec ivSpec = new IvParameterSpec(key_.IVAsBytes());</span>
-<span class="fc" id="L103">        SecretKeySpec keySpec = new SecretKeySpec(key_.keyAsBytes(), &quot;AES&quot;);</span>
-<span class="fc" id="L104">        Cipher cipher = Cipher.getInstance(&quot;AES/CBC/PKCS5PADDING&quot;);</span>
-<span class="fc" id="L105">        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);</span>
-<span class="fc" id="L106">        in_ = new CipherInputStream(new FileInputStream(file), cipher);</span>
-<span class="fc" id="L107">    }</span>
+<span class="nc" id="L102">        IvParameterSpec ivSpec = new IvParameterSpec(key_.IVAsBytes());</span>
+<span class="nc" id="L103">        SecretKeySpec keySpec = new SecretKeySpec(key_.keyAsBytes(), &quot;AES&quot;);</span>
+<span class="nc" id="L104">        Cipher cipher = Cipher.getInstance(&quot;AES/CBC/PKCS5PADDING&quot;);</span>
+<span class="nc" id="L105">        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);</span>
+<span class="nc" id="L106">        in_ = new CipherInputStream(new FileInputStream(file), cipher);</span>
+<span class="nc" id="L107">    }</span>
 
     private final KeyData key_;
     private CipherInputStream in_;

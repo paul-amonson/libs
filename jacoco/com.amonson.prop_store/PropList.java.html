@@ -16,98 +16,98 @@ import java.util.Collection;
 @SuppressWarnings(&quot;serial&quot;)
 public class PropList extends ArrayList&lt;Object&gt; {
     public PropList() {
-<span class="fc" id="L19">        super();</span>
-<span class="fc" id="L20">    }</span>
+<span class="nc" id="L19">        super();</span>
+<span class="nc" id="L20">    }</span>
 
     public PropList(Collection&lt;?&gt; list) {
-<span class="fc" id="L23">        super(list);</span>
-<span class="fc" id="L24">    }</span>
+<span class="nc" id="L23">        super(list);</span>
+<span class="nc" id="L24">    }</span>
 
     public String getString(int index) {
-<span class="fc" id="L27">        return get(index).toString();</span>
+<span class="nc" id="L27">        return get(index).toString();</span>
     }
 
     public PropMap getMap(int index) {
-<span class="fc" id="L31">        return (PropMap)get(index);</span>
+<span class="nc" id="L31">        return (PropMap)get(index);</span>
     }
 
     public PropList getArray(int index) {
-<span class="fc" id="L35">        return (PropList)get(index);</span>
+<span class="nc" id="L35">        return (PropList)get(index);</span>
     }
 
     public Boolean getBoolean(int index) {
-<span class="fc" id="L39">        return (Boolean)get(index);</span>
+<span class="nc" id="L39">        return (Boolean)get(index);</span>
     }
 
     public Short getShort(int index) {
-<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L44">        return ((BigDecimal)get(index)).shortValue();</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L44">        return ((BigDecimal)get(index)).shortValue();</span>
     }
 
     public Integer getInteger(int index) {
-<span class="fc bfc" id="L48" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L49">        return ((BigDecimal)get(index)).intValue();</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L49">        return ((BigDecimal)get(index)).intValue();</span>
     }
 
     public Long getLong(int index) {
-<span class="fc bfc" id="L53" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L54">        return ((BigDecimal)get(index)).longValue();</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L54">        return ((BigDecimal)get(index)).longValue();</span>
     }
 
     public BigInteger getBigInteger(int index) {
-<span class="fc bfc" id="L58" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L59">        return ((BigDecimal)get(index)).toBigInteger();</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L59">        return ((BigDecimal)get(index)).toBigInteger();</span>
     }
 
     public Float getFloat(int index) {
-<span class="fc bfc" id="L63" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L64">        return ((BigDecimal)get(index)).floatValue();</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L64">        return ((BigDecimal)get(index)).floatValue();</span>
     }
 
     public Double getDouble(int index) {
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L69">        return ((BigDecimal)get(index)).doubleValue();</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L69">        return ((BigDecimal)get(index)).doubleValue();</span>
     }
 
     public BigDecimal getBigDecimal(int index) {
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        if(isNull(index)) return null;</span>
-<span class="fc" id="L74">        return (BigDecimal)get(index);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if(isNull(index)) return null;</span>
+<span class="nc" id="L74">        return (BigDecimal)get(index);</span>
     }
 
     public boolean isNull(int index) {
-<span class="fc bfc" id="L78" title="All 2 branches covered.">        return get(index) == null;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        return get(index) == null;</span>
     }
     
     @Override
     public boolean add(Object value) {
-<span class="fc" id="L83">        PropMap.checkType(value);</span>
-<span class="fc" id="L84">        return super.add(PropMap.makeStoredValue(value));</span>
+<span class="nc" id="L83">        PropMap.checkType(value);</span>
+<span class="nc" id="L84">        return super.add(PropMap.makeStoredValue(value));</span>
     }
     
     @Override
     public void add(int index, Object value) {
-<span class="fc" id="L89">        PropMap.checkType(value);</span>
-<span class="fc" id="L90">        super.add(index, PropMap.makeStoredValue(value));</span>
-<span class="fc" id="L91">    }</span>
+<span class="nc" id="L89">        PropMap.checkType(value);</span>
+<span class="nc" id="L90">        super.add(index, PropMap.makeStoredValue(value));</span>
+<span class="nc" id="L91">    }</span>
     
     @Override
     public boolean addAll(Collection&lt;?&gt; collection) {
-<span class="fc bfc" id="L95" title="All 2 branches covered.">        for(Object item: collection)</span>
-<span class="fc" id="L96">            add(item);</span>
-<span class="fc" id="L97">        return true;</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        for(Object item: collection)</span>
+<span class="nc" id="L96">            add(item);</span>
+<span class="nc" id="L97">        return true;</span>
     }
 
     @Override
     public boolean addAll(int index, Collection&lt;?&gt; collection) {
-<span class="fc bfc" id="L102" title="All 2 branches covered.">        for(Object item: collection)</span>
-<span class="fc" id="L103">            add(index++, item);</span>
-<span class="fc" id="L104">        return true;</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        for(Object item: collection)</span>
+<span class="nc" id="L103">            add(index++, item);</span>
+<span class="nc" id="L104">        return true;</span>
     }
     
     @Override
     public Object set(int index, Object value) {
-<span class="fc" id="L109">        PropMap.checkType(value);</span>
-<span class="fc" id="L110">        return super.set(index, PropMap.makeStoredValue(value));</span>
+<span class="nc" id="L109">        PropMap.checkType(value);</span>
+<span class="nc" id="L110">        return super.set(index, PropMap.makeStoredValue(value));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
