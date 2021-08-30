@@ -4,6 +4,7 @@
 //
 package com.amonson.data_access
 
+import org.voltdb.VoltTable
 import org.voltdb.client.Client
 import org.voltdb.client.ClientResponse
 import org.voltdb.client.ClientStatusListenerExt
@@ -15,6 +16,7 @@ class VoltWrapperClientSpec extends Specification {
     def list = new ArrayList<InetSocketAddress>()
     Properties props_
     VoltWrapperClient underTest
+    ClientResponse catResponse_
     void setup() {
         new File("/tmp/test.sql").text = """-- Dummy test file... 
 """
@@ -27,6 +29,10 @@ class VoltWrapperClientSpec extends Specification {
         underTest = new VoltWrapperClient(props_, Mock(Logger))
         underTest.client_ = Mock(Client)
         underTest.client_.getConnectedHostList() >> list
+        catResponse_ = Mock(ClientResponse)
+        catResponse_.getStatus() >> ClientResponse.SUCCESS
+        catResponse_.getResults() >> new VoltTable[0]
+        underTest.client_.callProcedure("@SystemCatalog", "tables") >> catResponse_;
     }
 
     static Properties props
