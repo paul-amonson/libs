@@ -100,6 +100,6 @@ public class PropStoreTest {
         });
     }
 
-    private File file_ = new File("/tmp/test_file.txt");
-    private File badFile_ = new File("/tmp/folder/does/not/exist/test_file2.txt");
+    private File file_ = new File("./build/tmp/test_file.txt");
+    private File badFile_ = new File("./build/tmp/folder/does/not/exist/test_file2.txt");
 }

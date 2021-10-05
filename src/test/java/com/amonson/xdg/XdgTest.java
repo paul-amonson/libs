@@ -15,9 +15,8 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisabledIfEnvironmentVariable(named = "OS", matches = "[Ww]indows.*", disabledReason = "Test skipped on Windows")
 public class XdgTest {
-    private static String tmpFolder = Paths.get(File.separator, "tmp").toString();
+    private static String tmpFolder = Paths.get("./build", "tmp").toString();
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -32,7 +31,7 @@ public class XdgTest {
         System.clearProperty("xdg.cache.home");
         System.clearProperty("xdg.config.dirs");
         System.clearProperty("xdg.data.dirs");
-        try (Writer writer = new FileWriter("/tmp/testFile1")) {
+        try (Writer writer = new FileWriter("./build/tmp/testFile1")) {
             writer.write("This is a test.\nThis is only a test.\n");
         }
     }
@@ -78,9 +77,10 @@ public class XdgTest {
         new Xdg();
         new Xdg("");
         Xdg xdg = new Xdg("test");
-        assertEquals(tmpFolder + "/.config/test", xdg.getConfigHome().toString());
-        assertEquals(tmpFolder + "/.local/share/test", xdg.getDataHome().toString());
-        assertEquals(tmpFolder + "/.cache/test", xdg.getCacheHome().toString());
+        assertEquals(Paths.get(tmpFolder, ".config", "test").toString(), xdg.getConfigHome().toString());
+        assertEquals(Paths.get(tmpFolder, ".local", "share", "test").toString(), xdg.getDataHome().toString());
+
+        assertEquals(Paths.get(tmpFolder, ".cache", "test").toString(), xdg.getCacheHome().toString());
     }
 
     @Test

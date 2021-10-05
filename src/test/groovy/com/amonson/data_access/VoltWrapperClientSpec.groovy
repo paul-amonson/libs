@@ -19,14 +19,14 @@ class VoltWrapperClientSpec extends Specification {
     VoltWrapperClient underTest
     ClientResponse catResponse_
     void setup() {
-        new File("/tmp/test.sql").text = """-- Dummy test file... 
+        new File("./build/tmp/test.sql").text = """-- Dummy test file... 
 """
-        new File("/tmp/test.jar").text = ""
+        new File("./build/tmp/test.jar").text = ""
         props_ = new Properties()
         props_.setProperty("list_of_servers", "server1,server2")
         props_.setProperty("resource_file", "test.sql")
-        props_.setProperty("filename", "/tmp/test.sql")
-        props_.setProperty("jar_files", "/tmp/test.jar")
+        props_.setProperty("filename", "./build/tmp/test.sql")
+        props_.setProperty("jar_files", "./build/tmp/test.jar")
         underTest = new VoltWrapperClient(props_, Mock(Logger))
         underTest.client_ = Mock(Client)
         underTest.client_.getConnectedHostList() >> list
