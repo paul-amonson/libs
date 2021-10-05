@@ -14,9 +14,9 @@ import java.util.*;
  * A generic class for creating factories for a Interface type.
  */
 public class FactoryGeneric&lt;Interface&gt; {
-<span class="nc" id="L17">    public FactoryGeneric(Logger logger) {</span>
-<span class="nc" id="L18">        log_ = logger;</span>
-<span class="nc" id="L19">    }</span>
+<span class="fc" id="L17">    public FactoryGeneric(Logger logger) {</span>
+<span class="fc" id="L18">        log_ = logger;</span>
+<span class="fc" id="L19">    }</span>
 
     /**
      * Create an instance of an Interface implementation.
@@ -28,15 +28,15 @@ public class FactoryGeneric&lt;Interface&gt; {
      */
     public synchronized final Interface getInstance(String instanceName, Properties properties)
             throws FactoryException {
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if(!registeredClasses_.containsKey(instanceName))</span>
-<span class="nc" id="L32">            throw new FactoryException(String.format(&quot;The instance called '%s' has not been registered&quot;,</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        if(!registeredClasses_.containsKey(instanceName))</span>
+<span class="fc" id="L32">            throw new FactoryException(String.format(&quot;The instance called '%s' has not been registered&quot;,</span>
                     instanceName));
         try {
-<span class="nc" id="L35">            Constructor&lt;? extends Interface&gt; ctor = registeredClasses_.get(instanceName).</span>
-<span class="nc" id="L36">                    getDeclaredConstructor(Properties.class, Logger.class);</span>
-<span class="nc" id="L37">            return ctor.newInstance(properties, log_);</span>
-<span class="nc" id="L38">        } catch(NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {</span>
-<span class="nc" id="L39">            throw new FactoryException(String.format(&quot;Failed to create instance of '%s'&quot;, instanceName), e);</span>
+<span class="fc" id="L35">            Constructor&lt;? extends Interface&gt; ctor = registeredClasses_.get(instanceName).</span>
+<span class="fc" id="L36">                    getDeclaredConstructor(Properties.class, Logger.class);</span>
+<span class="fc" id="L37">            return ctor.newInstance(properties, log_);</span>
+<span class="fc" id="L38">        } catch(NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {</span>
+<span class="fc" id="L39">            throw new FactoryException(String.format(&quot;Failed to create instance of '%s'&quot;, instanceName), e);</span>
         }
     }
 
@@ -50,11 +50,11 @@ public class FactoryGeneric&lt;Interface&gt; {
      */
     public synchronized final Interface getSingletonInstance(String instanceName, Properties properties)
             throws FactoryException {
-<span class="nc bnc" id="L53" title="All 2 branches missed.">        if(singletonInstances_.containsKey(instanceName))</span>
-<span class="nc" id="L54">            return singletonInstances_.get(instanceName);</span>
-<span class="nc" id="L55">        Interface instance = getInstance(instanceName, properties);</span>
-<span class="nc" id="L56">        singletonInstances_.put(instanceName, instance);</span>
-<span class="nc" id="L57">        return instance;</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if(singletonInstances_.containsKey(instanceName))</span>
+<span class="fc" id="L54">            return singletonInstances_.get(instanceName);</span>
+<span class="fc" id="L55">        Interface instance = getInstance(instanceName, properties);</span>
+<span class="fc" id="L56">        singletonInstances_.put(instanceName, instance);</span>
+<span class="fc" id="L57">        return instance;</span>
     }
 
     /**
@@ -65,7 +65,7 @@ public class FactoryGeneric&lt;Interface&gt; {
      * @return true if added, false otherwise.
      */
     public synchronized final boolean registerClass(String instanceName, Class&lt;? extends Interface&gt; classType) {
-<span class="nc bnc" id="L68" title="All 2 branches missed.">        return registeredClasses_.putIfAbsent(instanceName, classType) == null;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        return registeredClasses_.putIfAbsent(instanceName, classType) == null;</span>
     }
 
     /**
@@ -76,11 +76,11 @@ public class FactoryGeneric&lt;Interface&gt; {
      * @return true if removed, false otherwise.
      */
     public synchronized final boolean unregisterClass(String instanceName, Class&lt;? extends Interface&gt; classType) {
-<span class="nc" id="L79">        return registeredClasses_.remove(instanceName, classType);</span>
+<span class="fc" id="L79">        return registeredClasses_.remove(instanceName, classType);</span>
     }
 
     final private Logger log_;
-<span class="nc" id="L83">    final private Map&lt;String,Class&lt;? extends Interface&gt;&gt; registeredClasses_ = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L84">    final private Map&lt;String, Interface&gt; singletonInstances_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L83">    final private Map&lt;String,Class&lt;? extends Interface&gt;&gt; registeredClasses_ = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L84">    final private Map&lt;String, Interface&gt; singletonInstances_ = new HashMap&lt;&gt;();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

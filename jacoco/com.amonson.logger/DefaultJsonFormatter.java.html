@@ -28,15 +28,15 @@ public class DefaultJsonFormatter extends Formatter {
      * @param hostname Passed in host name, this class will not determine the hostname.
      * @throws RuntimeException if the parser could not be created.
      */
-<span class="nc" id="L31">    public DefaultJsonFormatter(String hostname) {</span>
+<span class="fc" id="L31">    public DefaultJsonFormatter(String hostname) {</span>
         try {
-<span class="nc" id="L33">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
+<span class="fc" id="L33">            parser_ = PropStoreFactory.getStore(&quot;json&quot;);</span>
 <span class="nc" id="L34">        } catch(PropStoreFactoryException e) {</span>
 <span class="nc" id="L35">            throw new RuntimeException(e);</span>
-<span class="nc" id="L36">        }</span>
-<span class="nc" id="L37">        hostName_ = hostname;</span>
-<span class="nc" id="L38">        pid_ = ProcessHandle.current().pid();</span>
-<span class="nc" id="L39">    }</span>
+<span class="fc" id="L36">        }</span>
+<span class="fc" id="L37">        hostName_ = hostname;</span>
+<span class="fc" id="L38">        pid_ = ProcessHandle.current().pid();</span>
+<span class="fc" id="L39">    }</span>
 
     /**
      * Overridden format method used by the Handler to format the LogRecord as a String. In this case a JSON string.
@@ -46,10 +46,10 @@ public class DefaultJsonFormatter extends Formatter {
      */
     @Override
     public String format(LogRecord logRecord) {
-<span class="nc" id="L49">        PropMap map = LogRecordSerialization.serializeLogRecord(logRecord);</span>
-<span class="nc" id="L50">        map.put(&quot;hostname&quot;, hostName_);</span>
-<span class="nc" id="L51">        map.put(&quot;pid&quot;, pid_);</span>
-<span class="nc" id="L52">        return parser_.toString(map);</span>
+<span class="fc" id="L49">        PropMap map = LogRecordSerialization.serializeLogRecord(logRecord);</span>
+<span class="fc" id="L50">        map.put(&quot;hostname&quot;, hostName_);</span>
+<span class="fc" id="L51">        map.put(&quot;pid&quot;, pid_);</span>
+<span class="fc" id="L52">        return parser_.toString(map);</span>
     }
 
     private final String hostName_;
