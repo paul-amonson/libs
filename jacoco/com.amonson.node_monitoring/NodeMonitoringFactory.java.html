@@ -4,9 +4,10 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
+
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * Factory to create a message-based (network) node monitoring class using a heartbeat. The implementation independent
@@ -46,15 +47,15 @@ public class NodeMonitoringFactory {
                                                          List&lt;String&gt; allHostnames, int port,
                                                          NodeStateChangeHandler nodeStateChangeHandler, Logger logger,
                                                          Properties config) {
-<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
-<span class="fc bfc" id="L50" title="All 2 branches covered.">            if(singleton_ == null)</span>
-<span class="fc" id="L51">                singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            if(singleton_ == null)</span>
+<span class="fc" id="L52">                singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);</span>
             else
-<span class="fc" id="L53">                logger.warning(&quot;Returning an already created instance, the instance will not represent &quot; +</span>
+<span class="fc" id="L54">                logger.warn(&quot;Returning an already created instance, the instance will not represent &quot; +</span>
                         &quot;the new passed parameters!&quot;);
-<span class="fc" id="L55">            return singleton_;</span>
+<span class="fc" id="L56">            return singleton_;</span>
         } else
-<span class="nc" id="L57">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
+<span class="nc" id="L58">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
     }
 
     /**
@@ -77,14 +78,14 @@ public class NodeMonitoringFactory {
      */
     public static NodeMonitoringClient createClient(String implementation, String myHostname,
                                                     List&lt;String&gt; allHostnames, int port, Logger logger) {
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
-<span class="fc" id="L81">            return new NodeMonitoringClientZeroMQ(myHostname, allHostnames, port, logger);</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
+<span class="fc" id="L82">            return new NodeMonitoringClientZeroMQ(myHostname, allHostnames, port, logger);</span>
         } else
-<span class="nc" id="L83">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
+<span class="nc" id="L84">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
     }
 
     private NodeMonitoringFactory() {}
 
-<span class="fc" id="L88">    private static NodeMonitoring singleton_ = null;</span>
+<span class="fc" id="L89">    private static NodeMonitoring singleton_ = null;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -4,6 +4,7 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
@@ -11,7 +12,6 @@ import org.zeromq.ZMsg;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Default description for class NodeMonitoringClientZeroMQ
@@ -45,7 +45,7 @@ class NodeMonitoringClientZeroMQ implements NodeMonitoringClient {
 <span class="fc" id="L45">        ZMsg msg = convertMessage(message);</span>
 <span class="fc" id="L46">        createSocket();</span>
 <span class="pc bpc" id="L47" title="1 of 4 branches missed.">        if(socket_ == null || !indirectSend_.send(msg, socket_)) {</span>
-<span class="fc" id="L48">            log_.warning(&quot;Failed to send the message to the open socket. Is the socket open?&quot;);</span>
+<span class="fc" id="L48">            log_.warn(&quot;Failed to send the message to the open socket. Is the socket open?&quot;);</span>
 <span class="fc" id="L49">            return false;</span>
         }
 <span class="fc" id="L51">        return true;</span>
@@ -74,9 +74,9 @@ class NodeMonitoringClientZeroMQ implements NodeMonitoringClient {
 <span class="fc bfc" id="L74" title="All 2 branches covered.">        if(socket_ == null) {</span>
 <span class="fc" id="L75">            socket_ = ctx_.socket(SocketType.PUSH);</span>
 <span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if(socket_ == null) {</span>
-<span class="nc" id="L77">                log_.warning(&quot;Failed to create a PUSH socket!&quot;);</span>
+<span class="nc" id="L77">                log_.warn(&quot;Failed to create a PUSH socket!&quot;);</span>
 <span class="pc bpc" id="L78" title="1 of 2 branches missed.">            } else if(!socket_.connect(url_)) {</span>
-<span class="fc" id="L79">                log_.warning(&quot;Failed to connect to the specified port at localhost!&quot;);</span>
+<span class="fc" id="L79">                log_.warn(&quot;Failed to connect to the specified port at localhost!&quot;);</span>
 <span class="fc" id="L80">                socket_.close();</span>
 <span class="fc" id="L81">                socket_ = null;</span>
             }

@@ -4,12 +4,12 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
 import org.zeromq.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * This is a JeroMQ based (a specific Java implementation of ZeroMQ) implementation of the
@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 <span class="fc" id="L33">                msg.addFirst(RELAY);</span>
 <span class="fc" id="L34">            ZMQ.Socket socket = publish_;</span>
 <span class="fc bfc" id="L35" title="All 2 branches covered.">            if(useRelay) {</span>
-<span class="fc" id="L36">                log_.fine(&quot;Sending inproc message across threads first: &quot; + message);</span>
+<span class="fc" id="L36">                log_.debug(&quot;Sending inproc message across threads first: &quot; + message);</span>
 <span class="fc" id="L37">                socket = nonZeroMQThreads_.getOrDefault(Thread.currentThread().getId(), null);</span>
 <span class="fc bfc" id="L38" title="All 2 branches covered.">                if (socket == null) {</span>
 <span class="fc" id="L39">                    socket = CTX.socket(SocketType.PUSH);</span>
@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 <span class="fc" id="L41">                    nonZeroMQThreads_.put(Thread.currentThread().getId(), socket);</span>
                 }
             } else
-<span class="fc" id="L44">                log_.fine(&quot;Sending message directly to cluster network: &quot; + message);</span>
+<span class="fc" id="L44">                log_.debug(&quot;Sending message directly to cluster network: &quot; + message);</span>
 <span class="fc" id="L45">            msg.send(socket);</span>
         }
 <span class="fc" id="L47">    }</span>
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
     @Override
     public void start(boolean blocking) {
 <span class="fc bfc" id="L51" title="All 2 branches covered.">        if(zeroMQThreadId_ == Long.MIN_VALUE) {</span>
-<span class="fc bfc" id="L52" title="All 2 branches covered.">            log_.fine(String.format(&quot;Starting %s listening on 'tcp://*:%d'...&quot;, blocking?&quot;blocking&quot;:&quot;non-blocking&quot;,</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            log_.debug(String.format(&quot;Starting %s listening on 'tcp://*:%d'...&quot;, blocking?&quot;blocking&quot;:&quot;non-blocking&quot;,</span>
 <span class="fc" id="L53">                    port_));</span>
 <span class="fc bfc" id="L54" title="All 2 branches covered.">            if(blocking)</span>
 <span class="fc" id="L55">                startBlocking();</span>
@@ -61,7 +61,7 @@ import java.util.logging.Logger;
     @Override
     public void stop() {
 <span class="fc bfc" id="L63" title="All 2 branches covered.">        if(zeroMQThreadId_ != Long.MIN_VALUE) {</span>
-<span class="fc" id="L64">            log_.fine(&quot;Stopping listening.&quot;);</span>
+<span class="fc" id="L64">            log_.debug(&quot;Stopping listening.&quot;);</span>
 <span class="fc bfc" id="L65" title="All 2 branches covered.">            if (zeroMQThreadId_ != Thread.currentThread().getId())</span>
 <span class="fc" id="L66">                sendMessage(new Message(STOP, me_, me_));</span>
             else
@@ -254,7 +254,7 @@ import java.util.logging.Logger;
 <span class="fc" id="L254">        String topic = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);</span>
 <span class="fc" id="L255">        String sender = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);</span>
 <span class="fc bfc" id="L256" title="All 2 branches covered.">        if(topic.equals(ALIVE)) {</span>
-<span class="fc" id="L257">            log_.finest(String.format(&quot;Received ALIVE message from '%s'!&quot;, sender));</span>
+<span class="fc" id="L257">            log_.trace(String.format(&quot;Received ALIVE message from '%s'!&quot;, sender));</span>
 <span class="fc" id="L258">            long previous = lastSeen_.get(sender).first;</span>
 <span class="fc" id="L259">            lastSeen_.get(sender).first = Instant.now().toEpochMilli();</span>
 <span class="pc bpc" id="L260" title="2 of 4 branches missed.">            if(previous == 0L &amp;&amp; nodeStateChangeHandler_ != null) {</span>
@@ -374,7 +374,7 @@ import java.util.logging.Logger;
 <span class="nc" id="L374">                            msg.removeFirst().getString(StandardCharsets.UTF_8), parseFrames(msg));</span>
 <span class="nc" id="L375">                    handler.handleMessage(message);</span>
 <span class="nc" id="L376">                } else</span>
-<span class="fc" id="L377">                    log_.warning(&quot;Unknown callback on thread: '&quot; + call + &quot;'!&quot;);</span>
+<span class="fc" id="L377">                    log_.warn(&quot;Unknown callback on thread: '&quot; + call + &quot;'!&quot;);</span>
             }
 <span class="fc" id="L379">        }</span>
 <span class="fc" id="L380">        pull.close();</span>
