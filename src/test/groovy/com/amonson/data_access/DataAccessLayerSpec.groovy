@@ -1,8 +1,8 @@
 package com.amonson.data_access
 
+import org.apache.logging.log4j.core.Logger
 import spock.lang.Specification
 
-import java.util.logging.Logger
 
 class DataAccessLayerSpec extends Specification {
     class Concrete extends DataAccessLayer {

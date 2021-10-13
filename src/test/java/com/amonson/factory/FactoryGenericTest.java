@@ -1,13 +1,10 @@
 package com.amonson.factory;
 
 import java.util.Properties;
-import java.util.logging.*;
 
+import org.apache.logging.log4j.core.Logger;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 interface InterfaceType {
 }

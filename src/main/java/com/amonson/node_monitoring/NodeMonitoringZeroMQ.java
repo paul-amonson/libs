@@ -4,12 +4,12 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
 import org.zeromq.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * This is a JeroMQ based (a specific Java implementation of ZeroMQ) implementation of the
@@ -33,7 +33,7 @@ class NodeMonitoringZeroMQ implements NodeMonitoring {
                 msg.addFirst(RELAY);
             ZMQ.Socket socket = publish_;
             if(useRelay) {
-                log_.fine("Sending inproc message across threads first: " + message);
+                log_.debug("Sending inproc message across threads first: " + message);
                 socket = nonZeroMQThreads_.getOrDefault(Thread.currentThread().getId(), null);
                 if (socket == null) {
                     socket = CTX.socket(SocketType.PUSH);
@@ -41,7 +41,7 @@ class NodeMonitoringZeroMQ implements NodeMonitoring {
                     nonZeroMQThreads_.put(Thread.currentThread().getId(), socket);
                 }
             } else
-                log_.fine("Sending message directly to cluster network: " + message);
+                log_.debug("Sending message directly to cluster network: " + message);
             msg.send(socket);
         }
     }
@@ -49,7 +49,7 @@ class NodeMonitoringZeroMQ implements NodeMonitoring {
     @Override
     public void start(boolean blocking) {
         if(zeroMQThreadId_ == Long.MIN_VALUE) {
-            log_.fine(String.format("Starting %s listening on 'tcp://*:%d'...", blocking?"blocking":"non-blocking",
+            log_.debug(String.format("Starting %s listening on 'tcp://*:%d'...", blocking?"blocking":"non-blocking",
                     port_));
             if(blocking)
                 startBlocking();
@@ -61,7 +61,7 @@ class NodeMonitoringZeroMQ implements NodeMonitoring {
     @Override
     public void stop() {
         if(zeroMQThreadId_ != Long.MIN_VALUE) {
-            log_.fine("Stopping listening.");
+            log_.debug("Stopping listening.");
             if (zeroMQThreadId_ != Thread.currentThread().getId())
                 sendMessage(new Message(STOP, me_, me_));
             else
@@ -254,7 +254,7 @@ class NodeMonitoringZeroMQ implements NodeMonitoring {
         String topic = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);
         String sender = recvMsg.removeFirst().getString(StandardCharsets.UTF_8);
         if(topic.equals(ALIVE)) {
-            log_.finest(String.format("Received ALIVE message from '%s'!", sender));
+            log_.trace(String.format("Received ALIVE message from '%s'!", sender));
             long previous = lastSeen_.get(sender).first;
             lastSeen_.get(sender).first = Instant.now().toEpochMilli();
             if(previous == 0L && nodeStateChangeHandler_ != null) {
@@ -374,7 +374,7 @@ class NodeMonitoringZeroMQ implements NodeMonitoring {
                             msg.removeFirst().getString(StandardCharsets.UTF_8), parseFrames(msg));
                     handler.handleMessage(message);
                 } else
-                    log_.warning("Unknown callback on thread: '" + call + "'!");
+                    log_.warn("Unknown callback on thread: '" + call + "'!");
             }
         }
         pull.close();

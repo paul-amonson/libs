@@ -4,6 +4,7 @@
 //
 package com.amonson.node_monitoring
 
+import org.apache.logging.log4j.core.Logger
 import org.zeromq.SocketType
 import org.zeromq.ZLoop
 import org.zeromq.ZMQ
@@ -11,7 +12,6 @@ import org.zeromq.ZMsg
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.util.logging.Logger
 
 class NodeMonitoringZeroMQSpec extends Specification {
     boolean stateCallbackCalled

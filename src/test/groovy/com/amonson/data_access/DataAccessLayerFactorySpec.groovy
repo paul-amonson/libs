@@ -4,9 +4,9 @@
 //
 package com.amonson.data_access
 
+import org.apache.logging.log4j.core.Logger
 import spock.lang.Specification
 
-import java.util.logging.Logger
 
 class DataAccessLayerFactorySpec extends Specification {
     def "Test ctor"() {

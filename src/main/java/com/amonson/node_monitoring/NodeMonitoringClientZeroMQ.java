@@ -4,6 +4,7 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
@@ -11,7 +12,6 @@ import org.zeromq.ZMsg;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Default description for class NodeMonitoringClientZeroMQ
@@ -45,7 +45,7 @@ class NodeMonitoringClientZeroMQ implements NodeMonitoringClient {
         ZMsg msg = convertMessage(message);
         createSocket();
         if(socket_ == null || !indirectSend_.send(msg, socket_)) {
-            log_.warning("Failed to send the message to the open socket. Is the socket open?");
+            log_.warn("Failed to send the message to the open socket. Is the socket open?");
             return false;
         }
         return true;
@@ -74,9 +74,9 @@ class NodeMonitoringClientZeroMQ implements NodeMonitoringClient {
         if(socket_ == null) {
             socket_ = ctx_.socket(SocketType.PUSH);
             if(socket_ == null) {
-                log_.warning("Failed to create a PUSH socket!");
+                log_.warn("Failed to create a PUSH socket!");
             } else if(!socket_.connect(url_)) {
-                log_.warning("Failed to connect to the specified port at localhost!");
+                log_.warn("Failed to connect to the specified port at localhost!");
                 socket_.close();
                 socket_ = null;
             }

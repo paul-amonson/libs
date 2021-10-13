@@ -4,6 +4,7 @@
 //
 package com.amonson.data_access;
 
+import org.apache.logging.log4j.core.Logger;
 import org.voltdb.client.*;
 import org.apache.commons.io.IOUtils;
 
@@ -14,7 +15,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * Class to wrap a VoltDB Client class. It controls connections to multiple servers configured as a cluster.
@@ -178,9 +178,9 @@ class VoltWrapperClient extends ClientStatusListenerExt {
     public void connectionLost(String hostname, int port, int connectionsLeft, DisconnectCause cause) {
         connections_.put(hostname, false);
         if(connectionsLeft == 0)
-            log_.severe("All connections to the VoltDB servers have been lost.");
+            log_.fatal("All connections to the VoltDB servers have been lost.");
         else
-            log_.warning(String.format("Connection to '%s' was disconnected for reason '%s', there are %d " +
+            log_.warn(String.format("Connection to '%s' was disconnected for reason '%s', there are %d " +
                             "connections left.", hostname, cause.toString(), connectionsLeft));
     }
 
@@ -196,22 +196,22 @@ class VoltWrapperClient extends ClientStatusListenerExt {
         try {
             ClientResponse response = client_.callProcedure("@SystemCatalog", "tables");
             if(response.getStatus() != ClientResponse.SUCCESS) {
-                log_.warning("Call to '@SystemCatalog' built-in procedure failed with: " +
+                log_.warn("Call to '@SystemCatalog' built-in procedure failed with: " +
                         response.getStatusString());
                 return false;
             }
             return response.getResults()[0].getRowCount() > 0;
         } catch (NoConnectionsException e) {
-            log_.warning("No connection to VoltDB databases!");
-            log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
+            log_.warn("No connection to VoltDB databases!");
+            log_.catching(e);
             return false;
         } catch (IOException e) {
-            log_.warning("I/O exception when calling to VoltDB databases!");
-            log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
+            log_.warn("I/O exception when calling to VoltDB databases!");
+            log_.catching(e);
             return false;
         } catch (ProcCallException e) {
-            log_.warning("Call to built in '@SystemCatalog' failed! Is the name correct?");
-            log_.throwing(getClass().getCanonicalName(), "checkSchema", e);
+            log_.warn("Call to built in '@SystemCatalog' failed! Is the name correct?");
+            log_.catching(e);
             return false;
         }
     }
@@ -221,18 +221,18 @@ class VoltWrapperClient extends ClientStatusListenerExt {
         for(String jarFilename: jars) {
             File jar = new File(jarFilename);
             if(!jar.canRead()) {
-                log_.severe(String.format("Jar file '%s' is missing or cannot be read!", jar));
+                log_.fatal(String.format("Jar file '%s' is missing or cannot be read!", jar));
                 return false;
             }
             try {
                 ClientResponse response = client_.updateClasses(jar, "");
                 if(response.getStatus() != ClientResponse.SUCCESS) {
-                    log_.severe(String.format("Failed to call VoltDB: %s", response.getStatusString()));
+                    log_.fatal(String.format("Failed to call VoltDB: %s", response.getStatusString()));
                     return false;
                 }
             } catch (IOException | ProcCallException e) {
-                log_.severe(String.format("Failed to load the JAR file '%s' into VoltDB!", jar));
-                log_.throwing(getClass().getCanonicalName(), "loadJarFiles", e);
+                log_.fatal(String.format("Failed to load the JAR file '%s' into VoltDB!", jar));
+                log_.catching(e);
                 return false;
             }
         }
@@ -242,26 +242,26 @@ class VoltWrapperClient extends ClientStatusListenerExt {
     private boolean loadSQLFromFile(String filename) {
         File file = new File(filename);
         if(!file.canRead()) {
-            log_.severe(String.format("File '%s' does not exist or is not readable!", file));
+            log_.fatal(String.format("File '%s' does not exist or is not readable!", file));
             return false;
         }
         String sql;
         try {
             sql = new String(Files.readAllBytes(file.toPath()));
         } catch (IOException e) {
-            log_.severe(String.format("Failed to read SQL file '%s'", file));
-            log_.throwing(getClass().getCanonicalName(), "loadSQLFromFile", e);
+            log_.fatal(String.format("Failed to read SQL file '%s'", file));
+            log_.catching(e);
             return false;
         }
         try {
             ClientResponse response = callProcedureSync("@AdHoc", sql);
             if(response.getStatus() != ClientResponse.SUCCESS) {
-                log_.severe(String.format("Failed to call VoltDB: %s", response.getStatusString()));
+                log_.fatal(String.format("Failed to call VoltDB: %s", response.getStatusString()));
                 return false;
             }
         } catch(IOException | ProcCallException e) {
-            log_.severe(String.format("Failed to load the SQL file '%s' into VoltDB!", file));
-            log_.throwing(getClass().getCanonicalName(), "loadSQLFromFile", e);
+            log_.fatal(String.format("Failed to load the SQL file '%s' into VoltDB!", file));
+            log_.catching(e);
             return false;
         }
         return true;
@@ -270,7 +270,7 @@ class VoltWrapperClient extends ClientStatusListenerExt {
     private boolean loadSQLFromResource(String resourceName) {
         InputStream stream = ClassLoader.getSystemResourceAsStream(resourceName);
         if(stream == null) {
-            log_.severe(String.format("ClassLoader failed to get resource stream for '%s'!", resourceName));
+            log_.fatal(String.format("ClassLoader failed to get resource stream for '%s'!", resourceName));
             return false;
         }
 
@@ -278,19 +278,19 @@ class VoltWrapperClient extends ClientStatusListenerExt {
         try {
             sql = IOUtils.toString(stream, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log_.severe(String.format("ClassLoader failed to get read the stream for '%s'!", resourceName));
-            log_.throwing(getClass().getCanonicalName(), "loadSQLFromResource", e);
+            log_.fatal(String.format("ClassLoader failed to get read the stream for '%s'!", resourceName));
+            log_.catching(e);
             return false;
         }
         try {
             ClientResponse response = callProcedureSync("@AdHoc", sql);
             if(response.getStatus() != ClientResponse.SUCCESS) {
-                log_.severe(String.format("Failed to call VoltDB: %s", response.getStatusString()));
+                log_.fatal(String.format("Failed to call VoltDB: %s", response.getStatusString()));
                 return false;
             }
         } catch(IOException | ProcCallException e) {
-            log_.severe(String.format("Failed to load the resource SQL '%s' into VoltDB!", resourceName));
-            log_.throwing(getClass().getCanonicalName(), "loadSQLFromResource", e);
+            log_.fatal(String.format("Failed to load the resource SQL '%s' into VoltDB!", resourceName));
+            log_.catching(e);
             return false;
         }
         return true;

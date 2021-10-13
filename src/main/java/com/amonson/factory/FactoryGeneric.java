@@ -5,9 +5,10 @@
 
 package com.amonson.factory;
 
+import org.apache.logging.log4j.core.Logger;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.*;
 import java.util.*;
 
 /**

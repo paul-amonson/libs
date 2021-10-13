@@ -28,6 +28,7 @@ import java.util.*;
  * <b>NOTE:</b> This class only works on Linux based OS distributions.
  *
  */
+@Deprecated
 public class Xdg {
     /**
      * Create a non-specific version of the Xdg class that will not use a application name as a subfolder.

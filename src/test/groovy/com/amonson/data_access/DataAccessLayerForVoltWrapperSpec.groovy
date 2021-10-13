@@ -4,6 +4,7 @@
 //
 package com.amonson.data_access
 
+import org.apache.logging.log4j.core.Logger
 import org.voltdb.VoltTable
 import org.voltdb.VoltType
 import org.voltdb.client.ClientResponse
@@ -12,7 +13,6 @@ import org.voltdb.client.ProcedureCallback
 import spock.lang.Specification
 
 import java.time.Instant
-import java.util.logging.Logger
 
 class DataAccessLayerForVoltWrapperSpec extends Specification {
     VoltWrapperClient client

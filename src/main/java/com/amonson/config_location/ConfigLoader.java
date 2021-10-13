@@ -5,6 +5,7 @@
 package com.amonson.config_location;
 
 import com.amonson.prop_store.*;
+import org.apache.logging.log4j.core.Logger;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
@@ -12,7 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -94,7 +94,7 @@ public class ConfigLoader {
                     jsonParser_.fromStringToMap(redisClient_.hget(applicationName_, name));
                 } catch(PropStoreException e) {
                     // Treat bad data as no data but log it.
-                    log_.warning(e.getMessage());
+                    log_.warn(e.getMessage());
                 }
             }
         }
@@ -126,7 +126,7 @@ public class ConfigLoader {
         try (InputStream stream = new FileInputStream(file)) {
             mergeProp(parser_.readMap(stream), config);
         } catch(IOException | PropStoreException e) {
-            log_.warning(e.getMessage());
+            log_.warn(e.getMessage());
         }
     }
 
@@ -163,7 +163,7 @@ public class ConfigLoader {
         try {
             return new Jedis(authority);
         } catch(JedisConnectionException e) {
-            log_.warning(e.getMessage());
+            log_.warn(e.getMessage());
             return null;
         }
     }

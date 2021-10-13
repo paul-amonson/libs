@@ -4,11 +4,12 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
+
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Class for making a single node in a cluster the "Primary" node. This is done cooperatively.
@@ -36,7 +37,7 @@ public class PrimarySecondaryServiceMonitor {
         me_ = monitoring_.getMyHostname();
         primary_ = me_;
         handler_ = handler;
-        log_.fine("Greedily assuming I am the primary...");
+        log_.debug("Greedily assuming I am the primary...");
         enableHandler(true);
         makePriority();
         evaluatePrimary(true);
@@ -61,7 +62,7 @@ public class PrimarySecondaryServiceMonitor {
     }
 
     private void nodeStateChangeCallback(String node, RemoteNodeState newState, long lastSeen) {
-        log_.fine(String.format("STATE CHANGE: %s: %s", newState, node));
+        log_.debug(String.format("STATE CHANGE: %s: %s", newState, node));
         if(newState == RemoteNodeState.ACTIVE)
             announce();
         else {
@@ -74,12 +75,12 @@ public class PrimarySecondaryServiceMonitor {
         if(!message.getSender().equals(me_)) {
             int remotePriority = Integer.parseInt(message.getMessagePartsIterable().iterator().next());
             map_.put(message.getSender(), remotePriority);
-            log_.fine(String.format("%s: %s=%d", ANNOUNCE, message.getSender(), remotePriority));
+            log_.debug(String.format("%s: %s=%d", ANNOUNCE, message.getSender(), remotePriority));
             boolean needToAnnounce = remotePriority == map_.get(me_);
             while(remotePriority == map_.get(me_))
                 makePriority();
             if(needToAnnounce) {
-                log_.fine("Detected priority collision, selecting new priority and re-announcing.");
+                log_.debug("Detected priority collision, selecting new priority and re-announcing.");
                 announce();
             }
             evaluatePrimary(false);
@@ -89,7 +90,7 @@ public class PrimarySecondaryServiceMonitor {
     private void announce() {
         Message msg = new  Message(ANNOUNCE, me_, "*", Long.toString(map_.get(me_)));
         monitoring_.sendMessage(msg);
-        log_.fine(String.format("Sent %s message to everyone.", ANNOUNCE));
+        log_.debug(String.format("Sent %s message to everyone.", ANNOUNCE));
     }
 
     private void evaluatePrimary(boolean initial) {
@@ -100,7 +101,7 @@ public class PrimarySecondaryServiceMonitor {
                 candidateRank = entry.getValue();
                 candidate = entry.getKey();
             }
-        log_.fine(String.format("Current primary='%s (%d)'; new candidate='%s (%d)'", primary_, map_.get(primary_),
+        log_.debug(String.format("Current primary='%s (%d)'; new candidate='%s (%d)'", primary_, map_.get(primary_),
                 candidate, candidateRank));
         if(initial)
             handler_.stateChanged(PrimarySecondaryRole.Primary);

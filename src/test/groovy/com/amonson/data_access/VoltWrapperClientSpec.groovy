@@ -4,6 +4,7 @@
 //
 package com.amonson.data_access
 
+import org.apache.logging.log4j.core.Logger
 import org.voltdb.VoltTable
 import org.voltdb.VoltType
 import org.voltdb.client.Client
@@ -11,7 +12,6 @@ import org.voltdb.client.ClientResponse
 import org.voltdb.client.ClientStatusListenerExt
 import spock.lang.Specification
 
-import java.util.logging.Logger
 
 class VoltWrapperClientSpec extends Specification {
     def list = new ArrayList<InetSocketAddress>()

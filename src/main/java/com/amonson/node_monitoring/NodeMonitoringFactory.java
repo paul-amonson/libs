@@ -4,9 +4,10 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
+
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * Factory to create a message-based (network) node monitoring class using a heartbeat. The implementation independent
@@ -50,7 +51,7 @@ public class NodeMonitoringFactory {
             if(singleton_ == null)
                 singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);
             else
-                logger.warning("Returning an already created instance, the instance will not represent " +
+                logger.warn("Returning an already created instance, the instance will not represent " +
                         "the new passed parameters!");
             return singleton_;
         } else

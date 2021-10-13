@@ -4,6 +4,8 @@
 //
 
 /**
- * Some helper classes and JeroMQ based publishers for the native java.util.logger Logger implementation.
+ * DEPRECATED: It is highly recommended that you use Log4j2 instead of the native logger.
+ *
+ * Some helper classes for the native java.util.logger Logger implementation.
  */
 package com.amonson.logger;

@@ -18,6 +18,7 @@ import java.util.logging.Level;
  * intended to be used to send the log data over a network or unix socket to a log receiver outside the current
  * process.
  */
+@Deprecated
 public final class LogRecordSerialization {
     private LogRecordSerialization() {}
 

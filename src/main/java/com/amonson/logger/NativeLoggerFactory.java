@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 /**
  * A simple factory wrapper for the built-in java logger (java.util.logging).
  */
+@Deprecated
 public final class NativeLoggerFactory {
     private NativeLoggerFactory() {} // Disable instance creation
 

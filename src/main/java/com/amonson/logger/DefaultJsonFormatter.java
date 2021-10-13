@@ -21,6 +21,7 @@ import java.util.logging.LogRecord;
  * A simple default Json formatter with a eye on performance. A general JSON serializer was not used. Instead, a
  * simple StringBuilder is used.
  */
+@Deprecated
 public class DefaultJsonFormatter extends Formatter {
     /**
      * Default ctor that prefetches the hostname and PID for the process and stores them as fields.

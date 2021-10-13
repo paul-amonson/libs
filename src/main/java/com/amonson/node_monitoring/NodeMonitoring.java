@@ -4,8 +4,9 @@
 //
 package com.amonson.node_monitoring;
 
+import org.apache.logging.log4j.core.Logger;
+
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * This interface is designed to handle one way message passing to multiple nodes in a multi-node cluster of nodes

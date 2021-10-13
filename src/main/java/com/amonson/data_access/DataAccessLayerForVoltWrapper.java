@@ -6,17 +6,16 @@ package com.amonson.data_access;
 
 import com.amonson.prop_store.PropList;
 import com.amonson.prop_store.PropMap;
+import org.apache.logging.log4j.core.Logger;
 import org.voltdb.VoltTable;
 import org.voltdb.VoltType;
 import org.voltdb.client.ClientResponse;
 import org.voltdb.client.ProcCallException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * <p>VoltDB Implementation of DataAccessLayer. Use the implementation string "voltdb" in the {@link DataAccessLayerFactory}.</p>
@@ -51,10 +50,10 @@ public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
             ClientResponse response = client_.callProcedureSync(name, params);
             return convertClientResponse(response);
         } catch (IOException e) {
-            log_.throwing(this.getClass().getCanonicalName(), "query", e);
+            log_.catching(e);
             return new DataAccessLayerResponse(DataAccessLayerStatus.IO_FAILURE, null);
         } catch (ProcCallException e) {
-            log_.throwing(this.getClass().getCanonicalName(), "query", e);
+            log_.catching(e);
             return new DataAccessLayerResponse(DataAccessLayerStatus.PROCEDURE_FAILURE, null);
         }
     }
@@ -72,7 +71,7 @@ public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
         try {
             client_.callProcedureAsync((response) -> clientCallback(response, callback), name, params);
         } catch (IOException e) {
-            log_.throwing(this.getClass().getCanonicalName(), "query", e);
+            log_.catching(e);
             callback.callback(new DataAccessLayerResponse(DataAccessLayerStatus.IO_FAILURE, null));
         }
     }
@@ -166,8 +165,7 @@ public class DataAccessLayerForVoltWrapper extends DataAccessLayer {
                         Object value = voltTypeToType(table, columnIndex);
                         row.put(name, value);
                     } catch(UnsupportedOperationException e) {
-                        log_.warning(String.format("Unsupported type '%s' was converted to a 'null' value for " +
-                                        "column '%s'!", table.getColumnType(columnIndex), name));
+                        log_.catching(e);
                         row.put(name, null);
                     }
                 }

@@ -4,8 +4,9 @@
 //
 package com.amonson.data_access;
 
+import org.apache.logging.log4j.core.Logger;
+
 import java.util.Properties;
-import java.util.logging.Logger;
 
 /**
  * Interface for DataAccess, agnostic to implementation.

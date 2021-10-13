@@ -4,11 +4,11 @@
 //
 package com.amonson.node_monitoring
 
+import org.apache.logging.log4j.core.Logger
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.time.Instant
-import java.util.logging.Logger
 
 class PrimarySecondaryServiceMonitorSpec extends Specification {
     NodeMonitoring monitor_

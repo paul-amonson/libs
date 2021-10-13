@@ -5,8 +5,7 @@
 package com.amonson.data_access;
 
 import com.amonson.factory.FactoryGeneric;
-
-import java.util.logging.Logger;
+import org.apache.logging.log4j.core.Logger;
 
 /**
  * DataAccessLayerFactory is the declared factory for @link{DataAccessLayer} instances.

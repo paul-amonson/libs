@@ -11,6 +11,7 @@ import java.util.logging.LogRecord;
  * as the last character of the message. The will behave correctly when using the ConsoleHandler and show one JSON
  * message per line on the console.
  */
+@Deprecated
 public class DefaultLineFormatter extends DefaultJsonFormatter {
     /**
      * Default ctor that prefetches the hostname and PID for the process and stores them as fields.

@@ -1,12 +1,11 @@
 package com.amonson.config_location
 
 import com.amonson.prop_store.PropMap
+import org.apache.logging.log4j.core.Logger
 import redis.clients.jedis.HostAndPort
 import redis.clients.jedis.Jedis
-import redis.clients.jedis.exceptions.JedisConnectionException
 import spock.lang.Specification
 
-import java.util.logging.Logger
 
 // This class does not test the Redis configure location as that should be treated as a functional test not a unit test.
 // Effort was made to mock the Jedis code but no real processing occurs. Need functional test for this.
