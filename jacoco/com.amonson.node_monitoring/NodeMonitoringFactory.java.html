@@ -47,13 +47,13 @@ public class NodeMonitoringFactory {
                                                          List&lt;String&gt; allHostnames, int port,
                                                          NodeStateChangeHandler nodeStateChangeHandler, Logger logger,
                                                          Properties config) {
-<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">            if(singleton_ == null)</span>
-<span class="fc" id="L52">                singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            if(singleton_ == null)</span>
+<span class="nc" id="L52">                singleton_ = new NodeMonitoringZeroMQ(myHostname, allHostnames, port, nodeStateChangeHandler, logger, config);</span>
             else
-<span class="fc" id="L54">                logger.warn(&quot;Returning an already created instance, the instance will not represent &quot; +</span>
+<span class="nc" id="L54">                logger.warn(&quot;Returning an already created instance, the instance will not represent &quot; +</span>
                         &quot;the new passed parameters!&quot;);
-<span class="fc" id="L56">            return singleton_;</span>
+<span class="nc" id="L56">            return singleton_;</span>
         } else
 <span class="nc" id="L58">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
     }
@@ -78,14 +78,14 @@ public class NodeMonitoringFactory {
      */
     public static NodeMonitoringClient createClient(String implementation, String myHostname,
                                                     List&lt;String&gt; allHostnames, int port, Logger logger) {
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
-<span class="fc" id="L82">            return new NodeMonitoringClientZeroMQ(myHostname, allHostnames, port, logger);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if(implementation.equals(&quot;zeromq&quot;)) {</span>
+<span class="nc" id="L82">            return new NodeMonitoringClientZeroMQ(myHostname, allHostnames, port, logger);</span>
         } else
 <span class="nc" id="L84">            throw new IllegalArgumentException(&quot;Unknown implementation name: &quot; + implementation);</span>
     }
 
     private NodeMonitoringFactory() {}
 
-<span class="fc" id="L89">    private static NodeMonitoring singleton_ = null;</span>
+<span class="nc" id="L89">    private static NodeMonitoring singleton_ = null;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

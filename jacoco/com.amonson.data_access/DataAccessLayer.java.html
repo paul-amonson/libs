@@ -12,10 +12,10 @@ import java.util.Properties;
  * Interface for DataAccess, agnostic to implementation.
  */
 public abstract class DataAccessLayer {
-<span class="fc" id="L15">    protected DataAccessLayer(Properties configurationProperties, Logger logger) {</span>
-<span class="fc" id="L16">        log_ = logger;</span>
-<span class="fc" id="L17">        configurationProperties_ = configurationProperties;</span>
-<span class="fc" id="L18">    }</span>
+<span class="nc" id="L15">    protected DataAccessLayer(Properties configurationProperties, Logger logger) {</span>
+<span class="nc" id="L16">        log_ = logger;</span>
+<span class="nc" id="L17">        configurationProperties_ = configurationProperties;</span>
+<span class="nc" id="L18">    }</span>
 
     /**
      * Perform a synchronous query of the DataAccessLayer implementation.

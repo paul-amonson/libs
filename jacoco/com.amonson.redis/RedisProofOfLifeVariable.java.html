@@ -29,8 +29,8 @@ public class RedisProofOfLifeVariable implements Runnable {
      * @throws IllegalArgumentException When any argument is incorrect.
      */
     public RedisProofOfLifeVariable(Jedis client, int db, String name) {
-<span class="fc" id="L32">        this(client, db, name, 5000);</span>
-<span class="fc" id="L33">    }</span>
+<span class="nc" id="L32">        this(client, db, name, 5000);</span>
+<span class="nc" id="L33">    }</span>
 
     /**
      * Construct an object with the Jedis client and specified name and period.
@@ -42,21 +42,21 @@ public class RedisProofOfLifeVariable implements Runnable {
      *              in twice this value. Cannot be less than 500 ms.
      * @throws IllegalArgumentException When any argument is incorrect.
      */
-<span class="fc" id="L45">    public RedisProofOfLifeVariable(Jedis client, int db, String name, int period) {</span>
-<span class="fc bfc" id="L46" title="All 2 branches covered.">        if(client == null)</span>
-<span class="fc" id="L47">            throw new IllegalArgumentException(&quot;parameter 'client' cannot be null!&quot;);</span>
-<span class="fc bfc" id="L48" title="All 2 branches covered.">        if(db &lt; 0)</span>
-<span class="fc" id="L49">            throw new IllegalArgumentException(&quot;parameter 'db' must be greater than or equal to 0!&quot;);</span>
-<span class="fc bfc" id="L50" title="All 4 branches covered.">        if(name == null || name.isBlank())</span>
-<span class="fc" id="L51">            throw new IllegalArgumentException(&quot;parameter 'name' cannot be null or blank!&quot;);</span>
-<span class="fc bfc" id="L52" title="All 2 branches covered.">        if(period &lt; MINIMUM_PERIOD)</span>
-<span class="fc" id="L53">            throw new IllegalArgumentException(&quot;cannot set period to less than 500!&quot;);</span>
-<span class="fc" id="L54">        client_ = client;</span>
-<span class="fc" id="L55">        db_ = db;</span>
-<span class="fc" id="L56">        name_ = &quot;proofOfLife.&quot; + name;</span>
-<span class="fc" id="L57">        period_ = period;</span>
-<span class="fc" id="L58">        params_.ex(period_ / HALF_A_SECOND);</span>
-<span class="fc" id="L59">    }</span>
+<span class="nc" id="L45">    public RedisProofOfLifeVariable(Jedis client, int db, String name, int period) {</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if(client == null)</span>
+<span class="nc" id="L47">            throw new IllegalArgumentException(&quot;parameter 'client' cannot be null!&quot;);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if(db &lt; 0)</span>
+<span class="nc" id="L49">            throw new IllegalArgumentException(&quot;parameter 'db' must be greater than or equal to 0!&quot;);</span>
+<span class="nc bnc" id="L50" title="All 4 branches missed.">        if(name == null || name.isBlank())</span>
+<span class="nc" id="L51">            throw new IllegalArgumentException(&quot;parameter 'name' cannot be null or blank!&quot;);</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if(period &lt; MINIMUM_PERIOD)</span>
+<span class="nc" id="L53">            throw new IllegalArgumentException(&quot;cannot set period to less than 500!&quot;);</span>
+<span class="nc" id="L54">        client_ = client;</span>
+<span class="nc" id="L55">        db_ = db;</span>
+<span class="nc" id="L56">        name_ = &quot;proofOfLife.&quot; + name;</span>
+<span class="nc" id="L57">        period_ = period;</span>
+<span class="nc" id="L58">        params_.ex(period_ / HALF_A_SECOND);</span>
+<span class="nc" id="L59">    }</span>
 
     /**
      * Start the thread that starts the periodic update on the redis server. Will fail silently if the server
@@ -64,27 +64,27 @@ public class RedisProofOfLifeVariable implements Runnable {
      */
     @Override
     public void run() {
-<span class="fc bfc" id="L67" title="All 2 branches covered.">        if(thread_ == null) {</span>
-<span class="fc" id="L68">            thread_ = new Thread(() -&gt; {</span>
-<span class="fc bfc" id="L69" title="All 2 branches covered.">                while (!Thread.currentThread().isInterrupted()) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if(thread_ == null) {</span>
+<span class="nc" id="L68">            thread_ = new Thread(() -&gt; {</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">                while (!Thread.currentThread().isInterrupted()) {</span>
                     try {
-<span class="fc" id="L71">                        Transaction trans = client_.multi();</span>
-<span class="fc" id="L72">                        trans.select(db_);</span>
-<span class="fc" id="L73">                        trans.set(name_, Date.from(Instant.now()).toString(), params_);</span>
-<span class="fc" id="L74">                        trans.exec();</span>
+<span class="nc" id="L71">                        Transaction trans = client_.multi();</span>
+<span class="nc" id="L72">                        trans.select(db_);</span>
+<span class="nc" id="L73">                        trans.set(name_, Date.from(Instant.now()).toString(), params_);</span>
+<span class="nc" id="L74">                        trans.exec();</span>
 <span class="nc" id="L75">                    } catch(JedisConnectionException | JedisDataException e) {</span>
 <span class="nc" id="L76">                        errorCount_.incrementAndGet();</span>
-<span class="fc" id="L77">                    }</span>
+<span class="nc" id="L77">                    }</span>
                     try {
 <span class="nc" id="L79">                        Thread.sleep(period_);</span>
-<span class="fc" id="L80">                    } catch(InterruptedException e) {</span>
-<span class="fc" id="L81">                        Thread.currentThread().interrupt();</span>
-<span class="pc" id="L82">                    }</span>
+<span class="nc" id="L80">                    } catch(InterruptedException e) {</span>
+<span class="nc" id="L81">                        Thread.currentThread().interrupt();</span>
+<span class="nc" id="L82">                    }</span>
                 }
-<span class="fc" id="L84">            });</span>
-<span class="fc" id="L85">            thread_.start();</span>
+<span class="nc" id="L84">            });</span>
+<span class="nc" id="L85">            thread_.start();</span>
         }
-<span class="fc" id="L87">    }</span>
+<span class="nc" id="L87">    }</span>
 
     /**
      * Check to see if the thread is running the period updates.
@@ -92,28 +92,28 @@ public class RedisProofOfLifeVariable implements Runnable {
      * @return true if the thread is running, false otherwise.
      */
     public boolean isRunning() {
-<span class="fc bfc" id="L95" title="All 4 branches covered.">        return thread_ != null &amp;&amp; thread_.isAlive();</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">        return thread_ != null &amp;&amp; thread_.isAlive();</span>
     }
 
     /**
      * Stops a running proof of life thread doing the period update. Will fail silently if the server is not running.
      */
     public void stop() {
-<span class="fc bfc" id="L102" title="All 2 branches covered.">        if(isRunning()) {</span>
-<span class="fc" id="L103">            thread_.interrupt();</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if(isRunning()) {</span>
+<span class="nc" id="L103">            thread_.interrupt();</span>
             try {
-<span class="fc" id="L105">                thread_.join();</span>
-<span class="pc" id="L106">            } catch(InterruptedException e) { /* Ignore */ }</span>
+<span class="nc" id="L105">                thread_.join();</span>
+<span class="nc" id="L106">            } catch(InterruptedException e) { /* Ignore */ }</span>
         }
-<span class="fc" id="L108">    }</span>
+<span class="nc" id="L108">    }</span>
 
     private final Jedis client_;
     private final int db_;
     private final String name_;
-<span class="fc" id="L113">    private final AtomicLong errorCount_ = new AtomicLong(0L);</span>
-<span class="fc" id="L114">    private final SetParams params_ = new SetParams();</span>
+<span class="nc" id="L113">    private final AtomicLong errorCount_ = new AtomicLong(0L);</span>
+<span class="nc" id="L114">    private final SetParams params_ = new SetParams();</span>
     private final int period_;
-<span class="fc" id="L116">    private       Thread thread_ = null;</span>
+<span class="nc" id="L116">    private       Thread thread_ = null;</span>
 
     private static final int MINIMUM_PERIOD = 500;
     private static final int HALF_A_SECOND = 500;

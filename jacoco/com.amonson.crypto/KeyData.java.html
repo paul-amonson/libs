@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-
 package com.amonson.crypto;
 
 import javax.crypto.KeyGenerator;
@@ -12,6 +11,8 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 import com.amonson.prop_store.*;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Since;
 
 /**
  * Class to create/store initialization vectors and keys for AES encryption/decryption.
@@ -22,42 +23,44 @@ public class KeyData {
      * @param iv The Base64 encoded initialization vector.
      * @param key The base64 encoded key.
      */
-<span class="fc" id="L25">    public KeyData(String iv, String key) {</span>
-<span class="fc" id="L26">        iv_ = iv;</span>
-<span class="fc" id="L27">        key_ = key;</span>
-<span class="fc" id="L28">    }</span>
+<span class="fc" id="L26">    public KeyData(String iv, String key) {</span>
+<span class="fc" id="L27">        iv_ = iv;</span>
+<span class="fc" id="L28">        key_ = key;</span>
+<span class="fc" id="L29">    }</span>
 
     /**
      * Duplicating constructor for Key data.
      * @param data The KeyData instance to copy from.
      */
-<span class="fc" id="L34">    public KeyData(KeyData data) {</span>
-<span class="fc" id="L35">        iv_ = data.IV();</span>
-<span class="fc" id="L36">        key_ = data.key();</span>
-<span class="fc" id="L37">    }</span>
+<span class="fc" id="L35">    public KeyData(KeyData data) {</span>
+<span class="fc" id="L36">        iv_ = data.IV();</span>
+<span class="fc" id="L37">        key_ = data.key();</span>
+<span class="fc" id="L38">    }</span>
 
     /**
      * Generates new strong IV and Key's for AES encryption/decryption.
+     * @return The new KeyData instance.
      * @throws NoSuchAlgorithmException Thrown when the JRE platform does not support strong algorithms for
      * IV/Key generation.
      */
-<span class="fc" id="L44">    public KeyData() throws NoSuchAlgorithmException {</span>
-<span class="fc" id="L45">        SecureRandom randomSecureRandom = SecureRandom.getInstance(getAlgorithm());</span>
-<span class="fc" id="L46">        byte[] iv = new byte[16];</span>
-<span class="fc" id="L47">        randomSecureRandom.nextBytes(iv);</span>
-<span class="fc" id="L48">        iv_ = Base64.getEncoder().encodeToString(iv);</span>
-<span class="fc" id="L49">        KeyGenerator kgen = KeyGenerator.getInstance(&quot;AES&quot;);</span>
-<span class="fc" id="L50">        kgen.init(128);</span>
-<span class="fc" id="L51">        SecretKey aesKey = kgen.generateKey();</span>
-<span class="fc" id="L52">        key_ = Base64.getEncoder().encodeToString(aesKey.getEncoded());</span>
-<span class="fc" id="L53">    }</span>
+    public static KeyData newKeyData() throws NoSuchAlgorithmException {
+<span class="fc" id="L47">        SecureRandom randomSecureRandom = SecureRandom.getInstance(getAlgorithm());</span>
+<span class="fc" id="L48">        byte[] iv = new byte[16];</span>
+<span class="fc" id="L49">        randomSecureRandom.nextBytes(iv);</span>
+<span class="fc" id="L50">        String sIv = Base64.getEncoder().encodeToString(iv);</span>
+<span class="fc" id="L51">        KeyGenerator kgen = KeyGenerator.getInstance(&quot;HmacSHA256&quot;);</span>
+<span class="fc" id="L52">        kgen.init(BITS);</span>
+<span class="fc" id="L53">        SecretKey aesKey = kgen.generateKey();</span>
+<span class="fc" id="L54">        String sKey = Base64.getEncoder().encodeToString(aesKey.getEncoded());</span>
+<span class="fc" id="L55">        return new KeyData(sIv, sKey);</span>
+    }
 
     /**
      * IV Accessor method.
      * @return The base64 encoded initialization vector.
      */
     public String IV() {
-<span class="fc" id="L60">        return iv_;</span>
+<span class="fc" id="L63">        return iv_;</span>
     }
 
     /**
@@ -65,7 +68,7 @@ public class KeyData {
      * @return The base64 encoded key.
      */
     public String key() {
-<span class="fc" id="L68">        return key_;</span>
+<span class="fc" id="L71">        return key_;</span>
     }
 
     /**
@@ -74,7 +77,7 @@ public class KeyData {
      */
     @Override
     public String toString() {
-<span class="fc" id="L77">        return String.format(&quot;IV='%s'; Key='%s'&quot;, iv_, key_);</span>
+<span class="fc" id="L80">        return String.format(&quot;IV='%s'; Key='%s'&quot;, iv_, key_);</span>
     }
 
     /**
@@ -83,11 +86,11 @@ public class KeyData {
      */
     @Override
     public boolean equals(Object o) {
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        if(o instanceof KeyData) {</span>
-<span class="fc" id="L87">            KeyData kd = (KeyData)o;</span>
-<span class="fc bfc" id="L88" title="All 4 branches covered.">            return kd.iv_.equals(iv_) &amp;&amp; kd.key_.equals(key_);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if(o instanceof KeyData) {</span>
+<span class="fc" id="L90">            KeyData kd = (KeyData)o;</span>
+<span class="fc bfc" id="L91" title="All 4 branches covered.">            return kd.iv_.equals(iv_) &amp;&amp; kd.key_.equals(key_);</span>
         }
-<span class="nc" id="L90">        return super.equals(o);</span>
+<span class="nc" id="L93">        return super.equals(o);</span>
     }
 
     /**
@@ -96,7 +99,7 @@ public class KeyData {
      */
     @Override
     public int hashCode() {
-<span class="nc" id="L99">        return super.hashCode();</span>
+<span class="nc" id="L102">        return super.hashCode();</span>
     }
 
     /**
@@ -104,7 +107,7 @@ public class KeyData {
      * @return The IV as bytes.
      */
     public byte[] IVAsBytes() {
-<span class="fc" id="L107">        return Base64.getDecoder().decode(iv_);</span>
+<span class="fc" id="L110">        return Base64.getDecoder().decode(iv_);</span>
     }
 
     /**
@@ -112,7 +115,7 @@ public class KeyData {
      * @return The Key as bytes.
      */
     public byte[] keyAsBytes() {
-<span class="fc" id="L115">        return Base64.getDecoder().decode(key_);</span>
+<span class="fc" id="L118">        return Base64.getDecoder().decode(key_);</span>
     }
 
     /**
@@ -120,10 +123,10 @@ public class KeyData {
      * @return The PropMap representation of this object.
      */
     public PropMap toPropMap() {
-<span class="fc" id="L123">        return new PropMap() {{</span>
-<span class="fc" id="L124">            put(&quot;A&quot;, iv_);</span>
-<span class="fc" id="L125">            put(&quot;B&quot;, key_);</span>
-<span class="fc" id="L126">        }};</span>
+<span class="fc" id="L126">        return new PropMap() {{</span>
+<span class="fc" id="L127">            put(&quot;A&quot;, iv_);</span>
+<span class="fc" id="L128">            put(&quot;B&quot;, key_);</span>
+<span class="fc" id="L129">        }};</span>
     }
 
     /**
@@ -132,20 +135,23 @@ public class KeyData {
      * @return The new KeyData instance.
      */
     public static KeyData fromPropMap(PropMap keyProp) {
-<span class="fc" id="L135">        String iv = keyProp.getString(&quot;A&quot;);</span>
-<span class="fc" id="L136">        String key = keyProp.getString(&quot;B&quot;);</span>
-<span class="fc" id="L137">        return new KeyData(iv, key);</span>
+<span class="fc" id="L138">        String iv = keyProp.getString(&quot;A&quot;);</span>
+<span class="fc" id="L139">        String key = keyProp.getString(&quot;B&quot;);</span>
+<span class="fc" id="L140">        return new KeyData(iv, key);</span>
     }
 
-    String iv_;
-    String key_;
+    @Since(value=1.7) @SerializedName(value = &quot;A&quot;, alternate = &quot;iv&quot;) String iv_;
+    @Since(value=1.7) @SerializedName(value=&quot;B&quot;, alternate = &quot;key&quot;) String key_;
 
     // Strong but may block on some OSes. Try &quot;NativePRNGNonBlocking&quot; if you have problems.
     private static String getAlgorithm() {
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">        if(System.getProperty(&quot;os.name&quot;).matches(&quot;.*[wW]indows.*&quot;))</span>
-<span class="nc" id="L146">            return &quot;Windows-PRNG&quot;;</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if(System.getProperty(&quot;os.name&quot;).matches(&quot;.*[wW]indows.*&quot;))</span>
+<span class="nc" id="L149">            return &quot;Windows-PRNG&quot;;</span>
         else
-<span class="fc" id="L148">            return &quot;NativePRNGBlocking&quot;;</span>
+<span class="fc" id="L151">            return &quot;NativePRNGBlocking&quot;;</span>
     }
+
+<span class="fc" id="L154">    static int BITS  = 256;</span>
+<span class="fc" id="L155">    static int BYTES = BITS / 8;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

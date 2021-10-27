@@ -20,8 +20,8 @@ public class DefaultLineFormatter extends DefaultJsonFormatter {
      * @throws RuntimeException if the JSON parser cannot be created or the hostname cannot be retrieved.
      */
     public DefaultLineFormatter(String hostname) {
-<span class="fc" id="L23">        super(hostname);</span>
-<span class="fc" id="L24">    }</span>
+<span class="nc" id="L23">        super(hostname);</span>
+<span class="nc" id="L24">    }</span>
 
     /**
      * Call the parent (DefaultJsonFormatter) format method and appends a newline for text output.
@@ -31,7 +31,7 @@ public class DefaultLineFormatter extends DefaultJsonFormatter {
      */
     @Override
     public String format(LogRecord logRecord) {
-<span class="fc" id="L34">        return super.format(logRecord) + &quot;\n&quot;;</span>
+<span class="nc" id="L34">        return super.format(logRecord) + &quot;\n&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

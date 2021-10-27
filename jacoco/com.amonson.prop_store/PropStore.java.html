@@ -20,8 +20,8 @@ public abstract class PropStore {
      * @param config The properties of configuration parameters that may or may not be used by the derived classes.
      *              This may be null.
      */
-<span class="fc" id="L23">    public PropStore(Properties config) {</span>
-<span class="fc" id="L24">    }</span>
+<span class="nc" id="L23">    public PropStore(Properties config) {</span>
+<span class="nc" id="L24">    }</span>
 
     /**
      * Convert the PropMap to the text Store format.
@@ -67,7 +67,7 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropMap readMap(String filename) throws IOException, PropStoreException {
-<span class="fc" id="L70">        return readMap(new File(filename));</span>
+<span class="nc" id="L70">        return readMap(new File(filename));</span>
     }
 
     /**
@@ -79,8 +79,8 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropMap readMap(File file) throws IOException, PropStoreException {
-<span class="fc" id="L82">        try (InputStream stream = new FileInputStream(file)) {</span>
-<span class="fc" id="L83">            return readMap(stream);</span>
+<span class="nc" id="L82">        try (InputStream stream = new FileInputStream(file)) {</span>
+<span class="nc" id="L83">            return readMap(stream);</span>
         }
     }
 
@@ -93,8 +93,8 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropMap readMap(InputStream stream) throws IOException, PropStoreException {
-<span class="fc" id="L96">        try (Reader reader = new InputStreamReader(stream)) {</span>
-<span class="fc" id="L97">            return readMap(reader);</span>
+<span class="nc" id="L96">        try (Reader reader = new InputStreamReader(stream)) {</span>
+<span class="nc" id="L97">            return readMap(reader);</span>
         }
     }
 
@@ -107,8 +107,8 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropMap readMap(Reader reader) throws IOException, PropStoreException {
-<span class="fc" id="L110">        String storeText = readStoreText(reader);</span>
-<span class="fc" id="L111">        return fromStringToMap(storeText);</span>
+<span class="nc" id="L110">        String storeText = readStoreText(reader);</span>
+<span class="nc" id="L111">        return fromStringToMap(storeText);</span>
     }
 
     /**
@@ -120,7 +120,7 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropList readList(String filename) throws IOException, PropStoreException {
-<span class="fc" id="L123">        return readList(new File(filename));</span>
+<span class="nc" id="L123">        return readList(new File(filename));</span>
     }
 
     /**
@@ -132,8 +132,8 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropList readList(File file) throws IOException, PropStoreException {
-<span class="fc" id="L135">        try (InputStream stream = new FileInputStream(file)) {</span>
-<span class="fc" id="L136">            return readList(stream);</span>
+<span class="nc" id="L135">        try (InputStream stream = new FileInputStream(file)) {</span>
+<span class="nc" id="L136">            return readList(stream);</span>
         }
     }
 
@@ -146,8 +146,8 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropList readList(InputStream stream) throws IOException, PropStoreException {
-<span class="fc" id="L149">        try (Reader reader = new InputStreamReader(stream)) {</span>
-<span class="fc" id="L150">            return readList(reader);</span>
+<span class="nc" id="L149">        try (Reader reader = new InputStreamReader(stream)) {</span>
+<span class="nc" id="L150">            return readList(reader);</span>
         }
     }
 
@@ -160,8 +160,8 @@ public abstract class PropStore {
      * @throws PropStoreException is thrown when the implementation cannot parse the text representation.
      */
     public final PropList readList(Reader reader) throws IOException, PropStoreException {
-<span class="fc" id="L163">        String storeText = readStoreText(reader);</span>
-<span class="fc" id="L164">        return fromStringToList(storeText);</span>
+<span class="nc" id="L163">        String storeText = readStoreText(reader);</span>
+<span class="nc" id="L164">        return fromStringToList(storeText);</span>
     }
 
     /**
@@ -172,8 +172,8 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the filename.
      */
     public final void writeTo(String filename, PropMap map) throws IOException {
-<span class="fc" id="L175">        writeTo(new File(filename), map);</span>
-<span class="fc" id="L176">    }</span>
+<span class="nc" id="L175">        writeTo(new File(filename), map);</span>
+<span class="nc" id="L176">    }</span>
 
     /**
      * Write the PropMap to the filename as text.
@@ -183,10 +183,10 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the file.
      */
     public final void writeTo(File file, PropMap map) throws IOException {
-<span class="fc" id="L186">        try (OutputStream stream = new FileOutputStream(file)) {</span>
-<span class="fc" id="L187">            writeTo(stream, map);</span>
+<span class="nc" id="L186">        try (OutputStream stream = new FileOutputStream(file)) {</span>
+<span class="nc" id="L187">            writeTo(stream, map);</span>
         }
-<span class="fc" id="L189">    }</span>
+<span class="nc" id="L189">    }</span>
 
     /**
      * Write the PropMap to the filename as text.
@@ -196,10 +196,10 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the stream.
      */
     public final void writeTo(OutputStream stream, PropMap map) throws IOException {
-<span class="fc" id="L199">        try (Writer writer = new OutputStreamWriter(stream)) {</span>
-<span class="fc" id="L200">            writeTo(writer, map);</span>
+<span class="nc" id="L199">        try (Writer writer = new OutputStreamWriter(stream)) {</span>
+<span class="nc" id="L200">            writeTo(writer, map);</span>
         }
-<span class="fc" id="L202">    }</span>
+<span class="nc" id="L202">    }</span>
 
     /**
      * Write the PropMap to the filename as text.
@@ -209,9 +209,9 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the writer.
      */
     public final void writeTo(Writer writer, PropMap map) throws IOException {
-<span class="fc" id="L212">        String storeText = toString(map);</span>
-<span class="fc" id="L213">        writer.write(storeText);</span>
-<span class="fc" id="L214">    }</span>
+<span class="nc" id="L212">        String storeText = toString(map);</span>
+<span class="nc" id="L213">        writer.write(storeText);</span>
+<span class="nc" id="L214">    }</span>
 
     /**
      * Write the PropMap to the filename as text.
@@ -221,8 +221,8 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the filename.
      */
     public final void writeTo(String filename, PropList list) throws IOException {
-<span class="fc" id="L224">        writeTo(new File(filename), list);</span>
-<span class="fc" id="L225">    }</span>
+<span class="nc" id="L224">        writeTo(new File(filename), list);</span>
+<span class="nc" id="L225">    }</span>
 
     /**
      * Write the PropMap to the file as text.
@@ -232,10 +232,10 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the file.
      */
     public final void writeTo(File file, PropList list) throws IOException {
-<span class="fc" id="L235">        try (OutputStream stream = new FileOutputStream(file)) {</span>
-<span class="fc" id="L236">            writeTo(stream, list);</span>
+<span class="nc" id="L235">        try (OutputStream stream = new FileOutputStream(file)) {</span>
+<span class="nc" id="L236">            writeTo(stream, list);</span>
         }
-<span class="fc" id="L238">    }</span>
+<span class="nc" id="L238">    }</span>
 
     /**
      * Write the PropMap to the stream as text.
@@ -245,10 +245,10 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the stream.
      */
     public final void writeTo(OutputStream stream, PropList list) throws IOException {
-<span class="fc" id="L248">        try (Writer writer = new OutputStreamWriter(stream)) {</span>
-<span class="fc" id="L249">            writeTo(writer, list);</span>
+<span class="nc" id="L248">        try (Writer writer = new OutputStreamWriter(stream)) {</span>
+<span class="nc" id="L249">            writeTo(writer, list);</span>
         }
-<span class="fc" id="L251">    }</span>
+<span class="nc" id="L251">    }</span>
 
     /**
      * Write the PropMap to the writer as text.
@@ -258,18 +258,18 @@ public abstract class PropStore {
      * @throws IOException if cannot be written to the writer.
      */
     public final void writeTo(Writer writer, PropList list) throws IOException {
-<span class="fc" id="L261">        String storeText = toString(list);</span>
-<span class="fc" id="L262">        writer.write(storeText);</span>
-<span class="fc" id="L263">    }</span>
+<span class="nc" id="L261">        String storeText = toString(list);</span>
+<span class="nc" id="L262">        writer.write(storeText);</span>
+<span class="nc" id="L263">    }</span>
 
     private String readStoreText(Reader reader) throws IOException {
-<span class="fc" id="L266">        try (BufferedReader buffered = new BufferedReader(reader)) {</span>
-<span class="fc" id="L267">            StringBuilder builder = new StringBuilder();</span>
-<span class="fc" id="L268">            String line = null;</span>
-<span class="fc" id="L269">            String newline = System.getProperty(&quot;line.separator&quot;);</span>
-<span class="fc bfc" id="L270" title="All 2 branches covered.">            while((line = buffered.readLine()) != null)</span>
-<span class="fc" id="L271">                builder.append(line).append(newline);</span>
-<span class="fc" id="L272">            return builder.toString();</span>
+<span class="nc" id="L266">        try (BufferedReader buffered = new BufferedReader(reader)) {</span>
+<span class="nc" id="L267">            StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L268">            String line = null;</span>
+<span class="nc" id="L269">            String newline = System.getProperty(&quot;line.separator&quot;);</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">            while((line = buffered.readLine()) != null)</span>
+<span class="nc" id="L271">                builder.append(line).append(newline);</span>
+<span class="nc" id="L272">            return builder.toString();</span>
         }
     }
 }

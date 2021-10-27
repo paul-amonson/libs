@@ -19,10 +19,10 @@ public class Task {
     /**
      * Possible types of task execution (Process=Default or Thread).
      */
-<span class="fc" id="L22">    public enum Type {</span>
-<span class="fc" id="L23">        Default,</span>
-<span class="fc" id="L24">        Process,</span>
-<span class="fc" id="L25">        Thread</span>
+<span class="nc" id="L22">    public enum Type {</span>
+<span class="nc" id="L23">        Default,</span>
+<span class="nc" id="L24">        Process,</span>
+<span class="nc" id="L25">        Thread</span>
     }
 
     /**
@@ -35,15 +35,15 @@ public class Task {
      * @return The Task object of the running task.
      */
     public static Task execute(Class&lt;?&gt; mainClass, String[] args, Type type, Object userData) {
-<span class="fc bfc" id="L38" title="All 2 branches covered.">        if(type == Type.Default) type = Type.Process; // Current default.</span>
-<span class="fc bfc" id="L39" title="All 2 branches covered.">        if(type == Type.Process) {</span>
-<span class="fc" id="L40">            Task task = new Task(mainClass, args, userData);</span>
-<span class="fc" id="L41">            task.doProcessExecute();</span>
-<span class="fc" id="L42">            return task;</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if(type == Type.Default) type = Type.Process; // Current default.</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if(type == Type.Process) {</span>
+<span class="nc" id="L40">            Task task = new Task(mainClass, args, userData);</span>
+<span class="nc" id="L41">            task.doProcessExecute();</span>
+<span class="nc" id="L42">            return task;</span>
         } else {
-<span class="fc" id="L44">            Task task = new Task(mainClass, args, userData);</span>
-<span class="fc" id="L45">            task.doThreadExecute();</span>
-<span class="fc" id="L46">            return task;</span>
+<span class="nc" id="L44">            Task task = new Task(mainClass, args, userData);</span>
+<span class="nc" id="L45">            task.doThreadExecute();</span>
+<span class="nc" id="L46">            return task;</span>
         }
     }
 
@@ -53,23 +53,23 @@ public class Task {
      * @return true if the Task is still running, false if the Task has stopped.
      */
     public boolean isRunning() {
-<span class="fc bfc" id="L56" title="All 2 branches covered.">        if(process_ != null)</span>
-<span class="fc" id="L57">            return process_.isAlive();</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if(process_ != null)</span>
+<span class="nc" id="L57">            return process_.isAlive();</span>
         else
-<span class="fc" id="L59">            return thread_.isAlive();</span>
+<span class="nc" id="L59">            return thread_.isAlive();</span>
     }
 
     /**
      * Stops the Task. Uses .destroy() on a process or .interrupt() on a thread.
      */
     public void stopRunning() {
-<span class="fc bfc" id="L66" title="All 2 branches covered.">        if(isRunning()) {</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">            if(process_ != null)</span>
-<span class="fc" id="L68">                process_.destroy();</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if(isRunning()) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            if(process_ != null)</span>
+<span class="nc" id="L68">                process_.destroy();</span>
             else
-<span class="fc" id="L70">                thread_.interrupt();</span>
+<span class="nc" id="L70">                thread_.interrupt();</span>
         }
-<span class="fc" id="L72">    }</span>
+<span class="nc" id="L72">    }</span>
 
     /**
      * Block until the Task stops.
@@ -77,11 +77,11 @@ public class Task {
      * @return true if the wait exits normally (stopped) or false if it did not stop normally.
      */
     public boolean waitForCompletion() {
-<span class="fc bfc" id="L80" title="All 2 branches covered.">        if(!isRunning()) return true;</span>
-<span class="fc bfc" id="L81" title="All 2 branches covered.">        if(process_ != null)</span>
-<span class="pc" id="L82">            try { process_.waitFor(); return true; } catch(InterruptedException e) { return false; }</span>
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        else if(thread_ != null)</span>
-<span class="pc" id="L84">            try { thread_.join(); return true; } catch(InterruptedException e) { return false; }</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if(!isRunning()) return true;</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if(process_ != null)</span>
+<span class="nc" id="L82">            try { process_.waitFor(); return true; } catch(InterruptedException e) { return false; }</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        else if(thread_ != null)</span>
+<span class="nc" id="L84">            try { thread_.join(); return true; } catch(InterruptedException e) { return false; }</span>
 <span class="nc" id="L85">        return false; // Should not get here but the future may have other execution methods...</span>
     }
 
@@ -92,12 +92,12 @@ public class Task {
      * @return true if the Task stopped in less than the timeout, false otherwise.
      */
     public boolean waitForCompletion(long milliSeconds) {
-<span class="fc bfc" id="L95" title="All 2 branches covered.">        if(!isRunning()) return true;</span>
-<span class="fc bfc" id="L96" title="All 2 branches covered.">        if(process_ != null)</span>
-<span class="fc" id="L97">            try { return process_.waitFor(milliSeconds, TimeUnit.MILLISECONDS); }</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if(!isRunning()) return true;</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if(process_ != null)</span>
+<span class="nc" id="L97">            try { return process_.waitFor(milliSeconds, TimeUnit.MILLISECONDS); }</span>
 <span class="nc" id="L98">            catch(InterruptedException e) { return false; }</span>
-<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        else if(thread_ != null)</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">            try { thread_.join(milliSeconds, 0); return !thread_.isAlive(); }</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        else if(thread_ != null)</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            try { thread_.join(milliSeconds, 0); return !thread_.isAlive(); }</span>
 <span class="nc" id="L101">            catch(InterruptedException e) { return false; }</span>
 <span class="nc" id="L102">        return false; // Should not get here but the future may have other execution methods...</span>
     }
@@ -108,9 +108,9 @@ public class Task {
      * @return An integer return code. For a process this is the code returned to the shell.
      */
     public int getResult() {
-<span class="pc bpc" id="L111" title="2 of 4 branches missed.">        if(waitForCompletion() &amp;&amp; exception_.get() == null) {</span>
-<span class="pc bpc" id="L112" title="1 of 2 branches missed.">            if(process_ != null)</span>
-<span class="fc" id="L113">                return process_.exitValue();</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">        if(waitForCompletion() &amp;&amp; exception_.get() == null) {</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            if(process_ != null)</span>
+<span class="nc" id="L113">                return process_.exitValue();</span>
         }
 <span class="nc" id="L115">        return Integer.MIN_VALUE;</span>
     }
@@ -124,11 +124,11 @@ public class Task {
      * Integer.MIN_VALUE if the timeout expires.
      */
     public int getResult(long milliSeconds) {
-<span class="pc bpc" id="L127" title="1 of 4 branches missed.">        if(waitForCompletion(milliSeconds) &amp;&amp; exception_.get() == null) {</span>
+<span class="nc bnc" id="L127" title="All 4 branches missed.">        if(waitForCompletion(milliSeconds) &amp;&amp; exception_.get() == null) {</span>
 <span class="nc bnc" id="L128" title="All 2 branches missed.">            if(process_ != null)</span>
 <span class="nc" id="L129">                return process_.exitValue();</span>
         }
-<span class="fc" id="L131">        return Integer.MIN_VALUE;</span>
+<span class="nc" id="L131">        return Integer.MIN_VALUE;</span>
     }
 
     /**
@@ -136,7 +136,7 @@ public class Task {
      *
      * @return The data passed by the user and stored in the Task.
      */
-<span class="fc" id="L139">    public Object getUserData() { return userData_; }</span>
+<span class="nc" id="L139">    public Object getUserData() { return userData_; }</span>
 
     /**
      * Get a exception if the Thread.start() or ProcessBuilder.start() threw an exception. Will wait for completion.
@@ -144,8 +144,8 @@ public class Task {
      * @return The Throwable thrown or null if no exception was thrown.
      */
     public Throwable getException() {
-<span class="fc" id="L147">        waitForCompletion();</span>
-<span class="fc" id="L148">        return exception_.get();</span>
+<span class="nc" id="L147">        waitForCompletion();</span>
+<span class="nc" id="L148">        return exception_.get();</span>
     }
 
     /**
@@ -155,53 +155,53 @@ public class Task {
      * @return The Throwable thrown or null if not exception or the timeout expired.
      */
     public Throwable getException(long milliSeconds) {
-<span class="fc" id="L158">        waitForCompletion(milliSeconds);</span>
-<span class="fc" id="L159">        return exception_.get();</span>
+<span class="nc" id="L158">        waitForCompletion(milliSeconds);</span>
+<span class="nc" id="L159">        return exception_.get();</span>
     }
 
-<span class="fc" id="L162">    private Task(Class&lt;?&gt; mainClass, String[] args, Object userData) {</span>
-<span class="fc" id="L163">        class_ = mainClass;</span>
-<span class="fc" id="L164">        arguments_ = args;</span>
-<span class="fc" id="L165">        userData_ = userData;</span>
-<span class="fc" id="L166">    }</span>
+<span class="nc" id="L162">    private Task(Class&lt;?&gt; mainClass, String[] args, Object userData) {</span>
+<span class="nc" id="L163">        class_ = mainClass;</span>
+<span class="nc" id="L164">        arguments_ = args;</span>
+<span class="nc" id="L165">        userData_ = userData;</span>
+<span class="nc" id="L166">    }</span>
 
     private void doProcessExecute() {
-<span class="fc" id="L169">        ProcessBuilder builder = new ProcessBuilder();</span>
-<span class="fc" id="L170">        String java = Paths.get(System.getProperty(&quot;java.home&quot;), &quot;bin&quot;, &quot;java&quot;).toString();</span>
-<span class="fc" id="L171">        String classPath = System.getProperty(&quot;java.class.path&quot;);</span>
-<span class="fc" id="L172">        String[] cmds = new String[4 + arguments_.length];</span>
-<span class="fc" id="L173">        cmds[0] = java;</span>
-<span class="fc" id="L174">        cmds[1] = &quot;-cp&quot;;</span>
-<span class="fc" id="L175">        cmds[2] = classPath;</span>
-<span class="fc" id="L176">        cmds[3] = class_.getCanonicalName();</span>
-<span class="fc" id="L177">        System.arraycopy(arguments_, 0, cmds, 4, arguments_.length);</span>
-<span class="fc" id="L178">        builder.command(cmds);</span>
-<span class="fc" id="L179">        builder.inheritIO();</span>
+<span class="nc" id="L169">        ProcessBuilder builder = new ProcessBuilder();</span>
+<span class="nc" id="L170">        String java = Paths.get(System.getProperty(&quot;java.home&quot;), &quot;bin&quot;, &quot;java&quot;).toString();</span>
+<span class="nc" id="L171">        String classPath = System.getProperty(&quot;java.class.path&quot;);</span>
+<span class="nc" id="L172">        String[] cmds = new String[4 + arguments_.length];</span>
+<span class="nc" id="L173">        cmds[0] = java;</span>
+<span class="nc" id="L174">        cmds[1] = &quot;-cp&quot;;</span>
+<span class="nc" id="L175">        cmds[2] = classPath;</span>
+<span class="nc" id="L176">        cmds[3] = class_.getCanonicalName();</span>
+<span class="nc" id="L177">        System.arraycopy(arguments_, 0, cmds, 4, arguments_.length);</span>
+<span class="nc" id="L178">        builder.command(cmds);</span>
+<span class="nc" id="L179">        builder.inheritIO();</span>
         try {
-<span class="fc" id="L181">            process_ = builder.start();</span>
+<span class="nc" id="L181">            process_ = builder.start();</span>
 <span class="nc" id="L182">        } catch(IOException e) {</span>
 <span class="nc" id="L183">            exception_.set(e);</span>
-<span class="fc" id="L184">        }</span>
-<span class="fc" id="L185">    }</span>
+<span class="nc" id="L184">        }</span>
+<span class="nc" id="L185">    }</span>
 
     private void doThreadExecute() {
-<span class="fc" id="L188">        thread_ = new Thread(() -&gt; {</span>
+<span class="nc" id="L188">        thread_ = new Thread(() -&gt; {</span>
             try {
-<span class="fc" id="L190">                Method main = class_.getMethod(&quot;main&quot;, String[].class);</span>
+<span class="nc" id="L190">                Method main = class_.getMethod(&quot;main&quot;, String[].class);</span>
 <span class="nc" id="L191">                result_.set((Integer)main.invoke(null, (Object)arguments_));</span>
-<span class="fc" id="L192">            } catch(Exception e) {</span>
-<span class="fc" id="L193">                exception_.set(e);</span>
+<span class="nc" id="L192">            } catch(Exception e) {</span>
+<span class="nc" id="L193">                exception_.set(e);</span>
 <span class="nc" id="L194">            }</span>
-<span class="fc" id="L195">        });</span>
-<span class="fc" id="L196">        thread_.start();</span>
-<span class="fc" id="L197">    }</span>
+<span class="nc" id="L195">        });</span>
+<span class="nc" id="L196">        thread_.start();</span>
+<span class="nc" id="L197">    }</span>
 
     private final Class&lt;?&gt; class_;
     private final String[] arguments_;
-<span class="fc" id="L201">    private final AtomicInteger result_ = new AtomicInteger(0);</span>
-<span class="fc" id="L202">    private final AtomicReference&lt;Throwable&gt; exception_ = new AtomicReference&lt;&gt;(null);</span>
+<span class="nc" id="L201">    private final AtomicInteger result_ = new AtomicInteger(0);</span>
+<span class="nc" id="L202">    private final AtomicReference&lt;Throwable&gt; exception_ = new AtomicReference&lt;&gt;(null);</span>
     private final Object userData_;
-<span class="fc" id="L204">    private       Process process_ = null;</span>
-<span class="fc" id="L205">    private       Thread thread_ = null;</span>
+<span class="nc" id="L204">    private       Process process_ = null;</span>
+<span class="nc" id="L205">    private       Thread thread_ = null;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
