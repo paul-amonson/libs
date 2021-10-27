@@ -10,36 +10,41 @@ import org.junit.jupiter.api.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class KeyDataTest {
     @BeforeEach
     public void setup() {
-        byte[] zero = new byte[16];
-        byte[] ones = new byte[16];
-        for(int i = 0; i < 16; i++) {
+        byte[] zero = new byte[KeyData.BYTES];
+        byte[] ones = new byte[KeyData.BYTES];
+        byte[] iv = new byte[16];
+        for(int i = 0; i < KeyData.BYTES; i++) {
             zero[i] = 0;
+            iv[i % 16] = 0;
             ones[i] = 1;
         }
         one = Base64.getEncoder().encodeToString(ones);
         sZero = Base64.getEncoder().encodeToString(zero);
-        keyObj = new KeyData(sZero, sZero);
+        sIv = Base64.getEncoder().encodeToString(iv);
+        keyObj = new KeyData(sIv, sZero);
     }
 
     @Test
     public void ctor_1() {
-        Assertions.assertEquals(sZero, keyObj.IV());
+        Assertions.assertEquals(sIv, keyObj.IV());
         Assertions.assertEquals(sZero, keyObj.key());
-        Assertions.assertEquals("IV='AAAAAAAAAAAAAAAAAAAAAA=='; Key='AAAAAAAAAAAAAAAAAAAAAA=='", keyObj.toString());
+        Assertions.assertEquals(String.format("IV='AAAAAAAAAAAAAAAAAAAAAA=='; Key='%s'",goldenKeys.get(KeyData.BITS)), keyObj.toString());
         KeyData data2 = new KeyData(keyObj);
         Assertions.assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", data2.IV());
-        Assertions.assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", data2.key());
+        Assertions.assertEquals(goldenKeys.get(KeyData.BITS), data2.key());
         Assertions.assertEquals(keyObj, data2);
         Assertions.assertNotEquals("some_string", keyObj);
         PropMap map = data2.toPropMap();
         assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", map.getString("A"));
-        assertEquals("AAAAAAAAAAAAAAAAAAAAAA==", map.getString("B"));
+        assertEquals(goldenKeys.get(KeyData.BITS), map.getString("B"));
         KeyData.fromPropMap(map);
         data2.key_ = one;
         Assertions.assertNotEquals(keyObj, data2);
@@ -50,9 +55,9 @@ public class KeyDataTest {
     @Test
     public void ctor_2() {
         try {
-            KeyData data = new KeyData();
+            KeyData data = KeyData.newKeyData();
             Assertions.assertEquals(16, data.IVAsBytes().length);
-            Assertions.assertEquals(16, data.keyAsBytes().length);
+            Assertions.assertEquals(KeyData.BYTES, data.keyAsBytes().length);
         } catch(NoSuchAlgorithmException e) {
             Assertions.fail("This test failed due to lack of strong key generation support in the JRE!");
         }
@@ -60,5 +65,10 @@ public class KeyDataTest {
 
     private KeyData keyObj;
     private String sZero;
+    private String sIv;
     private String one;
+    private Map<Integer,String> goldenKeys = new HashMap<>() {{
+        put(128, "AAAAAAAAAAAAAAAAAAAAAA==");
+        put(256, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=");
+    }};
 }

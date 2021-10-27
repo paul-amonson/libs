@@ -2,7 +2,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
-
 package com.amonson.crypto;
 
 import javax.crypto.KeyGenerator;
@@ -12,6 +11,8 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 import com.amonson.prop_store.*;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Since;
 
 /**
  * Class to create/store initialization vectors and keys for AES encryption/decryption.
@@ -38,18 +39,20 @@ public class KeyData {
 
     /**
      * Generates new strong IV and Key's for AES encryption/decryption.
+     * @return The new KeyData instance.
      * @throws NoSuchAlgorithmException Thrown when the JRE platform does not support strong algorithms for
      * IV/Key generation.
      */
-    public KeyData() throws NoSuchAlgorithmException {
+    public static KeyData newKeyData() throws NoSuchAlgorithmException {
         SecureRandom randomSecureRandom = SecureRandom.getInstance(getAlgorithm());
         byte[] iv = new byte[16];
         randomSecureRandom.nextBytes(iv);
-        iv_ = Base64.getEncoder().encodeToString(iv);
-        KeyGenerator kgen = KeyGenerator.getInstance("AES");
-        kgen.init(128);
+        String sIv = Base64.getEncoder().encodeToString(iv);
+        KeyGenerator kgen = KeyGenerator.getInstance("HmacSHA256");
+        kgen.init(BITS);
         SecretKey aesKey = kgen.generateKey();
-        key_ = Base64.getEncoder().encodeToString(aesKey.getEncoded());
+        String sKey = Base64.getEncoder().encodeToString(aesKey.getEncoded());
+        return new KeyData(sIv, sKey);
     }
 
     /**
@@ -137,8 +140,8 @@ public class KeyData {
         return new KeyData(iv, key);
     }
 
-    String iv_;
-    String key_;
+    @Since(value=1.7) @SerializedName(value = "A", alternate = "iv") String iv_;
+    @Since(value=1.7) @SerializedName(value="B", alternate = "key") String key_;
 
     // Strong but may block on some OSes. Try "NativePRNGNonBlocking" if you have problems.
     private static String getAlgorithm() {
@@ -147,4 +150,7 @@ public class KeyData {
         else
             return "NativePRNGBlocking";
     }
+
+    static int BITS  = 256;
+    static int BYTES = BITS / 8;
 }

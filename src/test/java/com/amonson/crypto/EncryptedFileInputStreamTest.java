@@ -19,7 +19,7 @@ public class EncryptedFileInputStreamTest {
     public void setup() {
         if(key_ == null) {
             try {
-                key_ = new KeyData();
+                key_ = KeyData.newKeyData();
             } catch(NoSuchAlgorithmException e) {
                 Assertions.fail(e.getMessage());
             }
