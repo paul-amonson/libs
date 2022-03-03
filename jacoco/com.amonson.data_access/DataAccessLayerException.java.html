@@ -14,21 +14,21 @@ public class DataAccessLayerException extends Exception {
      * Create the status based exception.
      * @param status The enum reason for the failure.
      */
-<span class="nc" id="L17">    DataAccessLayerException(DataAccessLayerStatus status) { super(String.format(&quot;Failed with status: %s&quot;, status)); }</span>
+<span class="fc" id="L17">    DataAccessLayerException(DataAccessLayerStatus status) { super(String.format(&quot;Failed with status: %s&quot;, status)); }</span>
 
     /**
      * Create the status based exception.
      * @param status The enum reason for the failure.
      * @param message The caller message for the failure.
      */
-<span class="nc" id="L24">    DataAccessLayerException(DataAccessLayerStatus status, String message) { super(message); }</span>
+<span class="fc" id="L24">    DataAccessLayerException(DataAccessLayerStatus status, String message) { super(message); }</span>
 
     /**
      * Create the status based exception.
      * @param status The enum reason for the failure.
      * @param cause The cause (underlying exception) of the failure.
      */
-<span class="nc" id="L31">    DataAccessLayerException(DataAccessLayerStatus status, Throwable cause) { super(cause); }</span>
+<span class="fc" id="L31">    DataAccessLayerException(DataAccessLayerStatus status, Throwable cause) { super(cause); }</span>
 
     /**
      * Create the status based exception.
@@ -36,6 +36,6 @@ public class DataAccessLayerException extends Exception {
      * @param message The caller message for the failure.
      * @param cause The cause (underlying exception) of the failure.
      */
-<span class="nc" id="L39">    DataAccessLayerException(DataAccessLayerStatus status, String message, Throwable cause) { super(message, cause); }</span>
+<span class="fc" id="L39">    DataAccessLayerException(DataAccessLayerStatus status, String message, Throwable cause) { super(message, cause); }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

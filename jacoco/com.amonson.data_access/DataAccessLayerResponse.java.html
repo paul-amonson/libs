@@ -16,17 +16,17 @@ public class DataAccessLayerResponse {
      * @param status The status of the query.
      * @param results The results of a successful query or null if unsuccessful.
      */
-<span class="nc" id="L19">    DataAccessLayerResponse(DataAccessLayerStatus status, PropList results) {</span>
-<span class="nc" id="L20">        status_ = status;</span>
-<span class="nc" id="L21">        results_ = results;</span>
-<span class="nc" id="L22">    }</span>
+<span class="fc" id="L19">    DataAccessLayerResponse(DataAccessLayerStatus status, PropList results) {</span>
+<span class="fc" id="L20">        status_ = status;</span>
+<span class="fc" id="L21">        results_ = results;</span>
+<span class="fc" id="L22">    }</span>
 
     /**
      * Get the status of the query.
      *
      * @return The status of the query.
      */
-<span class="nc" id="L29">    public DataAccessLayerStatus getStatus() { return status_; }</span>
+<span class="fc" id="L29">    public DataAccessLayerStatus getStatus() { return status_; }</span>
 
     /**
      * Get the results of the query. This mimics an array of results of rows. So usually it's an array of
@@ -45,7 +45,7 @@ public class DataAccessLayerResponse {
      * ]
      * @return The results of the query.
      */
-<span class="nc" id="L48">    public PropList getResults() { return results_; }</span>
+<span class="fc" id="L48">    public PropList getResults() { return results_; }</span>
 
     private final DataAccessLayerStatus status_;
     private final PropList results_;

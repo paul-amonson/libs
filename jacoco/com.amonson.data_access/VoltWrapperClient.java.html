@@ -28,65 +28,65 @@ import java.util.concurrent.ConcurrentHashMap;
  *      filename        - (Optional) Filename in file system to load into VoltDB.
  *      jar_files       - (Optional) Comma separated list of JAR files to load into VoltDB (Must be Java 8 JARs)
  */
-<span class="nc bnc" id="L31" title="All 2 branches missed.">class VoltWrapperClient extends ClientStatusListenerExt {</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">class VoltWrapperClient extends ClientStatusListenerExt {</span>
     /**
      * Constructs the object and internal client but does not connect.
      *
      * @param properties Properties to configure the internal client.
      * @param logger This is where logging messages go.
      */
-<span class="nc" id="L38">    VoltWrapperClient(Properties properties, Logger logger) {</span>
-<span class="nc bnc" id="L39" title="All 6 branches missed.">        assert properties != null &amp;&amp; properties.containsKey(SERVERS);</span>
-<span class="nc bnc" id="L40" title="All 4 branches missed.">        assert logger != null;</span>
-<span class="nc" id="L41">        log_ = logger;</span>
-<span class="nc" id="L42">        port_ = Integer.parseInt(properties.getProperty(PORT, Integer.toString(Client.VOLTDB_SERVER_PORT)));</span>
-<span class="nc bnc" id="L43" title="All 2 branches missed.">        for(String server: properties.getProperty(SERVERS).split(&quot;,&quot;))</span>
-<span class="nc" id="L44">            connections_.put(server, false);</span>
-<span class="nc" id="L45">        properties_ = properties;</span>
-<span class="nc" id="L46">        client_ = ClientFactory.createClient(initClient());</span>
-<span class="nc" id="L47">    }</span>
+<span class="fc" id="L38">    VoltWrapperClient(Properties properties, Logger logger) {</span>
+<span class="pc bpc" id="L39" title="2 of 6 branches missed.">        assert properties != null &amp;&amp; properties.containsKey(SERVERS);</span>
+<span class="pc bpc" id="L40" title="2 of 4 branches missed.">        assert logger != null;</span>
+<span class="fc" id="L41">        log_ = logger;</span>
+<span class="fc" id="L42">        port_ = Integer.parseInt(properties.getProperty(PORT, Integer.toString(Client.VOLTDB_SERVER_PORT)));</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for(String server: properties.getProperty(SERVERS).split(&quot;,&quot;))</span>
+<span class="fc" id="L44">            connections_.put(server, false);</span>
+<span class="fc" id="L45">        properties_ = properties;</span>
+<span class="fc" id="L46">        client_ = ClientFactory.createClient(initClient());</span>
+<span class="fc" id="L47">    }</span>
 
     /**
      * Starts a connection thread that will attempt keep connections to the hosts.
      */
     public void connect() {
-<span class="nc bnc" id="L53" title="All 2 branches missed.">        if(connectionThread_ != null)</span>
-<span class="nc" id="L54">            return;</span>
-<span class="nc" id="L55">        connectionThread_ = new Thread(() -&gt; {</span>
-<span class="nc bnc" id="L56" title="All 2 branches missed.">            while(!Thread.currentThread().isInterrupted()) {</span>
-<span class="nc bnc" id="L57" title="All 2 branches missed.">                for (Map.Entry&lt;String, Boolean&gt; entry : connections_.entrySet())</span>
-<span class="nc bnc" id="L58" title="All 2 branches missed.">                    if (!entry.getValue())</span>
-<span class="nc" id="L59">                        entry.setValue(connectInternal(entry.getKey()));</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if(connectionThread_ != null)</span>
+<span class="fc" id="L54">            return;</span>
+<span class="fc" id="L55">        connectionThread_ = new Thread(() -&gt; {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            while(!Thread.currentThread().isInterrupted()) {</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">                for (Map.Entry&lt;String, Boolean&gt; entry : connections_.entrySet())</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">                    if (!entry.getValue())</span>
+<span class="fc" id="L59">                        entry.setValue(connectInternal(entry.getKey()));</span>
                 try {
-<span class="nc" id="L61">                    Thread.sleep(Long.parseLong(properties_.getProperty(CONNECTION_RETRY_DELAY_MS,</span>
-<span class="nc" id="L62">                            Long.toString(2_000L))));</span>
-<span class="nc" id="L63">                } catch (InterruptedException e) {</span>
-<span class="nc" id="L64">                    Thread.currentThread().interrupt();</span>
-<span class="nc" id="L65">                }</span>
+<span class="pc" id="L61">                    Thread.sleep(Long.parseLong(properties_.getProperty(CONNECTION_RETRY_DELAY_MS,</span>
+<span class="fc" id="L62">                            Long.toString(2_000L))));</span>
+<span class="fc" id="L63">                } catch (InterruptedException e) {</span>
+<span class="fc" id="L64">                    Thread.currentThread().interrupt();</span>
+<span class="pc" id="L65">                }</span>
             }
-<span class="nc" id="L67">        });</span>
-<span class="nc" id="L68">        connectionThread_.start();</span>
-<span class="nc" id="L69">    }</span>
+<span class="fc" id="L67">        });</span>
+<span class="fc" id="L68">        connectionThread_.start();</span>
+<span class="fc" id="L69">    }</span>
 
     /**
      * Stops the connection thread that was attempting to keep connections to the hosts. Object cannot be reused
      * after disconnect is called on a connected client.
      */
     public void disconnect() {
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        if(connectionThread_ == null)</span>
-<span class="nc" id="L77">            return;</span>
-<span class="nc" id="L78">        connectionThread_.interrupt();</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if(connectionThread_ == null)</span>
+<span class="fc" id="L77">            return;</span>
+<span class="fc" id="L78">        connectionThread_.interrupt();</span>
         try {
-<span class="nc" id="L80">            connectionThread_.join();</span>
-<span class="nc" id="L81">        } catch(InterruptedException e) { /* Ignore because we are closing anyway. */ }</span>
-<span class="nc" id="L82">        connectionThread_ = null;</span>
+<span class="fc" id="L80">            connectionThread_.join();</span>
+<span class="pc" id="L81">        } catch(InterruptedException e) { /* Ignore because we are closing anyway. */ }</span>
+<span class="fc" id="L82">        connectionThread_ = null;</span>
         try {
-<span class="nc" id="L84">            client_.drain();</span>
-<span class="nc" id="L85">        } catch(NoConnectionsException | InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
+<span class="fc" id="L84">            client_.drain();</span>
+<span class="pc" id="L85">        } catch(NoConnectionsException | InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
         try {
-<span class="nc" id="L87">            client_.close();</span>
-<span class="nc" id="L88">        } catch(InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
-<span class="nc" id="L89">    }</span>
+<span class="fc" id="L87">            client_.close();</span>
+<span class="pc" id="L88">        } catch(InterruptedException e) { /* No connection then drain() is not necessary */ }</span>
+<span class="fc" id="L89">    }</span>
 
     /**
      * &lt;p&gt;Synchronously invoke a procedure. Blocks until a result is available. A {@link ProcCallException}
@@ -101,7 +101,7 @@ import java.util.concurrent.ConcurrentHashMap;
      */
     public ClientResponse callProcedureSync(String procedureName, Object... params)
             throws IOException, ProcCallException {
-<span class="nc" id="L104">        return client_.callProcedure(procedureName, params);</span>
+<span class="fc" id="L104">        return client_.callProcedure(procedureName, params);</span>
     }
 
     /**
@@ -120,8 +120,8 @@ import java.util.concurrent.ConcurrentHashMap;
      */
     public void callProcedureAsync(ProcedureCallback callback, String procedureName, Object... params)
             throws IOException {
-<span class="nc" id="L123">        client_.callProcedure(callback, procedureName, params);</span>
-<span class="nc" id="L124">    }</span>
+<span class="fc" id="L123">        client_.callProcedure(callback, procedureName, params);</span>
+<span class="fc" id="L124">    }</span>
 
     /**
      * Checks for any connection to the VoltDB cluster.
@@ -129,7 +129,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @return &lt;code&gt;true&lt;/code&gt; if there is at least one connection; &lt;code&gt;false&lt;/code&gt; if there are no connections.
      */
     public boolean haveConnection() {
-<span class="nc bnc" id="L132" title="All 2 branches missed.">        return client_.getConnectedHostList().size() &gt; 0;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        return client_.getConnectedHostList().size() &gt; 0;</span>
     }
 
     /**
@@ -139,15 +139,15 @@ import java.util.concurrent.ConcurrentHashMap;
      * &lt;code&gt;false&lt;/code&gt; if no connection during timeout period.
      */
     public boolean waitForConnection(long timeoutMilliseconds) {
-<span class="nc" id="L142">        long now = Instant.now().toEpochMilli();</span>
-<span class="nc" id="L143">        long futureTimeout = now + timeoutMilliseconds;</span>
-<span class="nc bnc" id="L144" title="All 4 branches missed.">        while(!haveConnection() &amp;&amp; now &lt; futureTimeout) { // Wait for at least one connection</span>
+<span class="fc" id="L142">        long now = Instant.now().toEpochMilli();</span>
+<span class="fc" id="L143">        long futureTimeout = now + timeoutMilliseconds;</span>
+<span class="fc bfc" id="L144" title="All 4 branches covered.">        while(!haveConnection() &amp;&amp; now &lt; futureTimeout) { // Wait for at least one connection</span>
             try {
-<span class="nc" id="L146">                Thread.sleep(100); // Busy wait intentional.</span>
-<span class="nc" id="L147">            } catch(InterruptedException e) { /* Ignore this, should not happen */ }</span>
-<span class="nc" id="L148">            now = Instant.now().toEpochMilli();</span>
+<span class="fc" id="L146">                Thread.sleep(100); // Busy wait intentional.</span>
+<span class="pc" id="L147">            } catch(InterruptedException e) { /* Ignore this, should not happen */ }</span>
+<span class="fc" id="L148">            now = Instant.now().toEpochMilli();</span>
         }
-<span class="nc bnc" id="L150" title="All 2 branches missed.">        return now &lt; futureTimeout;</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        return now &lt; futureTimeout;</span>
     }
 
     /**
@@ -158,49 +158,49 @@ import java.util.concurrent.ConcurrentHashMap;
      * @return true if everything present is loaded ok, false something was attempted to load and failed.
      */
     public boolean initializeVoltDBAfterConnect() {
-<span class="nc bnc" id="L161" title="All 2 branches missed.">        if(!checkSchema()) {</span>
-<span class="nc bnc" id="L162" title="All 2 branches missed.">            if (properties_.containsKey(RESOURCE_FILE)) {</span>
-<span class="nc bnc" id="L163" title="All 2 branches missed.">                if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))</span>
-<span class="nc" id="L164">                    return false;</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if(!checkSchema()) {</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            if (properties_.containsKey(RESOURCE_FILE)) {</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                if (!loadSQLFromResource(properties_.getProperty(RESOURCE_FILE)))</span>
+<span class="fc" id="L164">                    return false;</span>
             }
-<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (properties_.containsKey(FILENAME)) {</span>
-<span class="nc bnc" id="L167" title="All 2 branches missed.">                if (!loadSQLFromFile(properties_.getProperty(FILENAME)))</span>
-<span class="nc" id="L168">                    return false;</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">            if (properties_.containsKey(FILENAME)) {</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">                if (!loadSQLFromFile(properties_.getProperty(FILENAME)))</span>
+<span class="fc" id="L168">                    return false;</span>
             }
-<span class="nc bnc" id="L170" title="All 2 branches missed.">            if (properties_.containsKey(JAR_FILES)) {</span>
-<span class="nc" id="L171">                return loadJarFiles(properties_.getProperty(JAR_FILES));</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (properties_.containsKey(JAR_FILES)) {</span>
+<span class="fc" id="L171">                return loadJarFiles(properties_.getProperty(JAR_FILES));</span>
             }
         }
-<span class="nc" id="L174">        return true;</span>
+<span class="fc" id="L174">        return true;</span>
     }
 
     @Override
     public void connectionLost(String hostname, int port, int connectionsLeft, DisconnectCause cause) {
-<span class="nc" id="L179">        connections_.put(hostname, false);</span>
-<span class="nc bnc" id="L180" title="All 2 branches missed.">        if(connectionsLeft == 0)</span>
-<span class="nc" id="L181">            log_.fatal(&quot;All connections to the VoltDB servers have been lost.&quot;);</span>
+<span class="fc" id="L179">        connections_.put(hostname, false);</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        if(connectionsLeft == 0)</span>
+<span class="fc" id="L181">            log_.fatal(&quot;All connections to the VoltDB servers have been lost.&quot;);</span>
         else
-<span class="nc" id="L183">            log_.warn(String.format(&quot;Connection to '%s' was disconnected for reason '%s', there are %d &quot; +</span>
-<span class="nc" id="L184">                            &quot;connections left.&quot;, hostname, cause.toString(), connectionsLeft));</span>
-<span class="nc" id="L185">    }</span>
+<span class="fc" id="L183">            log_.warn(String.format(&quot;Connection to '%s' was disconnected for reason '%s', there are %d &quot; +</span>
+<span class="fc" id="L184">                            &quot;connections left.&quot;, hostname, cause.toString(), connectionsLeft));</span>
+<span class="fc" id="L185">    }</span>
 
     @Override
     public void connectionCreated(String hostname, int port, AutoConnectionStatus status) {
-<span class="nc bnc" id="L189" title="All 4 branches missed.">        if(status == AutoConnectionStatus.SUCCESS &amp;&amp; !connections_.containsKey(hostname))</span>
-<span class="nc" id="L190">            connections_.put(hostname, true);</span>
+<span class="pc bpc" id="L189" title="1 of 4 branches missed.">        if(status == AutoConnectionStatus.SUCCESS &amp;&amp; !connections_.containsKey(hostname))</span>
+<span class="fc" id="L190">            connections_.put(hostname, true);</span>
         else
-<span class="nc" id="L192">            connections_.put(hostname, false);</span>
-<span class="nc" id="L193">    }</span>
+<span class="fc" id="L192">            connections_.put(hostname, false);</span>
+<span class="fc" id="L193">    }</span>
 
     private boolean checkSchema() {
         try {
-<span class="nc" id="L197">            ClientResponse response = client_.callProcedure(&quot;@SystemCatalog&quot;, &quot;tables&quot;);</span>
-<span class="nc bnc" id="L198" title="All 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="fc" id="L197">            ClientResponse response = client_.callProcedure(&quot;@SystemCatalog&quot;, &quot;tables&quot;);</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
 <span class="nc" id="L199">                log_.warn(&quot;Call to '@SystemCatalog' built-in procedure failed with: &quot; +</span>
 <span class="nc" id="L200">                        response.getStatusString());</span>
 <span class="nc" id="L201">                return false;</span>
             }
-<span class="nc bnc" id="L203" title="All 2 branches missed.">            return response.getResults()[0].getRowCount() &gt; 0;</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">            return response.getResults()[0].getRowCount() &gt; 0;</span>
 <span class="nc" id="L204">        } catch (NoConnectionsException e) {</span>
 <span class="nc" id="L205">            log_.warn(&quot;No connection to VoltDB databases!&quot;);</span>
 <span class="nc" id="L206">            log_.catching(e);</span>
@@ -217,16 +217,16 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     private boolean loadJarFiles(String jarFiles) {
-<span class="nc" id="L220">        String[] jars = jarFiles.split(&quot;,&quot;);</span>
-<span class="nc bnc" id="L221" title="All 2 branches missed.">        for(String jarFilename: jars) {</span>
-<span class="nc" id="L222">            File jar = new File(jarFilename);</span>
-<span class="nc bnc" id="L223" title="All 2 branches missed.">            if(!jar.canRead()) {</span>
-<span class="nc" id="L224">                log_.fatal(String.format(&quot;Jar file '%s' is missing or cannot be read!&quot;, jar));</span>
-<span class="nc" id="L225">                return false;</span>
+<span class="fc" id="L220">        String[] jars = jarFiles.split(&quot;,&quot;);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        for(String jarFilename: jars) {</span>
+<span class="fc" id="L222">            File jar = new File(jarFilename);</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">            if(!jar.canRead()) {</span>
+<span class="fc" id="L224">                log_.fatal(String.format(&quot;Jar file '%s' is missing or cannot be read!&quot;, jar));</span>
+<span class="fc" id="L225">                return false;</span>
             }
             try {
-<span class="nc" id="L228">                ClientResponse response = client_.updateClasses(jar, &quot;&quot;);</span>
-<span class="nc bnc" id="L229" title="All 2 branches missed.">                if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="fc" id="L228">                ClientResponse response = client_.updateClasses(jar, &quot;&quot;);</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">                if(response.getStatus() != ClientResponse.SUCCESS) {</span>
 <span class="nc" id="L230">                    log_.fatal(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
 <span class="nc" id="L231">                    return false;</span>
                 }
@@ -234,28 +234,28 @@ import java.util.concurrent.ConcurrentHashMap;
 <span class="nc" id="L234">                log_.fatal(String.format(&quot;Failed to load the JAR file '%s' into VoltDB!&quot;, jar));</span>
 <span class="nc" id="L235">                log_.catching(e);</span>
 <span class="nc" id="L236">                return false;</span>
-<span class="nc" id="L237">            }</span>
+<span class="fc" id="L237">            }</span>
         }
-<span class="nc" id="L239">        return true;</span>
+<span class="fc" id="L239">        return true;</span>
     }
 
     private boolean loadSQLFromFile(String filename) {
-<span class="nc" id="L243">        File file = new File(filename);</span>
-<span class="nc bnc" id="L244" title="All 2 branches missed.">        if(!file.canRead()) {</span>
-<span class="nc" id="L245">            log_.fatal(String.format(&quot;File '%s' does not exist or is not readable!&quot;, file));</span>
-<span class="nc" id="L246">            return false;</span>
+<span class="fc" id="L243">        File file = new File(filename);</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        if(!file.canRead()) {</span>
+<span class="fc" id="L245">            log_.fatal(String.format(&quot;File '%s' does not exist or is not readable!&quot;, file));</span>
+<span class="fc" id="L246">            return false;</span>
         }
         String sql;
         try {
-<span class="nc" id="L250">            sql = new String(Files.readAllBytes(file.toPath()));</span>
+<span class="fc" id="L250">            sql = new String(Files.readAllBytes(file.toPath()));</span>
 <span class="nc" id="L251">        } catch (IOException e) {</span>
 <span class="nc" id="L252">            log_.fatal(String.format(&quot;Failed to read SQL file '%s'&quot;, file));</span>
 <span class="nc" id="L253">            log_.catching(e);</span>
 <span class="nc" id="L254">            return false;</span>
-<span class="nc" id="L255">        }</span>
+<span class="fc" id="L255">        }</span>
         try {
-<span class="nc" id="L257">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
-<span class="nc bnc" id="L258" title="All 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="fc" id="L257">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
 <span class="nc" id="L259">                log_.fatal(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
 <span class="nc" id="L260">                return false;</span>
             }
@@ -263,28 +263,28 @@ import java.util.concurrent.ConcurrentHashMap;
 <span class="nc" id="L263">            log_.fatal(String.format(&quot;Failed to load the SQL file '%s' into VoltDB!&quot;, file));</span>
 <span class="nc" id="L264">            log_.catching(e);</span>
 <span class="nc" id="L265">            return false;</span>
-<span class="nc" id="L266">        }</span>
-<span class="nc" id="L267">        return true;</span>
+<span class="fc" id="L266">        }</span>
+<span class="fc" id="L267">        return true;</span>
     }
 
     private boolean loadSQLFromResource(String resourceName) {
-<span class="nc" id="L271">        InputStream stream = ClassLoader.getSystemResourceAsStream(resourceName);</span>
-<span class="nc bnc" id="L272" title="All 2 branches missed.">        if(stream == null) {</span>
-<span class="nc" id="L273">            log_.fatal(String.format(&quot;ClassLoader failed to get resource stream for '%s'!&quot;, resourceName));</span>
-<span class="nc" id="L274">            return false;</span>
+<span class="fc" id="L271">        InputStream stream = ClassLoader.getSystemResourceAsStream(resourceName);</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">        if(stream == null) {</span>
+<span class="fc" id="L273">            log_.fatal(String.format(&quot;ClassLoader failed to get resource stream for '%s'!&quot;, resourceName));</span>
+<span class="fc" id="L274">            return false;</span>
         }
 
         String sql;
         try {
-<span class="nc" id="L279">            sql = IOUtils.toString(stream, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L279">            sql = IOUtils.toString(stream, StandardCharsets.UTF_8);</span>
 <span class="nc" id="L280">        } catch (IOException e) {</span>
 <span class="nc" id="L281">            log_.fatal(String.format(&quot;ClassLoader failed to get read the stream for '%s'!&quot;, resourceName));</span>
 <span class="nc" id="L282">            log_.catching(e);</span>
 <span class="nc" id="L283">            return false;</span>
-<span class="nc" id="L284">        }</span>
+<span class="fc" id="L284">        }</span>
         try {
-<span class="nc" id="L286">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
-<span class="nc bnc" id="L287" title="All 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
+<span class="fc" id="L286">            ClientResponse response = callProcedureSync(&quot;@AdHoc&quot;, sql);</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">            if(response.getStatus() != ClientResponse.SUCCESS) {</span>
 <span class="nc" id="L288">                log_.fatal(String.format(&quot;Failed to call VoltDB: %s&quot;, response.getStatusString()));</span>
 <span class="nc" id="L289">                return false;</span>
             }
@@ -292,35 +292,35 @@ import java.util.concurrent.ConcurrentHashMap;
 <span class="nc" id="L292">            log_.fatal(String.format(&quot;Failed to load the resource SQL '%s' into VoltDB!&quot;, resourceName));</span>
 <span class="nc" id="L293">            log_.catching(e);</span>
 <span class="nc" id="L294">            return false;</span>
-<span class="nc" id="L295">        }</span>
-<span class="nc" id="L296">        return true;</span>
+<span class="fc" id="L295">        }</span>
+<span class="fc" id="L296">        return true;</span>
     }
 
     private boolean connectInternal(String server) {
         try {
-<span class="nc" id="L301">            client_.createConnection(server, port_);</span>
-<span class="nc" id="L302">            return true;</span>
-<span class="nc" id="L303">        } catch (IOException e) {</span>
-<span class="nc" id="L304">            return false;</span>
+<span class="fc" id="L301">            client_.createConnection(server, port_);</span>
+<span class="fc" id="L302">            return true;</span>
+<span class="fc" id="L303">        } catch (IOException e) {</span>
+<span class="fc" id="L304">            return false;</span>
         }
     }
 
     private ClientConfig initClient() {
         ClientConfig config;
-<span class="nc" id="L310">        config = new ClientConfig(properties_.getProperty(USERNAME, &quot;&quot;), properties_.getProperty(PASSWORD, &quot;&quot;), this);</span>
-<span class="nc" id="L311">        config.enableAutoTune();</span>
-<span class="nc" id="L312">        config.setReconnectOnConnectionLoss(true);</span>
-<span class="nc" id="L313">        config.setClientAffinity(true);</span>
-<span class="nc" id="L314">        config.setTopologyChangeAware(true);</span>
-<span class="nc" id="L315">        return config;</span>
+<span class="fc" id="L310">        config = new ClientConfig(properties_.getProperty(USERNAME, &quot;&quot;), properties_.getProperty(PASSWORD, &quot;&quot;), this);</span>
+<span class="fc" id="L311">        config.enableAutoTune();</span>
+<span class="fc" id="L312">        config.setReconnectOnConnectionLoss(true);</span>
+<span class="fc" id="L313">        config.setClientAffinity(true);</span>
+<span class="fc" id="L314">        config.setTopologyChangeAware(true);</span>
+<span class="fc" id="L315">        return config;</span>
     }
 
     private final Logger              log_;
     private final Properties          properties_;
-<span class="nc" id="L320">    private final Map&lt;String,Boolean&gt; connections_ = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L320">    private final Map&lt;String,Boolean&gt; connections_ = new ConcurrentHashMap&lt;&gt;();</span>
     private       Client              client_;
     private final int                 port_;
-<span class="nc" id="L323">    private       Thread              connectionThread_ = null;</span>
+<span class="fc" id="L323">    private       Thread              connectionThread_ = null;</span>
 
     public static final String USERNAME                  = &quot;username&quot;;
     public static final String PASSWORD                  = &quot;password&quot;;

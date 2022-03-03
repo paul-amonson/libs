@@ -22,8 +22,8 @@ public class Message {
      * @throws IllegalArgumentException if topic and sender are null or empty, also if targets is null or length 0.
      */
     public Message(String topic, String sender, Iterable&lt;String&gt; targets, String... messageParts) {
-<span class="nc" id="L25">        this(topic, sender, targets, Arrays.asList(messageParts));</span>
-<span class="nc" id="L26">    }</span>
+<span class="fc" id="L25">        this(topic, sender, targets, Arrays.asList(messageParts));</span>
+<span class="fc" id="L26">    }</span>
 
     /**
      * Create a Message instance with topic, sender, target(s) and optional payload parts.
@@ -37,8 +37,8 @@ public class Message {
      * @throws IllegalArgumentException if topic, sender or targets are null or empty.
      */
     public Message(String topic, String sender, String targets, String... messageParts) {
-<span class="nc" id="L40">        this(topic, sender, targets, Arrays.asList(messageParts));</span>
-<span class="nc" id="L41">    }</span>
+<span class="fc" id="L40">        this(topic, sender, targets, Arrays.asList(messageParts));</span>
+<span class="fc" id="L41">    }</span>
 
     /**
      * Create a Message instance with topic, sender, target(s) and optional payload parts.
@@ -52,14 +52,14 @@ public class Message {
      * @throws IllegalArgumentException if topic, sender or targets are null or empty.
      */
     public Message(String topic, String sender, String targets, Iterable&lt;String&gt; messageParts) {
-<span class="nc" id="L55">        this(topic, sender);</span>
-<span class="nc bnc" id="L56" title="All 4 branches missed.">        if(targets == null || targets.isBlank())</span>
-<span class="nc" id="L57">            throw new IllegalArgumentException(&quot;The 'targets' cannot be null or empty!&quot;);</span>
-<span class="nc" id="L58">        targets_.addAll(Arrays.asList(targets.split(&quot;,&quot;)));</span>
-<span class="nc bnc" id="L59" title="All 2 branches missed.">        if(messageParts != null)</span>
-<span class="nc bnc" id="L60" title="All 2 branches missed.">            for(String part: messageParts)</span>
-<span class="nc" id="L61">                frames_.add(part);</span>
-<span class="nc" id="L62">    }</span>
+<span class="fc" id="L55">        this(topic, sender);</span>
+<span class="fc bfc" id="L56" title="All 4 branches covered.">        if(targets == null || targets.isBlank())</span>
+<span class="fc" id="L57">            throw new IllegalArgumentException(&quot;The 'targets' cannot be null or empty!&quot;);</span>
+<span class="fc" id="L58">        targets_.addAll(Arrays.asList(targets.split(&quot;,&quot;)));</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if(messageParts != null)</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            for(String part: messageParts)</span>
+<span class="fc" id="L61">                frames_.add(part);</span>
+<span class="fc" id="L62">    }</span>
 
     /**
      * Create a Message instance with topic, sender, target(s) and optional payload parts.
@@ -73,17 +73,17 @@ public class Message {
      * @throws IllegalArgumentException if topic and sender are null or empty, also if targets is null or length 0.
      */
     public Message(String topic, String sender, Iterable&lt;String&gt; targets, Iterable&lt;String&gt; messageParts) {
-<span class="nc" id="L76">        this(topic, sender);</span>
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        if(targets == null)</span>
-<span class="nc" id="L78">            throw new IllegalArgumentException(&quot;The 'targets' cannot be null!&quot;);</span>
-<span class="nc bnc" id="L79" title="All 2 branches missed.">        for(String target: targets)</span>
-<span class="nc" id="L80">            targets_.add(target);</span>
-<span class="nc bnc" id="L81" title="All 2 branches missed.">        if(targets_.size() == 0)</span>
-<span class="nc" id="L82">            throw new IllegalArgumentException(&quot;The 'targets' cannot be empty!&quot;);</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">        if(messageParts != null)</span>
-<span class="nc bnc" id="L84" title="All 2 branches missed.">            for(String part: messageParts)</span>
-<span class="nc" id="L85">                frames_.add(part);</span>
-<span class="nc" id="L86">    }</span>
+<span class="fc" id="L76">        this(topic, sender);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if(targets == null)</span>
+<span class="fc" id="L78">            throw new IllegalArgumentException(&quot;The 'targets' cannot be null!&quot;);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        for(String target: targets)</span>
+<span class="fc" id="L80">            targets_.add(target);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if(targets_.size() == 0)</span>
+<span class="fc" id="L82">            throw new IllegalArgumentException(&quot;The 'targets' cannot be empty!&quot;);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if(messageParts != null)</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for(String part: messageParts)</span>
+<span class="fc" id="L85">                frames_.add(part);</span>
+<span class="fc" id="L86">    }</span>
 
     /**
      * Used by package local client to create a Message with not targets or message parts.
@@ -94,14 +94,14 @@ public class Message {
      *              in lost messages.
      * @throws IllegalArgumentException if topic and sender are null or empty, also if targets is null or length 0.
      */
-<span class="nc" id="L97">    Message(String topic, String sender) {</span>
-<span class="nc bnc" id="L98" title="All 4 branches missed.">        if(topic == null || topic.isBlank())</span>
-<span class="nc" id="L99">            throw new IllegalArgumentException(&quot;The 'topic' cannot be null or empty!&quot;);</span>
-<span class="nc bnc" id="L100" title="All 4 branches missed.">        if(sender == null || sender.isBlank())</span>
-<span class="nc" id="L101">            throw new IllegalArgumentException(&quot;The 'from' cannot be null or empty!&quot;);</span>
-<span class="nc" id="L102">        topic_ = topic;</span>
-<span class="nc" id="L103">        sender_ = sender;</span>
-<span class="nc" id="L104">    }</span>
+<span class="fc" id="L97">    Message(String topic, String sender) {</span>
+<span class="fc bfc" id="L98" title="All 4 branches covered.">        if(topic == null || topic.isBlank())</span>
+<span class="fc" id="L99">            throw new IllegalArgumentException(&quot;The 'topic' cannot be null or empty!&quot;);</span>
+<span class="fc bfc" id="L100" title="All 4 branches covered.">        if(sender == null || sender.isBlank())</span>
+<span class="fc" id="L101">            throw new IllegalArgumentException(&quot;The 'from' cannot be null or empty!&quot;);</span>
+<span class="fc" id="L102">        topic_ = topic;</span>
+<span class="fc" id="L103">        sender_ = sender;</span>
+<span class="fc" id="L104">    }</span>
 
     /**
      * Check if the hostname node passed is in the targets list of this instance.
@@ -109,7 +109,7 @@ public class Message {
      * @param node The hostname to check for inclusion in the targets list.
      * @return true indicates the passed node is present in the targets list, false otherwise.
      */
-<span class="nc" id="L112">    public boolean targetsContains(String node) { return targets_.contains(node); }</span>
+<span class="fc" id="L112">    public boolean targetsContains(String node) { return targets_.contains(node); }</span>
 
     /**
      * Get the targets list as a string.
@@ -117,10 +117,10 @@ public class Message {
      * @return The comma separated list of targets in this instance.
      */
     public String getTargetsAsString() {
-<span class="nc bnc" id="L120" title="All 2 branches missed.">        if(targets_.size() == 1)</span>
-<span class="nc" id="L121">            return targets_.iterator().next();</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if(targets_.size() == 1)</span>
+<span class="fc" id="L121">            return targets_.iterator().next();</span>
         else
-<span class="nc" id="L123">            return String.join(&quot;,&quot;, targets_);</span>
+<span class="fc" id="L123">            return String.join(&quot;,&quot;, targets_);</span>
     }
 
     /**
@@ -143,9 +143,9 @@ public class Message {
      * @param arg Any object you want to pass through into the callback.
      */
     public void forEachTargetDo(FECallback action, Object arg) {
-<span class="nc bnc" id="L146" title="All 2 branches missed.">        for(String target: targets_)</span>
-<span class="nc" id="L147">            action.call(target, arg);</span>
-<span class="nc" id="L148">    }</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        for(String target: targets_)</span>
+<span class="fc" id="L147">            action.call(target, arg);</span>
+<span class="fc" id="L148">    }</span>
 
     /**
      * Get the message payload parts as a String[].
@@ -153,8 +153,8 @@ public class Message {
      * @return The String[] of all payload message parts.
      */
     public String[] getMessageParts() {
-<span class="nc" id="L156">        String[] results = new String[frames_.size()];</span>
-<span class="nc" id="L157">        return frames_.toArray(results);</span>
+<span class="fc" id="L156">        String[] results = new String[frames_.size()];</span>
+<span class="fc" id="L157">        return frames_.toArray(results);</span>
     }
 
     /**
@@ -163,7 +163,7 @@ public class Message {
      * @return The iterable for the list of payload message parts.
      */
     public Iterable&lt;String&gt; getMessagePartsIterable() {
-<span class="nc" id="L166">        return frames_;</span>
+<span class="fc" id="L166">        return frames_;</span>
     }
 
     /**
@@ -171,56 +171,56 @@ public class Message {
      *
      * @param newTargets The collection of new targets.
      */
-<span class="nc" id="L174">    public void addTargets(Collection&lt;String&gt; newTargets) { targets_.addAll(newTargets); }</span>
+<span class="fc" id="L174">    public void addTargets(Collection&lt;String&gt; newTargets) { targets_.addAll(newTargets); }</span>
 
     /**
      * Add one or more targets to the targets list as a String[].
      *
      * @param newTargets The String[] of new targets.
      */
-<span class="nc" id="L181">    public void addTargets(String... newTargets) { Collections.addAll(targets_, newTargets); }</span>
+<span class="fc" id="L181">    public void addTargets(String... newTargets) { Collections.addAll(targets_, newTargets); }</span>
 
     /**
      * Replace targets with one or more targets to the targets list as a collection.
      *
      * @param newTargets The collection of new targets.
      */
-<span class="nc" id="L188">    public void replaceTargets(Collection&lt;String&gt; newTargets) { targets_.clear(); addTargets(newTargets); }</span>
+<span class="fc" id="L188">    public void replaceTargets(Collection&lt;String&gt; newTargets) { targets_.clear(); addTargets(newTargets); }</span>
 
     /**
      * Replace targets with one or more targets to the targets list as a String[].
      *
      * @param newTargets The String[] of new targets.
      */
-<span class="nc" id="L195">    public void replaceTargets(String... newTargets) { targets_.clear(); addTargets(newTargets); }</span>
+<span class="fc" id="L195">    public void replaceTargets(String... newTargets) { targets_.clear(); addTargets(newTargets); }</span>
 
     /**
      * Add one or more parts to the payload message parts list as a String[].
      *
      * @param newParts The String[] of new targets.
      */
-<span class="nc" id="L202">    public void addMessageParts(String... newParts) { frames_.addAll(Arrays.asList(newParts)); }</span>
+<span class="fc" id="L202">    public void addMessageParts(String... newParts) { frames_.addAll(Arrays.asList(newParts)); }</span>
 
     /**
      * Add one or more parts to the payload message parts list as a collection.
      *
      * @param newParts The collection of new targets.
      */
-<span class="nc" id="L209">    public void addMessageParts(Collection&lt;String&gt; newParts) { frames_.addAll(newParts); }</span>
+<span class="fc" id="L209">    public void addMessageParts(Collection&lt;String&gt; newParts) { frames_.addAll(newParts); }</span>
 
     /**
      * Get the message's topic.
      *
      * @return The topic passed in the ctor()
      */
-<span class="nc" id="L216">    public String getTopic() { return topic_; }</span>
+<span class="fc" id="L216">    public String getTopic() { return topic_; }</span>
 
     /**
      * Get the message's sender.
      *
      * @return The sender passed in the ctor()
      */
-<span class="nc" id="L223">    public String getSender() { return sender_; }</span>
+<span class="fc" id="L223">    public String getSender() { return sender_; }</span>
 
     /**
      * Convert the entire message to a string for display. NOTE: do not use in tight loops as this is not efficient.
@@ -228,13 +228,13 @@ public class Message {
      * @return The string representation of the message.
      */
     @Override public String toString() {
-<span class="nc" id="L231">        return String.format(&quot;Topic='%s'; Sender='%s'; Targets='%s', Frames='%s'&quot;, topic_, sender_,</span>
-<span class="nc" id="L232">                getTargetsAsString(), String.join(&quot;|&quot;, getMessageParts()));</span>
+<span class="fc" id="L231">        return String.format(&quot;Topic='%s'; Sender='%s'; Targets='%s', Frames='%s'&quot;, topic_, sender_,</span>
+<span class="fc" id="L232">                getTargetsAsString(), String.join(&quot;|&quot;, getMessageParts()));</span>
     }
 
     private final String topic_;
     private final String sender_;
-<span class="nc" id="L237">    private final Set&lt;String&gt; targets_ = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L238">    private final ArrayList&lt;String&gt; frames_ = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L237">    private final Set&lt;String&gt; targets_ = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L238">    private final ArrayList&lt;String&gt; frames_ = new ArrayList&lt;&gt;();</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

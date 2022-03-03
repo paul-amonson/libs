@@ -34,19 +34,19 @@ public class Xdg {
      * Create a non-specific version of the Xdg class that will not use a application name as a subfolder.
      */
     public Xdg() {
-<span class="nc" id="L37">        this(null);</span>
-<span class="nc" id="L38">    }</span>
+<span class="fc" id="L37">        this(null);</span>
+<span class="fc" id="L38">    }</span>
 
     /**
      * Create a specific version of the Xdg class that will use a application name as a subfolder.
      *
      * @param applicationName The name to use as an application subfolder to the base XDG specification defined folder.
      */
-<span class="nc" id="L45">    public Xdg(String applicationName) {</span>
-<span class="nc bnc" id="L46" title="All 4 branches missed.">        if(applicationName != null &amp;&amp; !applicationName.trim().equals(&quot;&quot;))</span>
-<span class="nc" id="L47">            applicationName_ = applicationName.trim();</span>
-<span class="nc" id="L48">        initialize();</span>
-<span class="nc" id="L49">    }</span>
+<span class="fc" id="L45">    public Xdg(String applicationName) {</span>
+<span class="fc bfc" id="L46" title="All 4 branches covered.">        if(applicationName != null &amp;&amp; !applicationName.trim().equals(&quot;&quot;))</span>
+<span class="fc" id="L47">            applicationName_ = applicationName.trim();</span>
+<span class="fc" id="L48">        initialize();</span>
+<span class="fc" id="L49">    }</span>
 
     /**
      * Open a XDG data input stream if found in the XDG_DATA_DIRS path. The XDG_DATA_HOME is the first priority if
@@ -57,11 +57,11 @@ public class Xdg {
      * @throws IOException When the file cannot be opened or is missing.
      */
     public InputStream openDataInputStream(String fileNameOnly) throws IOException {
-<span class="nc" id="L60">        File fullPath = findDataFile(fileNameOnly);</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">        if(fullPath == null)</span>
-<span class="nc" id="L62">            throw new FileNotFoundException(String.format(&quot;The data file %s was not found in the XDG_DATA_DIRS!&quot;,</span>
+<span class="fc" id="L60">        File fullPath = findDataFile(fileNameOnly);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L62">            throw new FileNotFoundException(String.format(&quot;The data file %s was not found in the XDG_DATA_DIRS!&quot;,</span>
                     fileNameOnly));
-<span class="nc" id="L64">        return new FileInputStream(fullPath);</span>
+<span class="fc" id="L64">        return new FileInputStream(fullPath);</span>
     }
 
     /**
@@ -73,11 +73,11 @@ public class Xdg {
      * @throws IOException When the file cannot be opened or is missing.
      */
     public Reader openDataReader(String fileNameOnly) throws IOException {
-<span class="nc" id="L76">        File fullPath = findDataFile(fileNameOnly);</span>
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        if(fullPath == null)</span>
-<span class="nc" id="L78">            throw new FileNotFoundException(String.format(&quot;The data file %s was not found in the XDG_DATA_DIRS!&quot;,</span>
+<span class="fc" id="L76">        File fullPath = findDataFile(fileNameOnly);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L78">            throw new FileNotFoundException(String.format(&quot;The data file %s was not found in the XDG_DATA_DIRS!&quot;,</span>
                     fileNameOnly));
-<span class="nc" id="L80">        return new FileReader(fullPath);</span>
+<span class="fc" id="L80">        return new FileReader(fullPath);</span>
     }
 
     /**
@@ -88,8 +88,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public OutputStream openDataOutputStream(String fileNameOnly) throws IOException {
-<span class="nc" id="L91">        File fullPath = Paths.get(dataHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L92">        return new FileOutputStream(fullPath);</span>
+<span class="fc" id="L91">        File fullPath = Paths.get(dataHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L92">        return new FileOutputStream(fullPath);</span>
     }
 
     /**
@@ -100,8 +100,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public Writer openDataWriter(String fileNameOnly) throws IOException {
-<span class="nc" id="L103">        File fullPath = Paths.get(dataHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L104">        return new FileWriter(fullPath);</span>
+<span class="fc" id="L103">        File fullPath = Paths.get(dataHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L104">        return new FileWriter(fullPath);</span>
     }
 
     /**
@@ -113,11 +113,11 @@ public class Xdg {
      * @throws IOException When the file cannot be opened or is missing.
      */
     public InputStream openConfigInputStream(String fileNameOnly) throws IOException {
-<span class="nc" id="L116">        File fullPath = findConfigFile(fileNameOnly);</span>
-<span class="nc bnc" id="L117" title="All 2 branches missed.">        if(fullPath == null)</span>
-<span class="nc" id="L118">            throw new FileNotFoundException(String.format(&quot;The config file %s was not found in the XDG_CONFIG_DIRS!&quot;,</span>
+<span class="fc" id="L116">        File fullPath = findConfigFile(fileNameOnly);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L118">            throw new FileNotFoundException(String.format(&quot;The config file %s was not found in the XDG_CONFIG_DIRS!&quot;,</span>
                     fileNameOnly));
-<span class="nc" id="L120">        return new FileInputStream(fullPath);</span>
+<span class="fc" id="L120">        return new FileInputStream(fullPath);</span>
     }
 
     /**
@@ -129,11 +129,11 @@ public class Xdg {
      * @throws IOException When the file cannot be opened or is missing.
      */
     public Reader openConfigReader(String fileNameOnly) throws IOException {
-<span class="nc" id="L132">        File fullPath = findConfigFile(fileNameOnly);</span>
-<span class="nc bnc" id="L133" title="All 2 branches missed.">        if(fullPath == null)</span>
-<span class="nc" id="L134">            throw new FileNotFoundException(String.format(&quot;The config file %s was not found in the XDG_CONFIG_DIRS!&quot;,</span>
+<span class="fc" id="L132">        File fullPath = findConfigFile(fileNameOnly);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if(fullPath == null)</span>
+<span class="fc" id="L134">            throw new FileNotFoundException(String.format(&quot;The config file %s was not found in the XDG_CONFIG_DIRS!&quot;,</span>
                     fileNameOnly));
-<span class="nc" id="L136">        return new FileReader(fullPath);</span>
+<span class="fc" id="L136">        return new FileReader(fullPath);</span>
     }
 
     /**
@@ -144,8 +144,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public OutputStream openConfigOutputStream(String fileNameOnly) throws IOException {
-<span class="nc" id="L147">        File fullPath = Paths.get(configHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L148">        return new FileOutputStream(fullPath);</span>
+<span class="fc" id="L147">        File fullPath = Paths.get(configHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L148">        return new FileOutputStream(fullPath);</span>
     }
 
     /**
@@ -156,8 +156,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public Writer openConfigWriter(String fileNameOnly) throws IOException {
-<span class="nc" id="L159">        File fullPath = Paths.get(configHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L160">        return new FileWriter(fullPath);</span>
+<span class="fc" id="L159">        File fullPath = Paths.get(configHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L160">        return new FileWriter(fullPath);</span>
     }
 
     /**
@@ -168,8 +168,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public InputStream openCacheInputStream(String fileNameOnly) throws IOException {
-<span class="nc" id="L171">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L172">        return new FileInputStream(fullPath);</span>
+<span class="fc" id="L171">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L172">        return new FileInputStream(fullPath);</span>
     }
 
     /**
@@ -180,8 +180,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public Reader openCacheReader(String fileNameOnly) throws IOException {
-<span class="nc" id="L183">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L184">        return new FileReader(fullPath);</span>
+<span class="fc" id="L183">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L184">        return new FileReader(fullPath);</span>
     }
 
     /**
@@ -192,8 +192,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public OutputStream openCacheOutputStream(String fileNameOnly) throws IOException {
-<span class="nc" id="L195">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L196">        return new FileOutputStream(fullPath);</span>
+<span class="fc" id="L195">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L196">        return new FileOutputStream(fullPath);</span>
     }
 
     /**
@@ -204,8 +204,8 @@ public class Xdg {
      * @throws IOException When the file cannot be opened.
      */
     public Writer openCacheWriter(String fileNameOnly) throws IOException {
-<span class="nc" id="L207">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
-<span class="nc" id="L208">        return new FileWriter(fullPath);</span>
+<span class="fc" id="L207">        File fullPath = Paths.get(cacheHome_, fileNameOnly).toFile();</span>
+<span class="fc" id="L208">        return new FileWriter(fullPath);</span>
     }
 
     /**
@@ -215,7 +215,7 @@ public class Xdg {
      * @return Either the File object if it exists, otherwise null is returned.
      */
     public File findDataFile(String fileNameOnly) {
-<span class="nc" id="L218">        return findFileInPath(fileNameOnly, dataDirs_);</span>
+<span class="fc" id="L218">        return findFileInPath(fileNameOnly, dataDirs_);</span>
     }
 
     /**
@@ -225,7 +225,7 @@ public class Xdg {
      * @return Either the File object if it exists, otherwise null is returned.
      */
     public File findConfigFile(String fileNameOnly) {
-<span class="nc" id="L228">        return findFileInPath(fileNameOnly, configDirs_);</span>
+<span class="fc" id="L228">        return findFileInPath(fileNameOnly, configDirs_);</span>
     }
 
     /**
@@ -234,7 +234,7 @@ public class Xdg {
      * @return The folder name.
      */
     public File getConfigHome() {
-<span class="nc" id="L237">        return new File(configHome_);</span>
+<span class="fc" id="L237">        return new File(configHome_);</span>
     }
 
     /**
@@ -243,7 +243,7 @@ public class Xdg {
      * @return The folder name.
      */
     public File getDataHome() {
-<span class="nc" id="L246">        return new File(dataHome_);</span>
+<span class="fc" id="L246">        return new File(dataHome_);</span>
     }
 
     /**
@@ -251,108 +251,108 @@ public class Xdg {
      *
      * @return The folder name.
      */
-<span class="nc" id="L254">    public File getCacheHome() { return new File(cacheHome_); }</span>
+<span class="fc" id="L254">    public File getCacheHome() { return new File(cacheHome_); }</span>
 
     private File findFileInPath(String fileNameOnly, List&lt;String&gt; path) {
-<span class="nc bnc" id="L257" title="All 2 branches missed.">        for(String parent: path) {</span>
-<span class="nc" id="L258">            File tryFile = Paths.get(parent, fileNameOnly).toFile();</span>
-<span class="nc bnc" id="L259" title="All 2 branches missed.">            if(tryFile.exists())</span>
-<span class="nc" id="L260">                return tryFile;</span>
-<span class="nc" id="L261">        }</span>
-<span class="nc" id="L262">        return null;</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        for(String parent: path) {</span>
+<span class="fc" id="L258">            File tryFile = Paths.get(parent, fileNameOnly).toFile();</span>
+<span class="fc bfc" id="L259" title="All 2 branches covered.">            if(tryFile.exists())</span>
+<span class="fc" id="L260">                return tryFile;</span>
+<span class="fc" id="L261">        }</span>
+<span class="fc" id="L262">        return null;</span>
     }
 
     private void initialize() {
-<span class="nc" id="L266">        setDataHome();</span>
-<span class="nc" id="L267">        setConfigHome();</span>
-<span class="nc" id="L268">        setCacheHome();</span>
-<span class="nc" id="L269">        setDataDirs();</span>
-<span class="nc" id="L270">        setConfigDirs();</span>
-<span class="nc" id="L271">    }</span>
+<span class="fc" id="L266">        setDataHome();</span>
+<span class="fc" id="L267">        setConfigHome();</span>
+<span class="fc" id="L268">        setCacheHome();</span>
+<span class="fc" id="L269">        setDataDirs();</span>
+<span class="fc" id="L270">        setConfigDirs();</span>
+<span class="fc" id="L271">    }</span>
 
     private void setDataDirs() {
-<span class="nc bnc" id="L274" title="All 2 branches missed.">        String candidate = (applicationName_ != null)?String.format(&quot;/usr/local/share/%s:/usr/share/%s&quot;,</span>
-<span class="nc" id="L275">                applicationName_, applicationName_):&quot;/usr/local/share:/usr/share&quot;;</span>
-<span class="nc" id="L276">        candidate = getPropertyOrDefault(&quot;xdg.data.dirs&quot;, candidate);</span>
-<span class="nc" id="L277">        candidate = getEnvironmentOrDefault(&quot;XDG_DATA_DIRS&quot;, candidate);</span>
-<span class="nc" id="L278">        candidate = String.format(&quot;%s:%s&quot;, dataHome_, candidate);</span>
-<span class="nc" id="L279">        dataDirs_ = Arrays.asList(candidate.split(&quot;:&quot;));</span>
-<span class="nc" id="L280">    }</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        String candidate = (applicationName_ != null)?String.format(&quot;/usr/local/share/%s:/usr/share/%s&quot;,</span>
+<span class="fc" id="L275">                applicationName_, applicationName_):&quot;/usr/local/share:/usr/share&quot;;</span>
+<span class="fc" id="L276">        candidate = getPropertyOrDefault(&quot;xdg.data.dirs&quot;, candidate);</span>
+<span class="fc" id="L277">        candidate = getEnvironmentOrDefault(&quot;XDG_DATA_DIRS&quot;, candidate);</span>
+<span class="fc" id="L278">        candidate = String.format(&quot;%s:%s&quot;, dataHome_, candidate);</span>
+<span class="fc" id="L279">        dataDirs_ = Arrays.asList(candidate.split(&quot;:&quot;));</span>
+<span class="fc" id="L280">    }</span>
 
     private void setConfigDirs() {
-<span class="nc bnc" id="L283" title="All 2 branches missed.">        String candidate = (applicationName_ != null)?String.format(&quot;/etc/xdg/%s:/etc/%s.d:/etc&quot;,</span>
-<span class="nc" id="L284">                applicationName_, applicationName_):&quot;/etc/xdg:/etc&quot;;</span>
-<span class="nc" id="L285">        candidate = getPropertyOrDefault(&quot;xdg.config.dirs&quot;, candidate);</span>
-<span class="nc" id="L286">        candidate = getEnvironmentOrDefault(&quot;XDG_CONFIG_DIRS&quot;, candidate);</span>
-<span class="nc" id="L287">        candidate = String.format(&quot;%s:%s&quot;, configHome_, candidate);</span>
-<span class="nc" id="L288">        configDirs_ = Arrays.asList(candidate.split(&quot;:&quot;));</span>
-<span class="nc" id="L289">    }</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">        String candidate = (applicationName_ != null)?String.format(&quot;/etc/xdg/%s:/etc/%s.d:/etc&quot;,</span>
+<span class="fc" id="L284">                applicationName_, applicationName_):&quot;/etc/xdg:/etc&quot;;</span>
+<span class="fc" id="L285">        candidate = getPropertyOrDefault(&quot;xdg.config.dirs&quot;, candidate);</span>
+<span class="fc" id="L286">        candidate = getEnvironmentOrDefault(&quot;XDG_CONFIG_DIRS&quot;, candidate);</span>
+<span class="fc" id="L287">        candidate = String.format(&quot;%s:%s&quot;, configHome_, candidate);</span>
+<span class="fc" id="L288">        configDirs_ = Arrays.asList(candidate.split(&quot;:&quot;));</span>
+<span class="fc" id="L289">    }</span>
 
     private void setDataHome() {
-<span class="nc" id="L292">        String candidate = Paths.get(home_, &quot;.local&quot;, &quot;share&quot;).toString();</span>
-<span class="nc" id="L293">        candidate = addApplicationName(candidate);</span>
-<span class="nc" id="L294">        candidate = getPropertyOrDefault(&quot;xdg.data.home&quot;, candidate);</span>
-<span class="nc" id="L295">        candidate = getEnvironmentOrDefault(&quot;XDG_DATA_HOME&quot;, candidate);</span>
-<span class="nc" id="L296">        mkdirs(candidate);</span>
-<span class="nc" id="L297">        dataHome_ = candidate;</span>
-<span class="nc" id="L298">    }</span>
+<span class="fc" id="L292">        String candidate = Paths.get(home_, &quot;.local&quot;, &quot;share&quot;).toString();</span>
+<span class="fc" id="L293">        candidate = addApplicationName(candidate);</span>
+<span class="fc" id="L294">        candidate = getPropertyOrDefault(&quot;xdg.data.home&quot;, candidate);</span>
+<span class="fc" id="L295">        candidate = getEnvironmentOrDefault(&quot;XDG_DATA_HOME&quot;, candidate);</span>
+<span class="fc" id="L296">        mkdirs(candidate);</span>
+<span class="fc" id="L297">        dataHome_ = candidate;</span>
+<span class="fc" id="L298">    }</span>
 
     private void setConfigHome() {
-<span class="nc" id="L301">        String candidate = Paths.get(home_, &quot;.config&quot;).toString();</span>
-<span class="nc" id="L302">        candidate = addApplicationName(candidate);</span>
-<span class="nc" id="L303">        candidate = getPropertyOrDefault(&quot;xdg.config.home&quot;, candidate);</span>
-<span class="nc" id="L304">        candidate = getEnvironmentOrDefault(&quot;XDG_CONFIG_HOME&quot;, candidate);</span>
-<span class="nc" id="L305">        mkdirs(candidate);</span>
-<span class="nc" id="L306">        configHome_ = candidate;</span>
-<span class="nc" id="L307">    }</span>
+<span class="fc" id="L301">        String candidate = Paths.get(home_, &quot;.config&quot;).toString();</span>
+<span class="fc" id="L302">        candidate = addApplicationName(candidate);</span>
+<span class="fc" id="L303">        candidate = getPropertyOrDefault(&quot;xdg.config.home&quot;, candidate);</span>
+<span class="fc" id="L304">        candidate = getEnvironmentOrDefault(&quot;XDG_CONFIG_HOME&quot;, candidate);</span>
+<span class="fc" id="L305">        mkdirs(candidate);</span>
+<span class="fc" id="L306">        configHome_ = candidate;</span>
+<span class="fc" id="L307">    }</span>
 
     private void setCacheHome() {
-<span class="nc" id="L310">        String candidate = Paths.get(home_, &quot;.cache&quot;).toString();</span>
-<span class="nc" id="L311">        candidate = addApplicationName(candidate);</span>
-<span class="nc" id="L312">        candidate = getPropertyOrDefault(&quot;xdg.cache.home&quot;, candidate);</span>
-<span class="nc" id="L313">        candidate = getEnvironmentOrDefault(&quot;XDG_CACHE_HOME&quot;, candidate);</span>
-<span class="nc" id="L314">        mkdirs(candidate);</span>
-<span class="nc" id="L315">        cacheHome_ = candidate;</span>
-<span class="nc" id="L316">    }</span>
+<span class="fc" id="L310">        String candidate = Paths.get(home_, &quot;.cache&quot;).toString();</span>
+<span class="fc" id="L311">        candidate = addApplicationName(candidate);</span>
+<span class="fc" id="L312">        candidate = getPropertyOrDefault(&quot;xdg.cache.home&quot;, candidate);</span>
+<span class="fc" id="L313">        candidate = getEnvironmentOrDefault(&quot;XDG_CACHE_HOME&quot;, candidate);</span>
+<span class="fc" id="L314">        mkdirs(candidate);</span>
+<span class="fc" id="L315">        cacheHome_ = candidate;</span>
+<span class="fc" id="L316">    }</span>
 
     private String addApplicationName(String path) {
-<span class="nc bnc" id="L319" title="All 2 branches missed.">        if(applicationName_ != null)</span>
-<span class="nc" id="L320">            return Paths.get(path, applicationName_).toString();</span>
-<span class="nc" id="L321">        return path;</span>
+<span class="fc bfc" id="L319" title="All 2 branches covered.">        if(applicationName_ != null)</span>
+<span class="fc" id="L320">            return Paths.get(path, applicationName_).toString();</span>
+<span class="fc" id="L321">        return path;</span>
     }
 
     private String getPropertyOrDefault(String propertyName, String defaultValue) {
-<span class="nc" id="L325">        String property = System.getProperty(propertyName);</span>
-<span class="nc bnc" id="L326" title="All 2 branches missed.">        if(property == null) return defaultValue;</span>
-<span class="nc bnc" id="L327" title="All 2 branches missed.">        if(property.trim().equals(&quot;&quot;)) return defaultValue;</span>
-<span class="nc" id="L328">        return property.trim();</span>
+<span class="fc" id="L325">        String property = System.getProperty(propertyName);</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">        if(property == null) return defaultValue;</span>
+<span class="pc bpc" id="L327" title="1 of 2 branches missed.">        if(property.trim().equals(&quot;&quot;)) return defaultValue;</span>
+<span class="fc" id="L328">        return property.trim();</span>
     }
 
     private String getEnvironmentOrDefault(String envName, String defaultValue) {
-<span class="nc" id="L332">        String env = environment_.get(envName);</span>
-<span class="nc bnc" id="L333" title="All 2 branches missed.">        if(env == null) return defaultValue;</span>
-<span class="nc bnc" id="L334" title="All 2 branches missed.">        if(env.trim().equals(&quot;&quot;)) return defaultValue;</span>
-<span class="nc" id="L335">        return env.trim();</span>
+<span class="fc" id="L332">        String env = environment_.get(envName);</span>
+<span class="fc bfc" id="L333" title="All 2 branches covered.">        if(env == null) return defaultValue;</span>
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">        if(env.trim().equals(&quot;&quot;)) return defaultValue;</span>
+<span class="fc" id="L335">        return env.trim();</span>
     }
 
     private void mkdirs(String folder) {
-<span class="nc bnc" id="L339" title="All 2 branches missed.">        if(!isValidFolder(folder)) {</span>
-<span class="nc" id="L340">            File dir = new File(folder);</span>
-<span class="nc" id="L341">            dir.mkdirs();</span>
+<span class="fc bfc" id="L339" title="All 2 branches covered.">        if(!isValidFolder(folder)) {</span>
+<span class="fc" id="L340">            File dir = new File(folder);</span>
+<span class="fc" id="L341">            dir.mkdirs();</span>
         }
-<span class="nc" id="L343">    }</span>
+<span class="fc" id="L343">    }</span>
 
     private boolean isValidFolder(String folder) {
-<span class="nc" id="L346">        return (new File(folder)).isDirectory();</span>
+<span class="fc" id="L346">        return (new File(folder)).isDirectory();</span>
     }
 
-<span class="nc" id="L349">    private String applicationName_ = null;</span>
+<span class="fc" id="L349">    private String applicationName_ = null;</span>
     private String dataHome_;
     private String configHome_;
-<span class="nc" id="L352">    private List&lt;String&gt; dataDirs_ = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L353">    private List&lt;String&gt; configDirs_ = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L352">    private List&lt;String&gt; dataDirs_ = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L353">    private List&lt;String&gt; configDirs_ = new ArrayList&lt;&gt;();</span>
     private String cacheHome_;
-<span class="nc" id="L355">    static String home_ = System.getProperty(&quot;user.home&quot;);</span>
-<span class="nc" id="L356">    static Map&lt;String, String&gt; environment_ = new HashMap&lt;&gt;(System.getenv());</span>
+<span class="fc" id="L355">    static String home_ = System.getProperty(&quot;user.home&quot;);</span>
+<span class="fc" id="L356">    static Map&lt;String, String&gt; environment_ = new HashMap&lt;&gt;(System.getenv());</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

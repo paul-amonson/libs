@@ -22,17 +22,17 @@ class YamlStore extends PropStore {
      *              This may be null.
      */
     public YamlStore(Properties config) {
-<span class="nc" id="L25">        super(config);</span>
-<span class="nc" id="L26">        int indent = 2;</span>
-<span class="nc bnc" id="L27" title="All 2 branches missed.">        if(config != null)</span>
-<span class="nc" id="L28">            indent = Integer.parseInt(config.getProperty(&quot;com.amonson.prop_store.indent&quot;, &quot;2&quot;));</span>
-<span class="nc" id="L29">        DumperOptions options = new DumperOptions();</span>
-<span class="nc" id="L30">        options.setIndent(indent);</span>
-<span class="nc" id="L31">        options.setPrettyFlow(true);</span>
-<span class="nc" id="L32">        options.setExplicitStart(true);</span>
-<span class="nc" id="L33">        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);</span>
-<span class="nc" id="L34">        store_ = new Yaml(options);</span>
-<span class="nc" id="L35">    }</span>
+<span class="fc" id="L25">        super(config);</span>
+<span class="fc" id="L26">        int indent = 2;</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if(config != null)</span>
+<span class="fc" id="L28">            indent = Integer.parseInt(config.getProperty(&quot;com.amonson.prop_store.indent&quot;, &quot;2&quot;));</span>
+<span class="fc" id="L29">        DumperOptions options = new DumperOptions();</span>
+<span class="fc" id="L30">        options.setIndent(indent);</span>
+<span class="fc" id="L31">        options.setPrettyFlow(true);</span>
+<span class="fc" id="L32">        options.setExplicitStart(true);</span>
+<span class="fc" id="L33">        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);</span>
+<span class="fc" id="L34">        store_ = new Yaml(options);</span>
+<span class="fc" id="L35">    }</span>
 
     /**
      * Convert the PropMap to the text Store format.
@@ -42,7 +42,7 @@ class YamlStore extends PropStore {
      */
     @Override
     public String toString(PropMap map) {
-<span class="nc" id="L45">        return store_.dump(map);</span>
+<span class="fc" id="L45">        return store_.dump(map);</span>
     }
 
     /**
@@ -53,7 +53,7 @@ class YamlStore extends PropStore {
      */
     @Override
     public String toString(PropList list) {
-<span class="nc" id="L56">        return store_.dump(list);</span>
+<span class="fc" id="L56">        return store_.dump(list);</span>
     }
 
     /**
@@ -65,7 +65,7 @@ class YamlStore extends PropStore {
      */
     @Override
     public PropMap fromStringToMap(String storeText) throws PropStoreException {
-<span class="nc" id="L68">        return parseMap(store_.load(storeText));</span>
+<span class="fc" id="L68">        return parseMap(store_.load(storeText));</span>
     }
 
     /**
@@ -77,35 +77,35 @@ class YamlStore extends PropStore {
      */
     @Override
     public PropList fromStringToList(String storeText) throws PropStoreException {
-<span class="nc" id="L80">        return parseArray(store_.load(storeText));</span>
+<span class="fc" id="L80">        return parseArray(store_.load(storeText));</span>
     }
 
     @SuppressWarnings(&quot;unchecked&quot;)
     private PropMap parseMap(Map&lt;? extends String, ?&gt; map) {
-<span class="nc" id="L85">        PropMap result = new PropMap();</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">        for(String key: map.keySet()) {</span>
-<span class="nc bnc" id="L87" title="All 2 branches missed.">            if(map.get(key) instanceof Map)</span>
-<span class="nc" id="L88">                result.put(key, parseMap((Map&lt;String,Object&gt;)map.get(key)));</span>
-<span class="nc bnc" id="L89" title="All 2 branches missed.">            else if(map.get(key) instanceof List)</span>
-<span class="nc" id="L90">                result.put(key, parseArray((List&lt;Object&gt;)map.get(key)));</span>
+<span class="fc" id="L85">        PropMap result = new PropMap();</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        for(String key: map.keySet()) {</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if(map.get(key) instanceof Map)</span>
+<span class="fc" id="L88">                result.put(key, parseMap((Map&lt;String,Object&gt;)map.get(key)));</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            else if(map.get(key) instanceof List)</span>
+<span class="fc" id="L90">                result.put(key, parseArray((List&lt;Object&gt;)map.get(key)));</span>
             else
-<span class="nc" id="L92">                result.put(key, map.get(key));</span>
-<span class="nc" id="L93">        }</span>
-<span class="nc" id="L94">        return result;</span>
+<span class="fc" id="L92">                result.put(key, map.get(key));</span>
+<span class="fc" id="L93">        }</span>
+<span class="fc" id="L94">        return result;</span>
     }
 
     @SuppressWarnings(&quot;unchecked&quot;)
     private PropList parseArray(List&lt;?&gt; array) {
-<span class="nc" id="L99">        PropList result = new PropList();</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">        for (Object anArray : array) {</span>
-<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (anArray instanceof Map)</span>
-<span class="nc" id="L102">                result.add(parseMap((Map&lt;String, Object&gt;)anArray));</span>
-<span class="nc bnc" id="L103" title="All 2 branches missed.">            else if (anArray instanceof List)</span>
-<span class="nc" id="L104">                result.add(parseArray((List&lt;Object&gt;)anArray));</span>
+<span class="fc" id="L99">        PropList result = new PropList();</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        for (Object anArray : array) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            if (anArray instanceof Map)</span>
+<span class="fc" id="L102">                result.add(parseMap((Map&lt;String, Object&gt;)anArray));</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            else if (anArray instanceof List)</span>
+<span class="fc" id="L104">                result.add(parseArray((List&lt;Object&gt;)anArray));</span>
             else
-<span class="nc" id="L106">                result.add(anArray);</span>
-<span class="nc" id="L107">        }</span>
-<span class="nc" id="L108">        return result;</span>
+<span class="fc" id="L106">                result.add(anArray);</span>
+<span class="fc" id="L107">        }</span>
+<span class="fc" id="L108">        return result;</span>
     }
 
     private Yaml store_;
