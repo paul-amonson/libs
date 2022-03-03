@@ -86,9 +86,6 @@ apply plugin: 'java-library'
 apply plugin: 'jacoco'
 apply plugin: 'groovy'
 
-targetCompatibility = 17
-sourceCompatibility = 17
-
 repositories {
     mavenCentral()
 }
